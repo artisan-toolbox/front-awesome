@@ -11,3 +11,4 @@ composer.lock
 .vscode
 node_modules/
 /config/maintainer_secrets.php
+config/maintainer_secrets.php

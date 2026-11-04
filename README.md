@@ -12,13 +12,13 @@ npm install --install-links ./vendor/artisan-toolbox/front-awesome ./vendor/arti
 After configuring Vite and loading the package styles, import a component in a Vue page.
 
 ```vue
-<script setup>
-import Button from '@artisan-toolbox/front-awesome/components/Button.vue'
-</script>
-
 <template>
   <Button variant="brand">Save changes</Button>
 </template>
+
+<script setup lang="ts">
+import Button from '@artisan-toolbox/front-awesome/components/Button.vue';
+</script>
 ```
 
 The initial `1.x` line targets PHP 8.5, Laravel 13, Vue 3.5, Inertia 3, and Tailwind CSS 4. The first release is in development.

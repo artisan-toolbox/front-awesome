@@ -11,6 +11,19 @@ npm ci
 
 Composer installs the Mosaicast sources and its JavaScript distribution before npm resolves the local dependency.
 
+## Use and update the agent skills
+
+- `vue-best-practices` and `vue-testing-best-practices` are snapshots of [Vue AI Skills](https://github.com/vuejs-ai/skills/tree/198f0cd8f7f9c0a3d9b566ccc16de6677519ee78).
+- `vueuse-functions` is a snapshot for VueUse 14.4.0, the version in the npm lockfile. [VueUse Skills revision](https://github.com/vueuse/skills/tree/5706f866118f04a6238bf77368dafa4a2c34b96b)
+- `inertia-vue-development` points to the Boost skill template in the installed Inertia Vue adapter. [Inertia Vue skill source](https://github.com/inertiajs/inertia/tree/3.x/packages/vue3/resources/boost/skills/inertia-vue-development)
+- `webawesome` and `webawesome-design` link to the skills in the installed Web Awesome package. [Web Awesome agent skills](https://webawesome.com/docs/ai/agent-skills)
+
+When updating a snapshot, replace its directory under `.agents/skills/` with the complete upstream skill, retain its license, and update the revision above. When updating VueUse, select the revision that matches the version in the lockfile.
+
+## Write Vue components
+
+Use the Composition API with `<script setup lang="ts">` in every Vue single-file component. Put `<template>` first and the TypeScript setup block below it.
+
 ## Validate changes
 
 ```bash

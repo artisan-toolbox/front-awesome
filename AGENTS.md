@@ -26,11 +26,20 @@ This repository is a Laravel package. Keep the package focused, idiomatic, and e
 - `package-release`: use when preparing changelog, release notes, tags, or GitHub release workflow changes.
 - `package-compatibility`: use when reviewing code, dependencies, or CI against the PHP and Laravel support matrix.
 - `package-generate-skill`: use when updating the bundled Boost skill from the package implementation, README, and examples.
+- `vue-best-practices`: use for Vue components, composables, and reactivity.
+- `vue-testing-best-practices`: use for Vue component and composable tests. Follow this repository's existing test setup.
+- `inertia-vue-development`: use for Inertia 3 forms, navigation, props, and SSR. Read the reference supplied by the installed Vue adapter.
+- `vueuse-functions`: use to select VueUse composables. Check availability in the installed VueUse version.
+- `webawesome`: use for Web Awesome component selection, APIs, events, slots, and Vue integration. Read `.agents/skills/webawesome/SKILL.md`.
+- `webawesome-design`: use for layouts, themes, design tokens, and UI composition with Web Awesome. Read `.agents/skills/webawesome-design/SKILL.md`.
+
+The Web Awesome and Inertia references come from the versions installed by `npm ci`. On a fresh checkout, run `composer install` before `npm ci`. Follow this repository's Vue and Vite conventions when applying the upstream examples.
 
 ## Frontend
 
 - Front Awesome provides reusable Vue components and Laravel frontend integrations that complement Inertia. Use Web Awesome for custom elements, Tailwind CSS for utilities, and VueUse for Vue composables.
 - Keep Vue components and styles in `resources/js`. Export supported source paths in `package.json` and let the host application's Vite build compile them.
+- Write Vue single-file components with the Composition API and `<script setup lang="ts">`. Put the `<template>` block first and the TypeScript setup block below it.
 - Install Artisan Toolbox JavaScript packages from the corresponding Composer package under `vendor/artisan-toolbox`. Run Composer before npm in development and CI.
 - Keep realtime transport in Mosaicast. Build future Front Awesome integrations on the Mosaicast client and Laravel package.
 - Run `npm run check`, `npm test`, and `npm run build` for frontend changes. The build exercises the Vite consumer fixture.
