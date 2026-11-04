@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Front Awesome icon</title>
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="#20252B"/>
+  <rect x="2.75" y="2.75" width="58.5" height="58.5" rx="13.25" fill="none" stroke="#FFFFFF" stroke-opacity=".16" stroke-width="1.5"/>
+  <path d="M13 18a3 3 0 0 1 3-3h28a2 2 0 0 1 1.4 3.4l-29 29A2 2 0 0 1 13 46Zm7 4v13l13-13Z" fill="#FFF7EF" fill-rule="evenodd"/>
+  <path d="M13 25h3m-3 6h4m-4 6h3m7-22v3m6-3v3" fill="none" stroke="#20252B" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M38 12v6m-1 7-6 18-4 7m12-25 8 17 4 8m-17-13h11" fill="none" stroke="#20252B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M38 12v6" fill="none" stroke="#FF5947" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="m34.5 22.5 5 1.5-6.5 19-6 8 1.5-9Zm3 1.5 4.5-2 8.5 20.5L51 51l-5-7Z" fill="#FF5947" stroke-linejoin="round"/>
+  <path d="M33 37h13" fill="none" stroke="#FF9A86" stroke-width="2" stroke-linecap="round"/>
+  <rect x="37.5" y="34.5" width="4" height="5" rx="1" fill="#FF5947"/>
+  <circle cx="38" cy="21.5" r="4.75" fill="#FF5947"/>
+  <circle cx="38" cy="21.5" r="1.5" fill="#20252B"/>
+  <path d="M51 20c.4 2.2 1.1 2.9 3.3 3.3-2.2.4-2.9 1.1-3.3 3.3-.4-2.2-1.1-2.9-3.3-3.3 2.2-.4 2.9-1.1 3.3-3.3Z" fill="#FFF7EF"/>
+  <path d="M21 48c.2 1.4.8 2 2.2 2.2-1.4.2-2 .8-2.2 2.2-.2-1.4-.8-2-2.2-2.2 1.4-.2 2-.8 2.2-2.2Z" fill="#FFF7EF" opacity=".7"/>
+  <g fill="#FFF7EF" opacity=".55">
+    <circle cx="54" cy="30" r="1"/>
+    <circle cx="16" cy="53" r="1"/>
+  </g>
+</svg>
