@@ -2,10 +2,12 @@ import { resolve } from 'node:path';
 import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
 import { defineConfig } from 'vite-plus';
+import { frontAwesome } from '@artisan-toolbox/front-awesome/vite';
 
 export default defineConfig({
     root: 'tests/frontend',
     plugins: [
+        frontAwesome(),
         tailwindcss(),
         vue({
             template: {
@@ -42,6 +44,12 @@ export default defineConfig({
         },
     },
     test: {
-        include: ['**/*.test.ts'],
+        root: import.meta.dirname,
+        include: ['tests/frontend/**/*.test.ts'],
+        coverage: {
+            include: ['resources/js/**/*.{mjs,ts,vue}'],
+            exclude: ['resources/js/**/*.d.ts'],
+            reporter: ['text'],
+        },
     },
 });

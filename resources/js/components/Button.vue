@@ -6,6 +6,6 @@
 import { onMounted } from 'vue';
 
 onMounted(async () => {
-    await import('@awesome.me/webawesome/dist/components/button/button.js');
+    await import('#front-awesome-webawesome/components/button/button.js');
 });
 </script>

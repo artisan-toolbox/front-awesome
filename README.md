@@ -22,6 +22,8 @@
 
 From a Laravel application with Inertia and Vue, run Composer before npm.
 
+Declare `@artisan-toolbox/mosaicast` in your application's `package.json` to satisfy Front Awesome's JavaScript peer dependency. The npm command below adds both frontend packages from Composer's vendor directory.
+
 ```bash
 composer require artisan-toolbox/front-awesome
 npm install --install-links ./vendor/artisan-toolbox/front-awesome ./vendor/artisan-toolbox/mosaicast

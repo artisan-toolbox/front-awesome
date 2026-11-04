@@ -19,5 +19,6 @@
 /rector.php         export-ignore
 /tsconfig.json      export-ignore
 /vite.config.ts     export-ignore
-/config             export-ignore
+/config/maintainer.php         export-ignore
+/config/maintainer_secrets.php export-ignore
 /.npmrc             export-ignore

@@ -39,7 +39,12 @@ The Web Awesome and Inertia references come from the versions installed by `npm 
 ## Frontend
 
 - Front Awesome provides reusable Vue components and Laravel frontend integrations that complement Inertia. Use Web Awesome for custom elements, Tailwind CSS for utilities, and VueUse for Vue composables.
+- Keep Front Awesome theme agnostic. Let the consuming application choose its palette, typography, spacing scale, and color mode. Keep package CSS limited to what components need to work.
+- Let Web Awesome components inherit the application's theme classes and `--wa-*` tokens. Use Web Awesome's public styling APIs and leave theme imports and token overrides to the application.
+- Keep shared Web Awesome integrations compatible with Core and Pro. Use `#front-awesome-webawesome` for runtime component and stylesheet imports so the Front Awesome Vite plugin can select the edition for package code. Preserve direct Web Awesome imports in the consuming application.
+- Register Vue global services under `$frontAwesome`. Expose a typed composable for services used in the Composition API.
 - Keep Vue components and styles in `resources/js`. Export supported source paths in `package.json` and let the host application's Vite build compile them.
+- Group related frontend features when possible. If a feature integrates with a specific library, put it in a directory named for that library. For example, the Web Awesome toast initializer lives at `resources/js/WebAwesome/flashToast.ts`.
 - Write Vue single-file components with the Composition API and `<script setup lang="ts">`. Put the `<template>` block first and the TypeScript setup block below it.
 - Install Artisan Toolbox JavaScript packages from the corresponding Composer package under `vendor/artisan-toolbox`. Run Composer before npm in development and CI.
 - Keep realtime transport in Mosaicast. Build future Front Awesome integrations on the Mosaicast client and Laravel package.

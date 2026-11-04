@@ -24,15 +24,25 @@
     "resources/js"
   ],
   "type": "module",
+  "imports": {
+    "#front-awesome-webawesome/*": "@awesome.me/webawesome/dist/*"
+  },
   "exports": {
+    ".": "./resources/js/index.ts",
+    "./WebAwesome/flashToast": "./resources/js/WebAwesome/flashToast.ts",
     "./components/Button.vue": "./resources/js/components/Button.vue",
     "./styles.css": "./resources/js/styles.css",
+    "./vite": {
+      "types": "./resources/js/vite.d.mts",
+      "default": "./resources/js/vite.mjs"
+    },
     "./web-awesome.css": "./resources/js/web-awesome.css"
   },
   "scripts": {
     "build": "vp build",
     "dev": "vp dev",
     "test": "vp test run",
+    "test:coverage": "vp test run --coverage",
     "check": "vp check && npm run typecheck",
     "check:fix": "vp check --fix",
     "typecheck": "vue-tsc --noEmit"
@@ -46,12 +56,13 @@
     "@tailwindcss/vite": "^4.3.4",
     "@types/node": "^24.13.3",
     "@vitejs/plugin-vue": "^6.0.0",
+    "@vitest/coverage-v8": "4.1.11",
     "typescript": "^5.8.3",
     "vite-plus": "0.3.3",
     "vue-tsc": "^3.3.14"
   },
   "peerDependencies": {
-    "@artisan-toolbox/mosaicast": "^0.1.0",
+    "@artisan-toolbox/mosaicast": "^1.1.1",
     "@inertiajs/vue3": "^3.0.0",
     "tailwindcss": "^4.0.0",
     "vue": "^3.5.0"

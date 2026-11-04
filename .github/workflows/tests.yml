@@ -42,7 +42,7 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, fileinfo, sqlite, pdo_sqlite, bcmath, intl
           ini-values: error_reporting=E_ALL
           tools: composer:v2
-          coverage: none
+          coverage: ${{ matrix.os == 'ubuntu-latest' && matrix.stability == 'prefer-stable' && 'xdebug' || 'none' }}
 
       - name: Install dependencies
         run: |
@@ -65,6 +65,14 @@ jobs:
 
       - name: Verify PHP type coverage
         run: composer test:types
+
+      - name: Report runtime test coverage
+        if: matrix.os == 'ubuntu-latest' && matrix.stability == 'prefer-stable'
+        env:
+          XDEBUG_MODE: coverage
+        run: |
+          composer test:coverage
+          npm run test:coverage
 
       - name: Build the Vite consumer fixture
         run: npm run build

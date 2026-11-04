@@ -24,7 +24,7 @@
     "require": {
         "php": "^8.5",
         "artisan-toolbox/maintainer": "^1.10.0",
-        "artisan-toolbox/mosaicast": "^1.1",
+        "artisan-toolbox/mosaicast": "^1.1.1",
         "illuminate/support": "^13.0",
         "inertiajs/inertia-laravel": "^3.0"
     },
@@ -81,6 +81,9 @@
         ],
         "test:types": [
             "vendor/bin/pest --type-coverage --min=100"
+        ],
+        "test:coverage": [
+            "vendor/bin/pest --coverage"
         ],
         "test:unit": [
             "vendor/bin/pest --parallel"
