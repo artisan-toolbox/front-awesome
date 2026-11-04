@@ -1,0 +1,114 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "artisan-toolbox/front-awesome",
+    "description": "Reusable Vue components and frontend integrations for Laravel and Inertia applications.",
+    "keywords": [
+        "laravel",
+        "artisan-toolbox",
+        "front-awesome",
+        "inertia",
+        "mosaicast",
+        "tailwindcss",
+        "vue",
+        "web-awesome"
+    ],
+    "homepage": "https://github.com/artisan-toolbox/front-awesome",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Allan Mariucci Carvalho",
+            "email": "allan@wss.group",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.5",
+        "artisan-toolbox/mosaicast": "^1.1",
+        "illuminate/support": "^13.0",
+        "inertiajs/inertia-laravel": "^3.0"
+    },
+    "require-dev": {
+        "artisan-toolbox/maintainer": "^1.7.0",
+        "driftingly/rector-laravel": "^2.5",
+        "larastan/larastan": "^3.9",
+        "laravel/pao": "^1.0",
+        "laravel/pint": "^1.29",
+        "orchestra/testbench": "^11.0",
+        "pestphp/pest": "^5.0",
+        "pestphp/pest-plugin-laravel": "^5.0",
+        "pestphp/pest-plugin-type-coverage": "^5.0",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan": "^2.2.8",
+        "rector/rector": "^2.6.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "ArtisanToolbox\\FrontAwesome\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ArtisanToolbox\\FrontAwesome\\Tests\\": "tests/",
+            "Workbench\\App\\": "workbench/app/",
+            "Workbench\\Database\\Factories\\": "workbench/database/factories/",
+            "Workbench\\Database\\Seeders\\": "workbench/database/seeders/"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "@clear",
+            "@prepare"
+        ],
+        "prepare": [
+            "@php vendor/bin/testbench package:discover --ansi"
+        ],
+        "build": [
+            "@php vendor/bin/testbench workbench:build --ansi"
+        ],
+        "serve": [
+            "Composer\\Config::disableProcessTimeout",
+            "@build",
+            "@php vendor/bin/testbench serve --ansi"
+        ],
+        "lint": [
+            "vendor/bin/pint --parallel"
+        ],
+        "lint:check": [
+            "vendor/bin/pint --parallel --test"
+        ],
+        "analyse": [
+            "vendor/bin/phpstan analyse"
+        ],
+        "test:types": [
+            "vendor/bin/pest --type-coverage --min=100"
+        ],
+        "test:unit": [
+            "vendor/bin/pest --parallel"
+        ],
+        "test": [
+            "@analyse",
+            "@lint:check",
+            "@test:types",
+            "@test:unit"
+        ],
+        "clear": [
+            "@php vendor/bin/testbench package:purge-skeleton --ansi"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "ArtisanToolbox\\FrontAwesome\\FrontAwesomeServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

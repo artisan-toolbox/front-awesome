@@ -1,0 +1,67 @@
+{
+  "$schema": "https://www.schemastore.org/package.json",
+  "name": "@artisan-toolbox/front-awesome",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Reusable Vue components and frontend integrations for Laravel and Inertia applications.",
+  "keywords": [
+    "artisan-toolbox",
+    "inertia",
+    "laravel",
+    "mosaicast",
+    "tailwindcss",
+    "vue",
+    "web-awesome"
+  ],
+  "homepage": "https://github.com/artisan-toolbox/front-awesome",
+  "license": "MIT",
+  "author": "Allan Mariucci Carvalho",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/artisan-toolbox/front-awesome.git"
+  },
+  "files": [
+    "resources/js"
+  ],
+  "type": "module",
+  "exports": {
+    "./components/Button.vue": "./resources/js/components/Button.vue",
+    "./styles.css": "./resources/js/styles.css",
+    "./web-awesome.css": "./resources/js/web-awesome.css"
+  },
+  "scripts": {
+    "build": "vp build",
+    "dev": "vp dev",
+    "test": "vp test run",
+    "check": "vp check && npm run typecheck",
+    "check:fix": "vp check --fix",
+    "typecheck": "vue-tsc --noEmit"
+  },
+  "dependencies": {
+    "@awesome.me/webawesome": "^3.14.0",
+    "@vueuse/core": "^14.0.0"
+  },
+  "devDependencies": {
+    "@artisan-toolbox/mosaicast": "file:vendor/artisan-toolbox/mosaicast",
+    "@tailwindcss/vite": "^4.3.4",
+    "@types/node": "^24.13.3",
+    "@vitejs/plugin-vue": "^6.0.0",
+    "typescript": "^5.8.3",
+    "vite-plus": "0.3.3",
+    "vue-tsc": "^3.3.14"
+  },
+  "peerDependencies": {
+    "@artisan-toolbox/mosaicast": "^0.1.0",
+    "@inertiajs/vue3": "^3.0.0",
+    "tailwindcss": "^4.0.0",
+    "vue": "^3.5.0"
+  },
+  "overrides": {
+    "vite": "npm:@voidzero-dev/vite-plus-core@0.3.3",
+    "vitest": "4.1.11"
+  },
+  "engines": {
+    "node": ">=24.11.0"
+  },
+  "packageManager": "npm@11.17.0"
+}
