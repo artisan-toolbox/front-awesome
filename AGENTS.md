@@ -30,6 +30,7 @@ This repository is a Laravel package. Keep the package focused, idiomatic, and e
 - `vue-testing-best-practices`: use for Vue component and composable tests. Follow this repository's existing test setup.
 - `inertia-vue-development`: use for Inertia 3 forms, navigation, props, and SSR. Read the reference supplied by the installed Vue adapter.
 - `vueuse-functions`: use to select VueUse composables. Check availability in the installed VueUse version.
+- `frontend-design`: use when defining the visual direction for a new interface or redesigning an existing one. Use it alongside `webawesome-design` to apply that direction with Web Awesome components and tokens.
 - `webawesome`: use for Web Awesome component selection, APIs, events, slots, and Vue integration. Read `.agents/skills/webawesome/SKILL.md`.
 - `webawesome-design`: use for layouts, themes, design tokens, and UI composition with Web Awesome. Read `.agents/skills/webawesome-design/SKILL.md`.
 
