@@ -20,16 +20,35 @@ final class FrontAwesome implements Versionable, WithReadmeHead
             ->withLogo(src: 'logo/front-awesome-icon.svg', alt: '', width: 88)
             ->withTitle('Front Awesome')
             ->withDescription('Reusable Vue components and frontend integrations for Laravel and Inertia applications.')
-            ->addBadge(Badge::releaseVersion('https://github.com/artisan-toolbox/front-awesome/releases'))
             ->addBadge(Badge::make(
-                link: 'https://packagist.org/packages/artisan-toolbox/front-awesome',
-                imgSrc: 'https://img.shields.io/packagist/php-v/artisan-toolbox/front-awesome.svg?style=flat-square',
-                imgAlt: 'PHP from Packagist',
+                link: 'https://github.com/artisan-toolbox/front-awesome/releases',
+                imgSrc: 'https://img.shields.io/badge/Release-in%20development-lightgrey?style=flat-square',
+                imgAlt: 'Release',
             ))
             ->addBadge(Badge::make(
-                link: 'https://github.com/artisan-toolbox/front-awesome/actions',
+                link: 'https://artisantoolbox.wsssoftware.com.br/packages/front-awesome/',
+                imgSrc: 'https://img.shields.io/badge/PHP-%5E8.5-777BB4?style=flat-square',
+                imgAlt: 'PHP',
+            ))
+            ->addBadge(Badge::make(
+                link: 'https://artisantoolbox.wsssoftware.com.br/packages/front-awesome/',
+                imgSrc: 'https://img.shields.io/badge/Laravel-13-FF2D20?style=flat-square',
+                imgAlt: 'Laravel',
+            ))
+            ->addBadge(Badge::make(
+                link: 'https://artisantoolbox.wsssoftware.com.br/packages/front-awesome/',
+                imgSrc: 'https://img.shields.io/badge/Node.js-%3E%3D24.11.0-339933?style=flat-square',
+                imgAlt: 'Node.js',
+            ))
+            ->addBadge(Badge::make(
+                link: 'https://github.com/artisan-toolbox/front-awesome/actions/workflows/tests.yml?query=branch%3A1.x',
                 imgSrc: 'https://img.shields.io/github/actions/workflow/status/artisan-toolbox/front-awesome/tests.yml?branch=1.x&label=Tests&style=flat-square',
                 imgAlt: 'Tests',
+            ))
+            ->addBadge(Badge::make(
+                link: 'https://artisantoolbox.wsssoftware.com.br/packages/front-awesome/',
+                imgSrc: 'https://img.shields.io/badge/Docs-Read-blue?style=flat-square',
+                imgAlt: 'Docs',
             ));
     }
 }
