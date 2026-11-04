@@ -23,12 +23,12 @@
     ],
     "require": {
         "php": "^8.5",
+        "artisan-toolbox/maintainer": "^1.10.0",
         "artisan-toolbox/mosaicast": "^1.1",
         "illuminate/support": "^13.0",
         "inertiajs/inertia-laravel": "^3.0"
     },
     "require-dev": {
-        "artisan-toolbox/maintainer": "^1.9.0",
         "driftingly/rector-laravel": "^2.5",
         "larastan/larastan": "^3.9",
         "laravel/pao": "^1.0",
