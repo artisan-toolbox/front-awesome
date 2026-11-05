@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Run the PHP unit suite and cover the mounted Vue theme controls in Chromium. Publish runtime coverage reports in CI.
+- Compose optional button and group attributes from Vue and Web Awesome types, excluding internal fields and duplicate aliases.
+- Export Vue components and their public types together from `@artisan-toolbox/front-awesome/components`.
+- Add a Vue `ButtonGroup.vue` wrapper and use Web Awesome types for button and group attributes.
+- Add an opt-in color mode manager to the Vue plugin and a `Theme.vue` component for custom light, dark, and system controls.
 - Add a Laravel `Toast` facade and a browser toast initializer for Mosaicast events and Inertia session flash.
 - Use a shared `WebAwesome\Variant` enum for standard Web Awesome variants in PHP.
 - Start a toast factory with `Toast::brand()`, `Toast::success()`, `Toast::warning()`, `Toast::danger()`, or `Toast::neutral()`. Call `flash()` or `dispatch()` on the returned factory to send it.

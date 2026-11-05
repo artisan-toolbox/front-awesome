@@ -66,13 +66,26 @@ jobs:
       - name: Verify PHP type coverage
         run: composer test:types
 
+      - name: Install Chromium for browser coverage
+        if: matrix.os == 'ubuntu-latest' && matrix.stability == 'prefer-stable'
+        run: npx playwright install --with-deps chromium --only-shell
+
       - name: Report runtime test coverage
         if: matrix.os == 'ubuntu-latest' && matrix.stability == 'prefer-stable'
         env:
+          COMPOSER_ALLOW_XDEBUG: '1'
           XDEBUG_MODE: coverage
         run: |
-          composer test:coverage
+          composer test:coverage -- --coverage-html build/coverage/php
           npm run test:coverage
+
+      - name: Upload coverage reports
+        if: matrix.os == 'ubuntu-latest' && matrix.stability == 'prefer-stable'
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-reports
+          path: build/coverage/
+          if-no-files-found: error
 
       - name: Build the Vite consumer fixture
         run: npm run build

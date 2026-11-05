@@ -1,2 +1,5 @@
 @import 'tailwindcss' source(none);
 @import '@artisan-toolbox/front-awesome/styles.css';
+
+@source './Fixture.vue';
+@custom-variant dark (&:where(.dark, .dark *));

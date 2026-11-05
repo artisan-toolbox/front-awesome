@@ -180,9 +180,10 @@ test('installs one toast host and delivers Inertia and Echo events through the p
         const third = createBrowserApp().use(createFrontAwesome());
         third.mount({});
         try {
-            navigateWithToast();
+            broadcast?.('front-awesome.toast', { message: 'Delivered after remount.' });
             await third.runWithContext(useToast).show('Remounted.', { icon: 'bell' });
             expect(create).toHaveBeenCalledTimes(9);
+            expect(create).toHaveBeenNthCalledWith(8, 'Delivered after remount.', undefined);
             expect(create).toHaveBeenNthCalledWith(9, 'Remounted.', { icon: 'bell' });
             expect(echo.private).toHaveBeenCalledTimes(1);
         } finally {

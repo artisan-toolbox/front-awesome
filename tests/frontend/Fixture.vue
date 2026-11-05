@@ -1,4 +1,15 @@
 <template>
+    <Theme v-slot="{ theme, system, dark, light, toggle }">
+        <output data-testid="theme-preference">{{ theme }}</output>
+        <ButtonGroup v-bind="groupProps" data-testid="theme-controls">
+            <Button type="button" :aria-pressed="theme === 'system'" @click="system">System</Button>
+            <Button type="button" :aria-pressed="theme === 'dark'" @click="dark">Dark</Button>
+            <Button type="button" :aria-pressed="theme === 'light'" @click="light">Light</Button>
+            <Button type="button" @click="toggle">Toggle theme</Button>
+        </ButtonGroup>
+    </Theme>
+    <p data-testid="theme-tailwind" class="text-black dark:text-white">Tailwind color mode</p>
+
     <Button @click="showMosaicastToast">Show Mosaicast toast</Button>
     <Button @click="showFlashToasts">Show Inertia flash toasts</Button>
     <Button @click="router.flash('unrelated', true)">Flash unrelated data</Button>
@@ -9,39 +20,23 @@
 </template>
 
 <script setup lang="ts">
+import { mosaicast } from '@artisan-toolbox/mosaicast';
 import { router } from '@inertiajs/vue3';
 import { useToast } from '@artisan-toolbox/front-awesome';
-import Button from '@artisan-toolbox/front-awesome/components/Button.vue';
+import { Button, ButtonGroup, Theme } from '@artisan-toolbox/front-awesome/components';
+import type { ButtonGroupProps } from '@artisan-toolbox/front-awesome/components';
 
 const toast = useToast();
+const groupProps = { label: 'Appearance', orientation: 'horizontal' } satisfies ButtonGroupProps;
 
 function showMosaicastToast(): void {
-    document.dispatchEvent(
-        new CustomEvent('inertia:navigate', {
-            detail: {
-                page: {
-                    props: {
-                        mosaicast: {
-                            sessionIdentifier: null,
-                            events: [
-                                {
-                                    name: 'front-awesome.toast',
-                                    payload: {
-                                        message: 'Order <123> saved.',
-                                        options: {
-                                            variant: 'success',
-                                            duration: 0,
-                                            icon: 'check',
-                                            size: 'l',
-                                        },
-                                    },
-                                },
-                            ],
-                        },
-                    },
-                },
-            },
-        }),
+    mosaicast().emit(
+        'front-awesome.toast',
+        {
+            message: 'Order <123> saved.',
+            options: { variant: 'success', duration: 0, icon: 'check', size: 'l' },
+        },
+        'inertia',
     );
 }
 

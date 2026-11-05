@@ -1,6 +1,7 @@
 import { resolve } from 'node:path';
 import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
+import { playwright } from '@vitest/browser-playwright';
 import { defineConfig } from 'vite-plus';
 import { frontAwesome } from '@artisan-toolbox/front-awesome/vite';
 
@@ -45,11 +46,34 @@ export default defineConfig({
     },
     test: {
         root: import.meta.dirname,
-        include: ['tests/frontend/**/*.test.ts'],
+        projects: [
+            {
+                extends: true,
+                test: {
+                    name: 'unit',
+                    include: ['tests/frontend/**/*.test.ts'],
+                    exclude: ['tests/frontend/**/*.browser.test.ts'],
+                },
+            },
+            {
+                extends: true,
+                optimizeDeps: { include: ['@artisan-toolbox/mosaicast'] },
+                test: {
+                    include: ['tests/frontend/**/*.browser.test.ts'],
+                    browser: {
+                        enabled: true,
+                        headless: true,
+                        provider: playwright(),
+                        instances: [{ browser: 'chromium', name: 'chromium' }],
+                    },
+                },
+            },
+        ],
         coverage: {
             include: ['resources/js/**/*.{mjs,ts,vue}'],
             exclude: ['resources/js/**/*.d.ts'],
-            reporter: ['text'],
+            reporter: ['text', 'html'],
+            reportsDirectory: 'build/coverage/frontend',
         },
     },
 });

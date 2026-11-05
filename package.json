@@ -30,7 +30,10 @@
   "exports": {
     ".": "./resources/js/index.ts",
     "./WebAwesome/flashToast": "./resources/js/WebAwesome/flashToast.ts",
+    "./components": "./resources/js/components/index.ts",
     "./components/Button.vue": "./resources/js/components/Button.vue",
+    "./components/ButtonGroup.vue": "./resources/js/components/ButtonGroup.vue",
+    "./components/Theme.vue": "./resources/js/components/Theme.vue",
     "./styles.css": "./resources/js/styles.css",
     "./vite": {
       "types": "./resources/js/vite.d.mts",
@@ -41,7 +44,8 @@
   "scripts": {
     "build": "vp build",
     "dev": "vp dev",
-    "test": "vp test run",
+    "test": "vp test run --project unit",
+    "test:browser": "vp test run --project chromium",
     "test:coverage": "vp test run --coverage",
     "check": "vp check && npm run typecheck",
     "check:fix": "vp check --fix",
@@ -56,6 +60,7 @@
     "@tailwindcss/vite": "^4.3.4",
     "@types/node": "^24.13.3",
     "@vitejs/plugin-vue": "^6.0.0",
+    "@vitest/browser-playwright": "4.1.11",
     "@vitest/coverage-v8": "4.1.11",
     "typescript": "^5.8.3",
     "vite-plus": "0.3.3",
