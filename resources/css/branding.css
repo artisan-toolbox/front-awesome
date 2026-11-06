@@ -1,0 +1,113 @@
+/*
+ * Application branding. Published once and owned by your application.
+ * Publish command: php artisan vendor:publish --tag=front-awesome-branding
+ * Destination: resources/css/branding.css
+ *
+ * Import this file after the package's Tailwind integration entry.
+ * Edit shared identity through @theme. The adapter reads those values for WA.
+ * Direct --wa-* overrides affect WA only. Never alias a shared input back to WA.
+ * Font declarations do not download fonts. Load licensed font files separately.
+ * Apply fa-theme to a local branding island to rebind shared aliases there.
+ * Keep role and mode classes on their intended scopes. Arbitrary variable-only
+ * descendants do not re-evaluate values already inherited from an outer scope.
+ *
+ * Tailwind theme variables: https://tailwindcss.com/docs/theme
+ * WA design tokens: https://webawesome.com/docs/tokens/
+ * WA theming: https://webawesome.com/docs/theming-overview/
+ * Complete mappings and upgrade rules:
+ * https://atb.dev.br/packages/front-awesome/branding/
+ */
+
+@theme {
+    /*
+     * Body and code fonts are shared with WA through the package adapter.
+     * Changing the body font can alter control widths, wrapping, and page height.
+     * Add @font-face before this block when the family is not a system font.
+     */
+    /* --font-sans: 'Project Sans', system-ui, sans-serif; */
+    /* --font-mono: 'Project Mono', ui-monospace, monospace; */
+    /* --font-serif: 'Project Serif', ui-serif, serif; */
+    /* --font-heading: var(--font-sans); */
+    /* --font-longform: var(--font-serif); */
+
+    /* Shared sizes follow Tailwind text-xs through text-5xl.
+     * WA 2xs and 3xs derive smaller rounded sizes from text-xs.
+     * Numeric WA font-size-scale remains additional WA-only tuning. */
+    /* --text-base: 1rem; */
+    /* --font-weight-medium: 500; */
+    /* --leading-normal: 1.5; */
+
+    /*
+     * Replace the complete brand ramp to use another imported Tailwind palette.
+     * The adapter supplies working blue defaults when these lines stay commented.
+     * Changing only 500 leaves other states on the previous palette.
+     * Shared brand utilities include bg-brand-700 and text-brand-700.
+     * Validate text, focus, and state contrast after changing any ramp.
+     */
+    /* --color-brand-50: var(--color-indigo-50); */
+    /* --color-brand-100: var(--color-indigo-100); */
+    /* --color-brand-200: var(--color-indigo-200); */
+    /* --color-brand-300: var(--color-indigo-300); */
+    /* --color-brand-400: var(--color-indigo-400); */
+    /* --color-brand-500: var(--color-indigo-500); */
+    /* --color-brand-600: var(--color-indigo-600); */
+    /* --color-brand-700: var(--color-indigo-700); */
+    /* --color-brand-800: var(--color-indigo-800); */
+    /* --color-brand-900: var(--color-indigo-900); */
+    /* --color-brand-950: var(--color-indigo-950); */
+
+    /*
+     * Add a color for new Tailwind utilities such as bg-project-accent.
+     * This does not create a WA variant or a wa-brand-project-accent class.
+     * To use a custom color family as the brand, define its full ramp and assign
+     * all brand stops to it using the recipe above.
+     */
+    /* --color-project-accent: oklch(0.65 0.16 250); */
+
+    /*
+     * Shared corner radii feed mapped WA controls and panels.
+     * WA's radius scale additionally changes WA, without mutating Tailwind.
+     * Pill and circle shapes retain their geometric meaning.
+     */
+    /* --radius-sm: 0.25rem; */
+    /* --radius-md: 0.5rem; */
+    /* --radius-xl: 1rem; */
+
+    /*
+     * The spacing base changes numeric Tailwind spacing and mapped WA spacing.
+     * It does not scale every component dimension or each breakpoint.
+     * Recheck compact forms and mobile navigation after changing it.
+     */
+    /* --spacing: 0.25rem; */
+
+    /*
+     * Full-shadow integration.
+     * Tailwind shadow values may contain several shadows. The mapped WA final
+     * shadows therefore bypass WA's offset, blur, spread, and shadow-color knobs.
+     * Changing a font, radius, or shadow here affects both systems through the
+     * documented mappings, rather than through a bidirectional variable loop.
+     */
+    /* --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.12); */
+    /* --shadow-md: 0 4px 12px rgb(0 0 0 / 0.15); */
+    /* --shadow-lg: 0 12px 24px rgb(0 0 0 / 0.18); */
+}
+
+@layer app-branding {
+    :root {
+        /*
+         * Advanced WA-only tuning. These controls do not change Tailwind.
+         * Prefer shared @theme inputs for project-wide identity.
+         * Keep each color foreground paired with its background and test both.
+         */
+        /* --wa-space-scale: 1.125; */
+        /* --wa-border-radius-scale: 1; */
+        /* --wa-font-size-scale: 1; */
+        /* --wa-focus-ring-width: 0.1875rem; */
+        /* --wa-transition-normal: 150ms; */
+
+        /* Shipped light loud fills use a darker ramp stop for readable text.
+         * Custom ramps require new contrast checks for all states and modes.
+         * Physical hue-on overrides must be unlayered because upstream formulas
+         * are unlayered. Place those rare exceptions after the JS style imports. */
+    }
+}

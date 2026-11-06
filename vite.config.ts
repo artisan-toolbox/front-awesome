@@ -7,17 +7,7 @@ import { frontAwesome } from '@artisan-toolbox/front-awesome/vite';
 
 export default defineConfig({
     root: 'tests/frontend',
-    plugins: [
-        frontAwesome(),
-        tailwindcss(),
-        vue({
-            template: {
-                compilerOptions: {
-                    isCustomElement: (tag) => tag.startsWith('wa-'),
-                },
-            },
-        }),
-    ],
+    plugins: [frontAwesome(), tailwindcss(), vue()],
     build: {
         outDir: resolve(import.meta.dirname, 'build/frontend'),
         emptyOutDir: true,
@@ -34,6 +24,7 @@ export default defineConfig({
             'composer.json',
             'pint.json',
             'resources/boost/**',
+            'resources/js/theme/tokens.css',
         ],
         semi: true,
         singleQuote: true,
@@ -63,7 +54,9 @@ export default defineConfig({
                     browser: {
                         enabled: true,
                         headless: true,
-                        provider: playwright(),
+                        provider: playwright({
+                            launchOptions: { executablePath: process.env.CHROMIUM_EXECUTABLE },
+                        }),
                         instances: [{ browser: 'chromium', name: 'chromium' }],
                     },
                 },

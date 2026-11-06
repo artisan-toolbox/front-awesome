@@ -1,0 +1,28 @@
+<!doctype html>
+<html class="wa-light">
+    <head>
+        <meta charset="utf-8" />
+        <title>Shared theme consumer</title>
+    </head>
+    <body>
+        <wa-page mobile-breakpoint="768px"
+            ><header slot="header">
+                <button data-toggle-nav>Toggle navigation</button>Consumer fixture
+            </header>
+            <div slot="navigation"><a href="#target" data-drawer="close">Target</a></div>
+            <main>
+                <wa-button id="wa" variant="brand">Web Awesome</wa-button
+                ><button id="native" class="font-sans rounded-md text-black dark:text-white">
+                    Tailwind
+                </button>
+                <div id="app"></div>
+                <div id="prime"></div>
+                <div id="scopes"></div>
+                <h2 id="target">Target heading</h2>
+            </main>
+            <aside slot="aside">Context</aside>
+            <footer slot="footer">Footer</footer></wa-page
+        >
+        <script type="module" src="/main.ts"></script>
+    </body>
+</html>

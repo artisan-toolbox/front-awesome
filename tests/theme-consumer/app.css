@@ -1,0 +1,32 @@
+@import '@artisan-toolbox/front-awesome/tailwind.css';
+@import '../../resources/css/branding.css';
+@source inline('p-0 p-4 shadow-md font-sans rounded-md text-black dark:text-white bg-white dark:bg-black');
+@theme {
+    --font-sans: Georgia, serif;
+    --radius-md: 0.625rem;
+    --shadow-md: 0 4px 12px rgb(0 0 0 / 0.15);
+}
+@layer app-branding {
+    .custom-brand {
+        --color-brand-50: var(--color-indigo-50);
+        --color-brand-100: var(--color-indigo-100);
+        --color-brand-200: var(--color-indigo-200);
+        --color-brand-300: var(--color-indigo-300);
+        --color-brand-400: var(--color-indigo-400);
+        --color-brand-500: var(--color-indigo-500);
+        --color-brand-600: var(--color-indigo-600);
+        --color-brand-700: var(--color-indigo-700);
+        --color-brand-800: var(--color-indigo-800);
+        --color-brand-900: var(--color-indigo-900);
+        --color-brand-950: var(--color-indigo-950);
+    }
+    wa-page {
+        --menu-width: 14rem;
+    }
+    wa-page[view='mobile'] {
+        --menu-width: auto;
+    }
+    wa-page[view='mobile'] > [slot='aside'] {
+        display: none;
+    }
+}

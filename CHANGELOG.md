@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+- Clarify preview installation and application build verification in the bundled consumer skill, and link to the migrated documentation routes.
+
+- Preserve false button boolean bindings during initial custom element registration and SSR, including reactive loading and disabled states.
+
+- Update documentation links and managed README badges to `https://atb.dev.br`, and use `contact@atb.dev.br` for public package contact metadata.
+
+- Recognize Web Awesome custom elements automatically through the Vite plugin while preserving existing Vue custom element matchers and compiler options.
+- Add opt-in Tailwind-backed Web Awesome branding, shared foundation tokens, class-based dark utilities, and targeted wa-page Preflight compatibility.
+- Publish an application-owned branding stylesheet with `front-awesome-branding`, preserving edited files during ordinary republishing.
+- Add an optional PrimeVue 4 styled-mode Aura adapter, production consumer checks, and a reviewed dependency and token inventory.
+
 - Run the PHP unit suite and cover the mounted Vue theme controls in Chromium. Publish runtime coverage reports in CI.
 - Compose optional button and group attributes from Vue and Web Awesome types, excluding internal fields and duplicate aliases.
 - Export Vue components and their public types together from `@artisan-toolbox/front-awesome/components`.

@@ -70,6 +70,10 @@ jobs:
         if: matrix.os == 'ubuntu-latest' && matrix.stability == 'prefer-stable'
         run: npx playwright install --with-deps chromium --only-shell
 
+      - name: Verify shared theme production consumers
+        if: matrix.os == 'ubuntu-latest' && matrix.stability == 'prefer-stable'
+        run: npm run test:theme
+
       - name: Report runtime test coverage
         if: matrix.os == 'ubuntu-latest' && matrix.stability == 'prefer-stable'
         env:

@@ -1,0 +1,137 @@
+import { readFile, writeFile } from 'node:fs/promises';
+import { hues, stops, roles, scopes, roleScopes } from './theme-tokens.mjs';
+const variable = (name) => `var(--${name})`;
+const wa = (name) => variable(`wa-${name}`);
+const pair = (light, dark) => `light-dark(${light}, ${dark})`;
+const declarations = (entries) =>
+    entries.map(([key, value]) => `    --wa-${key}: ${value};`).join('\n');
+const foundation = [
+    ...[
+        ['3xs', 1.265625],
+        ['2xs', 1.125],
+    ].map(([size, ratio]) => [
+        `font-size-${size}`,
+        `round(calc(${variable('text-xs')} / ${ratio} * ${wa('font-size-scale')}), 1px)`,
+    ]),
+    ['font-family-body', variable('font-sans')],
+    ['font-family-heading', variable('font-heading')],
+    ['font-family-code', variable('font-mono')],
+    ['font-family-longform', variable('font-longform')],
+    ...Object.entries({
+        xs: 'xs',
+        s: 'sm',
+        m: 'base',
+        l: 'lg',
+        xl: 'xl',
+        '2xl': '2xl',
+        '3xl': '3xl',
+        '4xl': '4xl',
+        '5xl': '5xl',
+    }).map(([size, input]) => [
+        `font-size-${size}`,
+        `calc(${variable(`text-${input}`)} * ${wa('font-size-scale')})`,
+    ]),
+    ...Object.entries({
+        light: 'light',
+        normal: 'normal',
+        semibold: 'medium',
+        bold: 'semibold',
+    }).map(([size, input]) => [`font-weight-${size}`, variable(`font-weight-${input}`)]),
+    ...Object.entries({ condensed: 'tight', normal: 'normal', expanded: 'loose' }).map(
+        ([size, input]) => [`line-height-${size}`, variable(`leading-${input}`)],
+    ),
+    ...Object.entries({
+        '3xs': 0.5,
+        '2xs': 1,
+        xs: 2,
+        s: 3,
+        m: 4,
+        l: 6,
+        xl: 8,
+        '2xl': 10,
+        '3xl': 12,
+        '4xl': 16,
+        '5xl': 20,
+    }).map(([size, count]) => [
+        `space-${size}`,
+        `calc(${variable('spacing')} * ${count} * ${wa('space-scale')})`,
+    ]),
+    ...Object.entries({ s: 'sm', m: 'md', l: 'xl' }).map(([size, input]) => [
+        `border-radius-${size}`,
+        `calc(${variable(`radius-${input}`)} * ${wa('border-radius-scale')})`,
+    ]),
+    ...Object.entries({ s: 'sm', m: 'md', l: 'lg' }).map(([size, input]) => [
+        `shadow-${size}`,
+        variable(`shadow-${input}`),
+    ]),
+];
+const palettes = hues.flatMap((hue) => [
+    ...stops.map(([waStop, twStop]) => [
+        `color-${hue}-${waStop}`,
+        variable(`color-${hue}-${twStop}`),
+    ]),
+    [`color-${hue}`, wa(`color-${hue}-30`)],
+    [`color-${hue}-key`, '30'],
+]);
+const defaultRoles = Object.entries(roles).flatMap(([role, hue]) => [
+    ...stops.map(([waStop, twStop]) => [
+        `color-${role}-${waStop}`,
+        role === 'brand' ? variable(`color-brand-${twStop}`) : wa(`color-${hue}-${waStop}`),
+    ]),
+    [`color-${role}`, wa(`color-${role}-30`)],
+    [`color-${role}-on`, 'white'],
+]);
+const semantics = [
+    ['color-surface-raised', pair('white', wa('color-neutral-10'))],
+    ['color-surface-default', pair('white', wa('color-neutral-05'))],
+    ['color-surface-lowered', pair(wa('color-neutral-95'), 'black')],
+    ['color-surface-border', pair(wa('color-neutral-80'), wa('color-neutral-30'))],
+    ['color-text-normal', pair(wa('color-neutral-10'), wa('color-neutral-95'))],
+    ['color-text-quiet', pair(wa('color-neutral-30'), wa('color-neutral-70'))],
+    ['color-text-link', pair(wa('color-brand-30'), wa('color-brand-70'))],
+    ['color-focus', pair(wa('color-brand-30'), wa('color-brand-60'))],
+    ['form-control-background-color', wa('color-surface-default')],
+    ['form-control-border-color', wa('color-neutral-border-loud')],
+    ['form-control-activated-color', wa('color-brand-fill-loud')],
+    ['form-control-label-color', wa('color-text-normal')],
+    ['form-control-value-color', wa('color-text-normal')],
+    ['form-control-hint-color', wa('color-text-quiet')],
+    ['form-control-placeholder-color', wa('color-text-quiet')],
+    ['tooltip-background-color', wa('color-text-normal')],
+    ['tooltip-border-color', wa('color-text-normal')],
+    ['tooltip-content-color', wa('color-surface-default')],
+    ...Object.keys(roles).flatMap((role) => [
+        ...Object.entries({ quiet: [95, 10], normal: [90, 20], loud: [20, 70] }).map(
+            ([state, [light, dark]]) => [
+                `color-${role}-fill-${state}`,
+                pair(wa(`color-${role}-${light}`), wa(`color-${role}-${dark}`)),
+            ],
+        ),
+        ...Object.entries({ quiet: [80, 30], normal: [60, 40], loud: [20, 70] }).map(
+            ([state, [light, dark]]) => [
+                `color-${role}-border-${state}`,
+                pair(wa(`color-${role}-${light}`), wa(`color-${role}-${dark}`)),
+            ],
+        ),
+        ...['quiet', 'normal'].map((state) => [
+            `color-${role}-on-${state}`,
+            pair(wa(`color-${role}-20`), wa(`color-${role}-80`)),
+        ]),
+        [`color-${role}-on-loud`, pair('white', wa(`color-${role}-05`))],
+    ]),
+];
+const css = `/* Generated by npm run theme:generate. Edit scripts/theme-tokens.mjs or scripts/generate-theme.mjs. */\n@theme {\n    --font-heading: var(--font-sans);\n    --font-longform: var(--font-serif);\n${stops.map(([, stop]) => `    --color-brand-${stop}: var(--color-blue-${stop});`).join('\n')}\n}\n\n@layer wa-theme-overrides {\n  :where(${scopes.join(', ')}) {\n${declarations([...foundation, ...palettes])}\n  }\n${Object.keys(
+    roles,
+)
+    .map(
+        (role) =>
+            `  :where(:root, .fa-theme):not(${hues.map((hue) => `.wa-${role}-${hue}`).join(', ')}) {\n${declarations(defaultRoles.filter(([key]) => key.startsWith(`color-${role}-`) || key === `color-${role}`))}\n  }`,
+    )
+    .join(
+        '\n',
+    )}\n  :where(${[...scopes, ...roleScopes].join(',\n    ')}) {\n${declarations(semantics)}\n  }\n}\n\n/* Upstream palette foreground formulas are unlayered. This deliberate exception wins by specificity.\n   Advanced foreground overrides belong in unlayered application CSS after the package entries. */\n:is(${scopes.join(', ')}) {\n${declarations(hues.map((hue) => [`color-${hue}-on`, 'white']))}\n}\n`;
+const path = new URL('../resources/js/theme/tokens.css', import.meta.url);
+if (process.argv.includes('--check')) {
+    if ((await readFile(path, 'utf8')) !== css)
+        throw new Error('Theme output drifted. Run npm run theme:generate.');
+} else await writeFile(path, css);

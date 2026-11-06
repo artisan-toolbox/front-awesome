@@ -26,17 +26,17 @@ final class FrontAwesome implements Versionable, WithReadmeHead
                 imgAlt: 'Release',
             ))
             ->addBadge(Badge::make(
-                link: 'https://artisantoolbox.wsssoftware.com.br/packages/front-awesome/',
+                link: 'https://atb.dev.br/packages/front-awesome/',
                 imgSrc: 'https://img.shields.io/badge/PHP-%5E8.5-777BB4?style=flat-square',
                 imgAlt: 'PHP',
             ))
             ->addBadge(Badge::make(
-                link: 'https://artisantoolbox.wsssoftware.com.br/packages/front-awesome/',
+                link: 'https://atb.dev.br/packages/front-awesome/',
                 imgSrc: 'https://img.shields.io/badge/Laravel-13-FF2D20?style=flat-square',
                 imgAlt: 'Laravel',
             ))
             ->addBadge(Badge::make(
-                link: 'https://artisantoolbox.wsssoftware.com.br/packages/front-awesome/',
+                link: 'https://atb.dev.br/packages/front-awesome/',
                 imgSrc: 'https://img.shields.io/badge/Node.js-%3E%3D24.11.0-339933?style=flat-square',
                 imgAlt: 'Node.js',
             ))
@@ -46,7 +46,7 @@ final class FrontAwesome implements Versionable, WithReadmeHead
                 imgAlt: 'Tests',
             ))
             ->addBadge(Badge::make(
-                link: 'https://artisantoolbox.wsssoftware.com.br/packages/front-awesome/',
+                link: 'https://atb.dev.br/packages/front-awesome/',
                 imgSrc: 'https://img.shields.io/badge/Docs-Read-blue?style=flat-square',
                 imgAlt: 'Docs',
             ));

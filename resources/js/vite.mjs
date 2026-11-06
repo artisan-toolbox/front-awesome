@@ -45,5 +45,29 @@ export function frontAwesome({ webAwesome } = {}) {
                 },
             };
         },
+        configResolved(config) {
+            for (const plugin of config.plugins) {
+                if (plugin.name !== 'vite:vue' || !plugin.api?.options) {
+                    continue;
+                }
+
+                const options = plugin.api.options;
+                const { template = {} } = options;
+                const { compilerOptions = {} } = template;
+                const { isCustomElement } = compilerOptions;
+
+                plugin.api.options = {
+                    ...options,
+                    template: {
+                        ...template,
+                        compilerOptions: {
+                            ...compilerOptions,
+                            isCustomElement: (tag) =>
+                                isCustomElement?.(tag) || tag.startsWith('wa-'),
+                        },
+                    },
+                };
+            }
+        },
     };
 }

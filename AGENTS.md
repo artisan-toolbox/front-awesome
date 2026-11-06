@@ -39,8 +39,8 @@ The Web Awesome and Inertia references come from the versions installed by `npm 
 ## Frontend
 
 - Front Awesome provides reusable Vue components and Laravel frontend integrations that complement Inertia. Use Web Awesome for custom elements, Tailwind CSS for utilities, and VueUse for Vue composables.
-- Keep Front Awesome theme agnostic. Let the consuming application choose its palette, typography, spacing scale, and color mode. Keep package CSS limited to what components need to work.
-- Let Web Awesome components inherit the application's theme classes and `--wa-*` tokens. Use Web Awesome's public styling APIs and leave theme imports and token overrides to the application.
+- Keep existing entries theme agnostic. Applications may explicitly opt into `tailwind.css` plus `web-awesome-tailwind` for the shared Tailwind-backed theme. The application still owns palette, typography, spacing, and mode choices through its published branding file.
+- Let Web Awesome components inherit the application's theme classes and `--wa-*` tokens. Use Web Awesome's public styling APIs and leave theme selection and branding overrides to the application.
 - Keep shared Web Awesome integrations compatible with Core and Pro. Use `#front-awesome-webawesome` for runtime component and stylesheet imports so the Front Awesome Vite plugin can select the edition for package code. Preserve direct Web Awesome imports in the consuming application.
 - Register Vue global services under `$frontAwesome`. Expose a typed composable for services used in the Composition API.
 - Keep Vue components and styles in `resources/js`. Export supported source paths in `package.json` and let the host application's Vite build compile them.
@@ -50,3 +50,12 @@ The Web Awesome and Inertia references come from the versions installed by `npm 
 - Keep realtime transport in Mosaicast. Build future Front Awesome integrations on the Mosaicast client and Laravel package.
 - Run `npm run check`, `npm test`, and `npm run build` for frontend changes. The build exercises the Vite consumer fixture.
 - Run `php vendor/bin/maintainer quality:check` for the configured PHP and frontend checks. Use Maintainer for the `1.x` release workflow.
+
+## Shared theme maintenance
+
+- Run `npm run theme:generate` after editing the fixed token ownership map or generator. Never edit generated `resources/js/theme/tokens.css` directly.
+- Run `npm run theme:check` and `npm run test:theme` after dependency or theme changes. The latter builds real base and optional PrimeVue consumers and checks their computed browser styles. Set `CHROMIUM_EXECUTABLE` when a system Chromium installation is required.
+- Review the owned and inherited token inventory and exact tested versions in `tests/theme-compatibility.json`. After reviewing upstream changes and passing all checks, refresh it with `node scripts/check-theme-compatibility.mjs --record`. A new record alone does not prove compatibility.
+- Retain upstream default theme and utility imports. Keep native.css out of the shared entry and preserve the existing styles.css, web-awesome.css, and theme:true contracts.
+- Keep PrimeVue imports confined to the optional export. Its official Aura base retains component-specific behavior. Do not claim all PrimeVue colors or dimensions are shared.
+- Test root and local role classes, nested modes, inversion, custom branding scopes, opposite OS mode, physical key/on pairs, semantic contrast, and wa-page mechanics. Pro requires a real licensed dependency before it can be recorded as tested.

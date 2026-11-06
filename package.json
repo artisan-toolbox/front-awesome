@@ -39,7 +39,10 @@
       "types": "./resources/js/vite.d.mts",
       "default": "./resources/js/vite.mjs"
     },
-    "./web-awesome.css": "./resources/js/web-awesome.css"
+    "./web-awesome.css": "./resources/js/web-awesome.css",
+    "./tailwind.css": "./resources/js/tailwind.css",
+    "./web-awesome-tailwind": "./resources/js/web-awesome-tailwind.mjs",
+    "./primevue": "./resources/js/primevue.ts"
   },
   "scripts": {
     "build": "vp build",
@@ -47,9 +50,12 @@
     "test": "vp test run --project unit",
     "test:browser": "vp test run --project chromium",
     "test:coverage": "vp test run --coverage",
-    "check": "vp check && npm run typecheck",
+    "check": "vp check && npm run typecheck && npm run theme:check",
     "check:fix": "vp check --fix",
-    "typecheck": "vue-tsc --noEmit"
+    "typecheck": "vue-tsc --noEmit",
+    "theme:generate": "node scripts/generate-theme.mjs",
+    "theme:check": "node scripts/generate-theme.mjs --check && node scripts/check-theme-compatibility.mjs",
+    "test:theme": "node scripts/test-peer-installation.mjs && node scripts/test-theme-consumer.mjs"
   },
   "dependencies": {
     "@awesome.me/webawesome": "^3.14.0",
@@ -57,11 +63,13 @@
   },
   "devDependencies": {
     "@artisan-toolbox/mosaicast": "file:vendor/artisan-toolbox/mosaicast",
+    "@primeuix/themes": "2.0.3",
     "@tailwindcss/vite": "^4.3.4",
     "@types/node": "^24.13.3",
     "@vitejs/plugin-vue": "^6.0.0",
     "@vitest/browser-playwright": "4.1.11",
     "@vitest/coverage-v8": "4.1.11",
+    "primevue": "4.5.5",
     "typescript": "^5.8.3",
     "vite-plus": "0.3.3",
     "vue-tsc": "^3.3.14"
@@ -69,8 +77,14 @@
   "peerDependencies": {
     "@artisan-toolbox/mosaicast": "^1.1.1",
     "@inertiajs/vue3": "^3.0.0",
+    "@primeuix/themes": "*",
     "tailwindcss": "^4.0.0",
     "vue": "^3.5.0"
+  },
+  "peerDependenciesMeta": {
+    "@primeuix/themes": {
+      "optional": true
+    }
   },
   "overrides": {
     "vite": "npm:@voidzero-dev/vite-plus-core@0.3.3",

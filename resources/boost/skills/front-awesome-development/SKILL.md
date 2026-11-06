@@ -9,13 +9,15 @@ Front Awesome provides reusable Vue components and Laravel frontend integrations
 
 ## Install and use
 
-1. Run `composer require artisan-toolbox/front-awesome` before installing frontend dependencies.
+Start in an existing Laravel 13 application with PHP 8.5, Inertia 3, Vue 3.5, Tailwind 4, Vite, and Node.js 24.11 or later. Front Awesome's `1.x` branch is a development preview without a stable Composer release. Check the installed Composer version and its `package.json` exports before choosing an API. Older preview revisions may not include the Vite plugin or shared branding entries below.
+
+1. To opt into the `1.x` preview, run `composer require 'artisan-toolbox/front-awesome:^1.0@dev'` in the application root before installing frontend dependencies. Keep the stability exception scoped to this package. When a compatible stable release is available, use its documented stable constraint instead.
 2. Declare both frontend packages in the application's `package.json`. Mosaicast is a peer dependency of Front Awesome. Run `npm install --install-links ./vendor/artisan-toolbox/front-awesome ./vendor/artisan-toolbox/mosaicast` from the application root. Keep `install-links=true` in the application's `.npmrc` so `npm ci` uses the same mode.
-3. Configure `@vitejs/plugin-vue` with `template.compilerOptions.isCustomElement` for tags that start with `wa-`.
+3. Add `frontAwesome()` from `@artisan-toolbox/front-awesome/vite` alongside `@vitejs/plugin-vue` in the application's Vite plugins. It recognizes `wa-` custom elements automatically and preserves existing custom element matchers and Vue compiler options.
 4. Import `@artisan-toolbox/front-awesome/styles.css` after Tailwind in the application's CSS entry. If the application needs the standard Web Awesome stylesheet, import `@artisan-toolbox/front-awesome/web-awesome.css` from the JavaScript entry.
 5. Import `@artisan-toolbox/front-awesome/components/Button.vue` from a Vue page. Pass the label through the default slot and use Web Awesome attributes such as `variant="brand"`.
 
-The application compiles the Vue and CSS sources through Vite. For SSR, include `@artisan-toolbox/front-awesome` in `ssr.noExternal` so Vite processes the Vue files. The button loads its Web Awesome element in the browser.
+Run the application's `npm run build`, open the page with the button, and confirm that its label and brand styling appear. The application compiles the Vue and CSS sources through Vite. For SSR, include `@artisan-toolbox/front-awesome` in `ssr.noExternal` so Vite processes the Vue files. The button loads its Web Awesome element in the browser.
 
 Use the application's Web Awesome theme and `--wa-*` tokens. Keep theme selection and token overrides in the application.
 
@@ -33,4 +35,16 @@ In Laravel, use the `ArtisanToolbox\FrontAwesome\Facades\Toast` methods `brand($
 
 To change the default icons for toasts sent from Laravel, run `php artisan vendor:publish --tag=front-awesome-config` and edit `webawesome.toast.icons` in `config/front-awesome.php`. Set a variant to `null` to disable its default. An explicit toast icon takes priority. For toasts created in Vue, pass `icon` to `show()` when you want one.
 
-[Front Awesome documentation](https://artisantoolbox.wsssoftware.com.br/packages/front-awesome/)
+[Front Awesome documentation](https://atb.dev.br/docs/front-awesome/)
+
+## Shared application branding
+
+Publish the editable branding file with `php artisan vendor:publish --tag=front-awesome-branding`. Import `@artisan-toolbox/front-awesome/tailwind.css` followed by `./branding.css` in the application's CSS entry. Import that CSS before `@artisan-toolbox/front-awesome/web-awesome-tailwind` in JavaScript. Keep the package adapters imported and edit only application branding. Ordinary republishing preserves your file.
+
+Use the shared `@theme` variables for colors, fonts, spacing, radii, and complete shadows. The class-based dark variant follows `.dark`; `createFrontAwesome({ theme: true })` manages `.dark`, `.wa-light`, and `.wa-dark`. Use one appearance controller per document. Add `fa-theme` to local branding scopes.
+
+For optional PrimeVue 4 styled mode, install `primevue` and `@primeuix/themes`, import `frontAwesomePrimeVueTheme` from `@artisan-toolbox/front-awesome/primevue`, and pass it as PrimeVue's `theme` option. Keep its named CSS layer and `.wa-dark` selector. Removing this import removes the optional adapter.
+
+Read the [shared theme guide](https://atb.dev.br/docs/front-awesome/shared-theme/), [branding reference](https://atb.dev.br/docs/front-awesome/branding/), and [wa-page guide](https://atb.dev.br/docs/front-awesome/page/) for mappings, shadow limitations, and responsive recipes. Existing `styles.css` and `web-awesome.css` remain available for application-owned theme setups.
+
+Run the application's `npm run build` after changing branding, then check the rendered button and light and dark modes in the browser.

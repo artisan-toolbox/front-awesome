@@ -1,0 +1,35 @@
+@layer theme, base, wa-native, wa-base, wa-utilities, wa-color-palette, wa-color-variant, wa-theme, wa-theme-dimension, wa-theme-overrides, app-branding, primevue, components, utilities;
+@import 'tailwindcss';
+@import './theme/tokens.css';
+@source './components';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Restore upstream shadow-slot padding removed by Preflight. Utilities still win. */
+@layer base {
+    body {
+        background-color: var(--wa-color-surface-default);
+        color: var(--wa-color-text-normal);
+    }
+
+    wa-page
+        > :where(
+            main:not([slot]),
+            section:not([slot]),
+            main[slot=''],
+            section[slot=''],
+            [slot='banner'],
+            [slot='header'],
+            [slot='subheader'],
+            [slot='navigation'],
+            [slot='navigation-header'],
+            [slot='navigation-footer'],
+            [slot='menu'],
+            [slot='aside'],
+            [slot='main-header'],
+            [slot='main-footer'],
+            [slot='footer']
+        ) {
+        padding: revert-layer;
+    }
+}

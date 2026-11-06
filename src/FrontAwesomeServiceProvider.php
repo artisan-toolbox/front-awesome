@@ -19,6 +19,10 @@ final class FrontAwesomeServiceProvider extends ServiceProvider
             $this->publishes([
                 dirname(__DIR__).'/config/front-awesome.php' => config_path('front-awesome.php'),
             ], 'front-awesome-config');
+
+            $this->publishes([
+                dirname(__DIR__).'/resources/css/branding.css' => resource_path('css/branding.css'),
+            ], 'front-awesome-branding');
         }
     }
 }

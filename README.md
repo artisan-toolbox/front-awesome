@@ -6,11 +6,11 @@
 
 <p id="maintainer-badges" align="center">
 <a href="https://github.com/artisan-toolbox/front-awesome/releases"><img src="https://img.shields.io/badge/Release-in%20development-lightgrey?style=flat-square" alt="Release"></a>
-<a href="https://artisantoolbox.wsssoftware.com.br/packages/front-awesome/"><img src="https://img.shields.io/badge/PHP-%5E8.5-777BB4?style=flat-square" alt="PHP"></a>
-<a href="https://artisantoolbox.wsssoftware.com.br/packages/front-awesome/"><img src="https://img.shields.io/badge/Laravel-13-FF2D20?style=flat-square" alt="Laravel"></a>
-<a href="https://artisantoolbox.wsssoftware.com.br/packages/front-awesome/"><img src="https://img.shields.io/badge/Node.js-%3E%3D24.11.0-339933?style=flat-square" alt="Node.js"></a>
+<a href="https://atb.dev.br/packages/front-awesome/"><img src="https://img.shields.io/badge/PHP-%5E8.5-777BB4?style=flat-square" alt="PHP"></a>
+<a href="https://atb.dev.br/packages/front-awesome/"><img src="https://img.shields.io/badge/Laravel-13-FF2D20?style=flat-square" alt="Laravel"></a>
+<a href="https://atb.dev.br/packages/front-awesome/"><img src="https://img.shields.io/badge/Node.js-%3E%3D24.11.0-339933?style=flat-square" alt="Node.js"></a>
 <a href="https://github.com/artisan-toolbox/front-awesome/actions/workflows/tests.yml?query=branch%3A1.x"><img src="https://img.shields.io/github/actions/workflow/status/artisan-toolbox/front-awesome/tests.yml?branch=1.x&amp;label=Tests&amp;style=flat-square" alt="Tests"></a>
-<a href="https://artisantoolbox.wsssoftware.com.br/packages/front-awesome/"><img src="https://img.shields.io/badge/Docs-Read-blue?style=flat-square" alt="Docs"></a>
+<a href="https://atb.dev.br/packages/front-awesome/"><img src="https://img.shields.io/badge/Docs-Read-blue?style=flat-square" alt="Docs"></a>
 </p>
 
 <p id="maintainer-description" align="center">
@@ -33,7 +33,7 @@ The initial `1.x` release is in development. It targets PHP 8.5, Laravel 13, Vue
 
 ## Usage
 
-After configuring Vite and loading the package styles, import the button in a Vue page.
+After configuring Vite and loading the package styles, import the button in a Vue page. For shared Tailwind, Web Awesome, and optional PrimeVue branding, follow the [shared theme guide](https://atb.dev.br/packages/front-awesome/shared-theme/).
 
 ```vue
 <template>
@@ -47,7 +47,7 @@ import Button from '@artisan-toolbox/front-awesome/components/Button.vue';
 
 ## Resources
 
-- [Documentation](https://artisantoolbox.wsssoftware.com.br/packages/front-awesome/)
+- [Documentation](https://atb.dev.br/packages/front-awesome/)
 - [Changelog](CHANGELOG.md)
 - [Contributing](.github/CONTRIBUTING.md)
 - [Security policy](.github/SECURITY.md)
