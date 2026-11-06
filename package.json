@@ -1,7 +1,7 @@
 {
   "$schema": "https://www.schemastore.org/package.json",
   "name": "@artisan-toolbox/front-awesome",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha.1",
   "private": true,
   "description": "Reusable Vue components and frontend integrations for Laravel and Inertia applications.",
   "keywords": [

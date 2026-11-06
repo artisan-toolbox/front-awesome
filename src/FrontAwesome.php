@@ -12,7 +12,7 @@ use ArtisanToolbox\Maintainer\Versionable\Readme\Head;
 /** @internal */
 final class FrontAwesome implements Versionable, WithReadmeHead
 {
-    public const string VERSION = '1.0.0';
+    public const string VERSION = '1.0.0-alpha.1';
 
     public function readmeHead(): Head
     {
