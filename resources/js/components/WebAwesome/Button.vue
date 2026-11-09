@@ -15,7 +15,7 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue';
-import type { ButtonProps } from '../WebAwesome/buttonProps';
+import type { ButtonProps } from '../../WebAwesome/buttonProps';
 
 interface Props extends /* @vue-ignore */ ButtonProps {
     disabled?: boolean;

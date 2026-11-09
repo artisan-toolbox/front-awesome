@@ -21,6 +21,6 @@ void createInertiaApp({
     },
     resolve: () => defineComponent({ render: () => h(Fixture) }),
     withApp(app) {
-        app.use(createFrontAwesome({ theme: true }));
+        app.use(createFrontAwesome({ appearance: true }));
     },
 });

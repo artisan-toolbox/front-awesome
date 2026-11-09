@@ -1,20 +1,20 @@
 import { shallowRef } from 'vue';
 import type { App, InjectionKey, Ref } from 'vue';
 
-export type ThemePreference = 'system' | 'light' | 'dark';
+export type AppearancePreference = 'system' | 'light' | 'dark';
 
-interface ThemeController {
-    theme: Readonly<Ref<ThemePreference>>;
-    setTheme: (preference: ThemePreference) => void;
+interface AppearanceController {
+    appearance: Readonly<Ref<AppearancePreference>>;
+    setAppearance: (preference: AppearancePreference) => void;
     toggle: () => void;
 }
 
-export const themeKey: InjectionKey<ThemeController> = Symbol('Front Awesome theme');
+export const appearanceKey: InjectionKey<AppearanceController> = Symbol('Front Awesome appearance');
 
 const storageKey = 'appearance';
-const activeThemes = new WeakMap<Document, ReturnType<typeof createTheme>>();
+const activeAppearances = new WeakMap<Document, ReturnType<typeof createAppearance>>();
 
-function storedTheme(view: Window | null | undefined): ThemePreference {
+function storedAppearance(view: Window | null | undefined): AppearancePreference {
     try {
         const value = view?.localStorage.getItem(storageKey);
 
@@ -28,14 +28,14 @@ function storedTheme(view: Window | null | undefined): ThemePreference {
     return 'system';
 }
 
-function createTheme(document?: Document) {
+function createAppearance(document?: Document) {
     const view = document?.defaultView;
     const media = view?.matchMedia?.('(prefers-color-scheme: dark)');
-    const theme = shallowRef(storedTheme(view));
+    const appearance = shallowRef(storedAppearance(view));
     const isDark = (): boolean =>
-        theme.value === 'system' ? media?.matches === true : theme.value === 'dark';
+        appearance.value === 'system' ? media?.matches === true : appearance.value === 'dark';
 
-    function applyTheme(): void {
+    function applyAppearance(): void {
         const classes = document?.documentElement.classList;
         const dark = isDark();
 
@@ -45,16 +45,16 @@ function createTheme(document?: Document) {
     }
 
     function systemChanged(): void {
-        if (theme.value === 'system') {
-            applyTheme();
+        if (appearance.value === 'system') {
+            applyAppearance();
         }
     }
 
-    const controller: ThemeController = {
-        theme,
-        setTheme(preference) {
-            theme.value = preference;
-            applyTheme();
+    const controller: AppearanceController = {
+        appearance,
+        setAppearance(preference) {
+            appearance.value = preference;
+            applyAppearance();
 
             try {
                 view?.localStorage.setItem(storageKey, preference);
@@ -63,11 +63,11 @@ function createTheme(document?: Document) {
             }
         },
         toggle() {
-            controller.setTheme(isDark() ? 'light' : 'dark');
+            controller.setAppearance(isDark() ? 'light' : 'dark');
         },
     };
 
-    applyTheme();
+    applyAppearance();
     media?.addEventListener('change', systemChanged);
 
     return {
@@ -77,17 +77,17 @@ function createTheme(document?: Document) {
     };
 }
 
-export function initializeTheme(app: App): void {
+export function initializeAppearance(app: App): void {
     if (typeof document === 'undefined') {
-        app.provide(themeKey, createTheme().controller);
+        app.provide(appearanceKey, createAppearance().controller);
         return;
     }
 
     const ownerDocument = document;
-    const active = activeThemes.get(ownerDocument) ?? createTheme(ownerDocument);
-    activeThemes.set(ownerDocument, active);
+    const active = activeAppearances.get(ownerDocument) ?? createAppearance(ownerDocument);
+    activeAppearances.set(ownerDocument, active);
     active.owners++;
-    app.provide(themeKey, active.controller);
+    app.provide(appearanceKey, active.controller);
 
     let released = false;
     app.onUnmount(() => {
@@ -100,7 +100,7 @@ export function initializeTheme(app: App): void {
 
         if (active.owners === 0) {
             active.disconnect();
-            activeThemes.delete(ownerDocument);
+            activeAppearances.delete(ownerDocument);
         }
     });
 }

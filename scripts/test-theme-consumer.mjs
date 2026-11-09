@@ -3,9 +3,11 @@ import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { build, preview, createServer } from 'vite';
 import tailwindcss from '@tailwindcss/vite';
+import vue from '@vitejs/plugin-vue';
 import { chromium } from 'playwright';
 import { frontAwesome } from '../resources/js/vite.mjs';
 import { hues, roles, stops } from './theme-tokens.mjs';
+import { verifyBranding } from './verify-theme-branding.mjs';
 import { measureContrast } from './browser-contrast.mjs';
 
 const root = resolve(import.meta.dirname, '../tests/theme-consumer');
@@ -20,6 +22,7 @@ console.log(`Chromium ${browser.version()}`);
 try {
     for (const prime of [false, true]) {
         const plugins = [
+            vue(),
             frontAwesome(),
             tailwindcss(),
             {
@@ -108,6 +111,48 @@ try {
                 ['0px', '0px', '100%'],
             ]);
             assert.equal(first.toggle, 'none');
+            await page.waitForFunction(() =>
+                [...document.querySelectorAll('wa-tag')].every(
+                    (tag) =>
+                        tag.shadowRoot?.querySelector('slot') &&
+                        tag.querySelector('wa-icon')?.shadowRoot?.querySelector('svg'),
+                ),
+            );
+            const tags = await page.evaluate(() =>
+                ['native', 'wrapper'].map((kind) =>
+                    [0, 1, 2].map((index) => {
+                        const tag = document.querySelector(`#tag-${kind}-${index}`);
+                        const css = getComputedStyle(tag);
+                        const bounds = tag.getBoundingClientRect();
+                        const content = tag.firstElementChild.getBoundingClientRect();
+                        const icon = tag.querySelector('wa-icon').getBoundingClientRect();
+                        return {
+                            padding: [css.paddingLeft, css.paddingRight].map(parseFloat),
+                            border: parseFloat(css.borderLeftWidth),
+                            iconInset: icon.left - bounds.left,
+                            contentFits:
+                                content.top >= bounds.top && content.bottom <= bounds.bottom,
+                        };
+                    }),
+                ),
+            );
+            for (const [index, [native, zero, custom]] of tags.entries()) {
+                const kind = index === 0 ? 'native' : 'wrapper';
+                assert.ok(
+                    native.padding.every((padding) => padding > 0),
+                    `${kind} Tag retains native horizontal padding`,
+                );
+                assert.ok(native.border > 0, `${kind} Tag retains its native border`);
+                assert.ok(
+                    native.iconInset > native.border,
+                    `${kind} Tag insets its icon from the border`,
+                );
+                assert.ok(native.contentFits, `${kind} Tag contains the icon and label`);
+                assert.deepEqual(zero.padding, [0, 0]);
+                assert.equal(zero.border, 0);
+                assert.deepEqual(custom.padding, [16, 16]);
+                assert.equal(custom.border, 4);
+            }
             const foundations = await page.evaluate(() => {
                 const scope = document.createElement('section');
                 scope.className = 'fa-theme';
@@ -449,6 +494,7 @@ try {
                 await page.keyboard.press('Escape');
                 await overlay.waitFor({ state: 'hidden' });
             }
+            await verifyBranding(page, { prime });
             await page.setViewportSize({ width: 390, height: 800 });
             await page.waitForFunction(
                 () => document.querySelector('wa-page')?.getAttribute('view') === 'mobile',

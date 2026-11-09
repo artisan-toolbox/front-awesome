@@ -48,7 +48,7 @@ export default defineConfig({
             },
             {
                 extends: true,
-                optimizeDeps: { include: ['@artisan-toolbox/mosaicast'] },
+                optimizeDeps: { include: ['@artisan-toolbox/mosaicast', 'vue/server-renderer'] },
                 test: {
                     include: ['tests/frontend/**/*.browser.test.ts'],
                     browser: {

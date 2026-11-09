@@ -116,7 +116,9 @@ test('recognizes Web Awesome elements in the development server', async () => {
     });
 
     try {
-        const result = await server.transformRequest('/resources/js/components/Button.vue');
+        const result = await server.transformRequest(
+            '/resources/js/components/WebAwesome/Button.vue',
+        );
 
         expect(result?.code).toContain('wa-button');
         expect(result?.code).not.toMatch(/resolveComponent\(["']wa-/);

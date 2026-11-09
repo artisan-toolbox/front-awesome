@@ -1,6 +1,7 @@
 @import '@artisan-toolbox/front-awesome/tailwind.css';
 @import '../../resources/css/branding.css';
 @source inline('p-0 p-4 shadow-md font-sans rounded-md text-black dark:text-white bg-white dark:bg-black');
+@source inline('bg-{gray,green,yellow,orange,red}-{50,100,200,300,400,500,600,700,800,900,950}');
 @theme {
     --font-sans: Georgia, serif;
     --radius-md: 0.625rem;

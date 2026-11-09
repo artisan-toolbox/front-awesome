@@ -1,15 +1,21 @@
 @layer theme, base, wa-native, wa-base, wa-utilities, wa-color-palette, wa-color-variant, wa-theme, wa-theme-dimension, wa-theme-overrides, app-branding, primevue, components, utilities;
-@import 'tailwindcss';
+/* Retain native theme inputs referenced at runtime by the optional PrimeVue preset. */
+@import 'tailwindcss' theme(static);
 @import './theme/tokens.css';
 @source './components';
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Restore upstream shadow-slot padding removed by Preflight. Utilities still win. */
+/* Restore upstream host and shadow-slot styles removed by Preflight. Utilities still win. */
 @layer base {
     body {
         background-color: var(--wa-color-surface-default);
         color: var(--wa-color-text-normal);
+    }
+
+    wa-tag {
+        padding: revert-layer;
+        border: revert-layer;
     }
 
     wa-page

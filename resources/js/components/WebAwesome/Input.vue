@@ -1,0 +1,197 @@
+<template>
+    <wa-input
+        ref="element"
+        v-bind="rootBindings()"
+        :value.attr="resetValue()"
+        :form.attr="typeof props.form === 'string' ? props.form : null"
+        :aria-invalid="invalid ? 'true' : attrs['aria-invalid']"
+        :data-fa-invalid="invalid ? '' : null"
+        :class="{ 'fa-input-invalid': invalid }"
+    >
+        <component :is="slotContent" />
+        <span v-if="invalid" slot="hint" role="alert">
+            <span v-for="(message, index) in errors" :key="index" class="fa-input-error">{{
+                message
+            }}</span>
+        </span>
+    </wa-input>
+</template>
+
+<script setup lang="ts" generic="T extends object">
+import {
+    cloneVNode,
+    createTextVNode,
+    Fragment,
+    h,
+    isVNode,
+    mergeProps,
+    onBeforeUnmount,
+    onMounted,
+    shallowRef,
+    useAttrs,
+    useSlots,
+    useTemplateRef,
+    watchEffect,
+} from 'vue';
+import type { VNode } from 'vue';
+import type WaInput from '@awesome.me/webawesome/dist/components/input/input.js';
+import type { InputAttributes } from '../../WebAwesome/inputProps';
+import { inputBooleanAttributes } from '../../WebAwesome/inputProps';
+import { useFormBridge } from '../../WebAwesome/useFormBridge';
+import type { FormBindingProps, FormBridgeValue } from '../../WebAwesome/useFormBridge';
+
+interface Attributes extends /* @vue-ignore */ InputAttributes {}
+type Props = Attributes & FormBindingProps<T>;
+
+defineOptions({ inheritAttrs: false });
+const props = defineProps<Props>();
+const emit = defineEmits<{ 'update:modelValue': [value: FormBridgeValue] }>();
+const attrs = useAttrs();
+const slots = useSlots();
+const { value, errors, invalid } = useFormBridge(props, {
+    emitValue: (next) => emit('update:modelValue', next),
+});
+const element = useTemplateRef<WaInput>('element');
+const registered = shallowRef(false);
+const initialValue = value.value;
+function resetValue() {
+    if (Object.hasOwn(attrs, 'defaultValue')) return attrs.defaultValue;
+    if (Object.hasOwn(attrs, 'default-value')) return attrs['default-value'];
+    return initialValue === undefined ? '' : initialValue;
+}
+let active = true;
+
+function normalizeName(key: string) {
+    return key.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
+}
+
+function rootBindings() {
+    const modifiers = attrs.modelModifiers;
+    if (modifiers && typeof modifiers === 'object' && Object.keys(modifiers).length > 0) {
+        throw new Error('Front Awesome Input requires unmodified v-model.');
+    }
+    const bindings: Record<string, unknown> = {};
+    for (const [key, next] of Object.entries(attrs)) {
+        if (key === 'value' || key === '.value' || key === '^value') {
+            throw new Error('Front Awesome Input uses v-model or form for its current value.');
+        }
+        if (key === 'defaultValue' || key === 'default-value' || key === 'modelModifiers') continue;
+        const name = key.startsWith('on') ? key : normalizeName(key);
+        if (Object.hasOwn(bindings, name) && bindings[name] !== next) {
+            throw new Error(`Front Awesome Input received conflicting aliases for "${name}".`);
+        }
+        bindings[name] = next;
+    }
+    for (const name of inputBooleanAttributes) {
+        if (Object.hasOwn(bindings, name)) {
+            const next = bindings[name];
+            delete bindings[name];
+            bindings[`^${name}`] = next === false || next == null ? null : '';
+        }
+    }
+    if (Object.hasOwn(bindings, 'autocorrect'))
+        bindings['^autocorrect'] =
+            bindings.autocorrect == null
+                ? null
+                : bindings.autocorrect === false || bindings.autocorrect === 'off'
+                  ? 'off'
+                  : 'on';
+    if (Object.hasOwn(bindings, 'spellcheck'))
+        bindings['^spellcheck'] =
+            bindings.spellcheck == null
+                ? null
+                : bindings.spellcheck === false || bindings.spellcheck === 'false'
+                  ? 'false'
+                  : 'true';
+    delete bindings.autocorrect;
+    delete bindings.spellcheck;
+    if (invalid.value) bindings.hint = '';
+    return mergeProps({ onInput: onInput }, bindings);
+}
+
+function onInput(event: Event) {
+    if (event.currentTarget === element.value && element.value) value.value = element.value.value;
+}
+
+function projectSlot(nodes: VNode[], name?: string): VNode[] {
+    return nodes.flatMap((node) => {
+        if (node.type === Fragment && Array.isArray(node.children))
+            return projectSlot(
+                node.children.flatMap((child) => {
+                    if (isVNode(child)) return [child];
+                    if (typeof child === 'string' || typeof child === 'number')
+                        return [createTextVNode(String(child))];
+                    return [];
+                }),
+                name,
+            );
+        if (invalid.value && (name === 'hint' || node.props?.slot === 'hint')) return [];
+        if (!name) return [node];
+        return [
+            typeof node.type === 'string' || typeof node.type === 'object'
+                ? cloneVNode(node, { slot: name })
+                : h('span', { slot: name }, [node]),
+        ];
+    });
+}
+
+const slotContent = () =>
+    Object.entries(slots).flatMap(([name, slot]) =>
+        projectSlot(slot?.() ?? [], name === 'default' ? undefined : name),
+    );
+
+watchEffect(() => {
+    const input = element.value;
+    if (!registered.value || !input) return;
+    const next = value.value === undefined ? '' : value.value;
+    input.value = next;
+    if (next === null && input.value !== null) {
+        input.value = '';
+        input.value = null;
+    }
+});
+
+function onReset(event: Event) {
+    const input = element.value;
+    if (!input || input.form !== event.target) return;
+    queueMicrotask(() => {
+        if (active && !event.defaultPrevented) value.value = input.value;
+    });
+}
+
+onMounted(async () => {
+    await import('#front-awesome-webawesome/components/input/input.js');
+    if (!active || !element.value) return;
+    registered.value = true;
+    element.value.ownerDocument.addEventListener('reset', onReset, true);
+});
+
+onBeforeUnmount(() => {
+    active = false;
+    element.value?.ownerDocument.removeEventListener('reset', onReset, true);
+});
+</script>
+
+<style scoped>
+.fa-input-error {
+    display: block;
+}
+.fa-input-invalid {
+    --wa-form-control-label-color: var(--wa-color-danger-on-quiet);
+    --wa-form-control-hint-color: var(--wa-color-danger-on-quiet);
+    --wa-form-control-value-color: var(--wa-color-danger-on-quiet);
+    --wa-form-control-placeholder-color: var(--wa-color-danger-on-quiet);
+    --wa-form-control-border-color: var(--wa-color-danger-border-loud);
+    --wa-color-focus: var(--wa-color-danger-border-loud);
+}
+.fa-input-invalid::part(input-wrapper) {
+    border-color: var(--wa-color-danger-border-loud);
+    background-color: var(--wa-color-danger-fill-quiet);
+}
+.fa-input-invalid::part(start),
+.fa-input-invalid::part(end),
+.fa-input-invalid::part(clear-button),
+.fa-input-invalid::part(password-toggle-button) {
+    color: var(--wa-color-danger-on-quiet);
+}
+</style>

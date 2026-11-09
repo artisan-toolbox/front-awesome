@@ -57,6 +57,81 @@
     /* --color-brand-950: var(--color-indigo-950); */
 
     /*
+     * Existing role inputs use physical Tailwind palettes. Uncomment a complete
+     * ramp to change neutral, success, warning, or danger colors across consumers.
+     * These overrides also change physical utilities such as bg-green-500 and
+     * role classes such as wa-brand-green. They are not role-only aliases.
+     * Leave every example commented to preserve the shipped defaults.
+     * PrimeVue retains Aura's severity choices. Its warn buttons, tags, and badges
+     * use orange, while warn messages and toasts use yellow. Change both ramps
+     * when those warning families should share your application's palette.
+     */
+    /* Neutral and PrimeVue surfaces. */
+    /* --color-gray-50: var(--color-slate-50); */
+    /* --color-gray-100: var(--color-slate-100); */
+    /* --color-gray-200: var(--color-slate-200); */
+    /* --color-gray-300: var(--color-slate-300); */
+    /* --color-gray-400: var(--color-slate-400); */
+    /* --color-gray-500: var(--color-slate-500); */
+    /* --color-gray-600: var(--color-slate-600); */
+    /* --color-gray-700: var(--color-slate-700); */
+    /* --color-gray-800: var(--color-slate-800); */
+    /* --color-gray-900: var(--color-slate-900); */
+    /* --color-gray-950: var(--color-slate-950); */
+
+    /* Success. */
+    /* --color-green-50: var(--color-emerald-50); */
+    /* --color-green-100: var(--color-emerald-100); */
+    /* --color-green-200: var(--color-emerald-200); */
+    /* --color-green-300: var(--color-emerald-300); */
+    /* --color-green-400: var(--color-emerald-400); */
+    /* --color-green-500: var(--color-emerald-500); */
+    /* --color-green-600: var(--color-emerald-600); */
+    /* --color-green-700: var(--color-emerald-700); */
+    /* --color-green-800: var(--color-emerald-800); */
+    /* --color-green-900: var(--color-emerald-900); */
+    /* --color-green-950: var(--color-emerald-950); */
+
+    /* WA warning and PrimeVue warn messages and toasts. */
+    /* --color-yellow-50: var(--color-amber-50); */
+    /* --color-yellow-100: var(--color-amber-100); */
+    /* --color-yellow-200: var(--color-amber-200); */
+    /* --color-yellow-300: var(--color-amber-300); */
+    /* --color-yellow-400: var(--color-amber-400); */
+    /* --color-yellow-500: var(--color-amber-500); */
+    /* --color-yellow-600: var(--color-amber-600); */
+    /* --color-yellow-700: var(--color-amber-700); */
+    /* --color-yellow-800: var(--color-amber-800); */
+    /* --color-yellow-900: var(--color-amber-900); */
+    /* --color-yellow-950: var(--color-amber-950); */
+
+    /* PrimeVue warn buttons, tags, and badges. */
+    /* --color-orange-50: var(--color-amber-50); */
+    /* --color-orange-100: var(--color-amber-100); */
+    /* --color-orange-200: var(--color-amber-200); */
+    /* --color-orange-300: var(--color-amber-300); */
+    /* --color-orange-400: var(--color-amber-400); */
+    /* --color-orange-500: var(--color-amber-500); */
+    /* --color-orange-600: var(--color-amber-600); */
+    /* --color-orange-700: var(--color-amber-700); */
+    /* --color-orange-800: var(--color-amber-800); */
+    /* --color-orange-900: var(--color-amber-900); */
+    /* --color-orange-950: var(--color-amber-950); */
+
+    /* Danger. */
+    /* --color-red-50: var(--color-rose-50); */
+    /* --color-red-100: var(--color-rose-100); */
+    /* --color-red-200: var(--color-rose-200); */
+    /* --color-red-300: var(--color-rose-300); */
+    /* --color-red-400: var(--color-rose-400); */
+    /* --color-red-500: var(--color-rose-500); */
+    /* --color-red-600: var(--color-rose-600); */
+    /* --color-red-700: var(--color-rose-700); */
+    /* --color-red-800: var(--color-rose-800); */
+    /* --color-red-900: var(--color-rose-900); */
+    /* --color-red-950: var(--color-rose-950); */
+
+    /*
      * Add a color for new Tailwind utilities such as bg-project-accent.
      * This does not create a WA variant or a wa-brand-project-accent class.
      * To use a custom color family as the brand, define its full ramp and assign

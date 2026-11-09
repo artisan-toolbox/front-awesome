@@ -3,16 +3,28 @@ import Aura from '@primeuix/themes/aura';
 
 const stops = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
 const hues = [
+    'slate',
+    'gray',
+    'zinc',
+    'neutral',
+    'stone',
     'red',
     'orange',
+    'amber',
     'yellow',
+    'lime',
     'green',
+    'emerald',
+    'teal',
     'cyan',
+    'sky',
     'blue',
     'indigo',
+    'violet',
     'purple',
+    'fuchsia',
     'pink',
-    'gray',
+    'rose',
 ];
 const palette = (hue: string) =>
     Object.fromEntries(stops.map((stop) => [stop, `var(--color-${hue}-${stop})`]));

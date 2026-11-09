@@ -2,7 +2,8 @@ import { createRenderer, createSSRApp, h } from 'vue';
 import { renderToString } from 'vue/server-renderer';
 import { expect, onTestFinished, test, vi } from 'vite-plus/test';
 import { createFrontAwesome } from '@artisan-toolbox/front-awesome';
-import Theme from '@artisan-toolbox/front-awesome/components/Theme.vue';
+import { Appearance as NamedAppearance } from '@artisan-toolbox/front-awesome/components';
+import Appearance from '@artisan-toolbox/front-awesome/components/Appearance.vue';
 
 vi.mock('@awesome.me/webawesome/dist/components/toast/toast.js', () => ({}));
 
@@ -19,8 +20,8 @@ const renderer = createRenderer<object, object>({
     nextSibling: () => null,
 });
 
-interface ThemeSlot {
-    theme: 'system' | 'dark' | 'light';
+interface AppearanceSlot {
+    appearance: 'system' | 'dark' | 'light';
     toggle: () => void;
     system: () => void;
     dark: () => void;
@@ -28,7 +29,7 @@ interface ThemeSlot {
 }
 
 async function mountSelector() {
-    let slot: ThemeSlot | undefined;
+    let slot: AppearanceSlot | undefined;
     let serverRender = true;
     const app = renderer
         .createApp({
@@ -38,18 +39,18 @@ async function mountSelector() {
                 }
 
                 return h(
-                    Theme,
+                    Appearance,
                     {},
                     {
-                        default: (themeSlot: ThemeSlot) => {
-                            slot = themeSlot;
-                            return h('output', themeSlot.theme);
+                        default: (appearanceSlot: AppearanceSlot) => {
+                            slot = appearanceSlot;
+                            return h('output', appearanceSlot.appearance);
                         },
                     },
                 );
             },
         })
-        .use(createFrontAwesome({ theme: true }));
+        .use(createFrontAwesome({ appearance: true }));
 
     // Vitest compiles Vue templates for SSR. Mount the app shell to exercise its cleanup.
     await renderToString(app);
@@ -67,7 +68,7 @@ async function mountSelector() {
     });
 
     if (slot === undefined) {
-        throw new Error('Theme did not render its default slot.');
+        throw new Error('Appearance did not render its default slot.');
     }
 
     return { slot, unmount };
@@ -123,33 +124,39 @@ function useBrowser({
     };
 }
 
+test('exports the same appearance component through named and direct imports', () => {
+    expect(NamedAppearance).toBe(Appearance);
+});
+
 test('renders the default slot with the system preference during SSR', async () => {
     const app = createSSRApp({
         render: () =>
             h(
-                Theme,
+                Appearance,
                 {},
                 {
-                    default: ({ theme }: ThemeSlot) => h('output', theme),
+                    default: ({ appearance }: AppearanceSlot) => h('output', appearance),
                 },
             ),
-    }).use(createFrontAwesome({ theme: true }));
+    }).use(createFrontAwesome({ appearance: true }));
 
     const html = await renderToString(app);
 
     expect(html).toMatch(/^(?:<!--\[-->)?<output>system<\/output>(?:<!--\]-->)?$/);
 });
 
-test('explains how to enable the plugin when a selector is rendered without theme support', async () => {
-    const app = createSSRApp({ render: () => h(Theme) }).use(createFrontAwesome());
+test('explains how to enable the plugin when a selector is rendered without appearance support', async () => {
+    const app = createSSRApp({ render: () => h(Appearance) }).use(createFrontAwesome());
     app.config.warnHandler = () => {};
 
-    await expect(renderToString(app)).rejects.toThrow('createFrontAwesome({ theme: true })');
+    await expect(renderToString(app)).rejects.toThrow('createFrontAwesome({ appearance: true })');
 });
 
-test('applies the stored theme before the Vue app mounts without changing the host theme or palette', () => {
+test('applies the stored appearance before the Vue app mounts without changing the host theme or palette', () => {
     const browser = useBrowser({ stored: 'dark' });
-    const app = renderer.createApp({ render: () => null }).use(createFrontAwesome({ theme: true }));
+    const app = renderer
+        .createApp({ render: () => null })
+        .use(createFrontAwesome({ appearance: true }));
     const beforeMount = new Set(browser.htmlClasses);
     app.mount({});
     onTestFinished(() => app.unmount());
@@ -160,7 +167,7 @@ test('applies the stored theme before the Vue app mounts without changing the ho
     expect(browser.bodyClasses).toEqual(new Set(['wa-light', 'body']));
 });
 
-test('leaves the document classes alone when theme support is disabled', () => {
+test('leaves the document classes alone when appearance support is disabled', () => {
     const browser = useBrowser({ stored: 'dark', dark: true });
     const app = renderer.createApp({ render: () => null }).use(createFrontAwesome());
     app.mount({});

@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- Restore Web Awesome Tag padding and borders removed by Tailwind Preflight in the optional shared theme, while preserving application utility overrides.
+
+- Make Page option optionality explicit for IDE inspection while retaining upstream option types and native defaults.
+
+- Add an unstyled source-preview `Popover` wrapper with upstream-derived `PopoverProps`, interactive default-slot content, external focusable anchors, native lifecycle events, and native host methods.
+
 ## [1.0.0-alpha.1] - 2026-11-06
 
 ### Features
@@ -39,6 +47,21 @@
 
 ## Unreleased
 
+- Add unstyled preview `Tag` and `Tooltip` Vue wrappers with upstream-derived prop types, native slots and events, presence boolean handling, numeric tooltip delay aliases, and Core/Pro-aware browser registration. Tooltip uses an external target ID through `for`.
+
+- Add an unstyled preview `Page` Vue wrapper with upstream-derived `PageProps`, native layout slots and responsive navigation, explicit boolean attributes, and Core/Pro-aware browser registration.
+
+- Add an unstyled preview `Icon` Vue wrapper with upstream-derived `IconProps`, native loading events and accessibility, custom library support, SSR-safe registration, and presence boolean handling. Export it from `components`, `components/WebAwesome`, and both direct `.vue` paths.
+
+- Include complete commented neutral, success, warning, and danger palette examples in the published branding template. Keep physical Tailwind palette ownership and explain Aura's orange and yellow warning inputs.
+- Read the remaining Aura color palettes from Tailwind in the optional PrimeVue preset, so application branding also reaches components using those colors.
+
+- Rename the preview appearance controller API consistently. Replace `{ Theme }` with `{ Appearance }`, direct `components/Theme.vue` imports with `components/Appearance.vue`, and `<Theme>` tags with `<Appearance>`. Replace the plugin option `theme: true` with `appearance: true`, the `ThemePreference` type with `AppearancePreference`, and the `theme` slot value with `appearance`. This breaks the unreleased development preview API; no old-name aliases are retained. The `system`, `light`, `dark`, and `toggle` actions, `system | light | dark` preference values, `localStorage.appearance` key, SSR fallback, and mode classes retain their behavior.
+
+- Group Web Awesome Vue wrappers under `components/WebAwesome` and expose matching component and type imports. Existing `components` imports remain available.
+
+- Add the preview `Input` Vue component and `useFormBridge` composable with exclusive Vue model or dotted Inertia text-field binding, reactive server errors, native form reset synchronization, and Web Awesome attributes, events, slots, and danger styling.
+
 - Clarify preview installation and application build verification in the bundled consumer skill, and link to the migrated documentation routes.
 
 - Preserve false button boolean bindings during initial custom element registration and SSR, including reactive loading and disabled states.
@@ -54,7 +77,7 @@
 - Compose optional button and group attributes from Vue and Web Awesome types, excluding internal fields and duplicate aliases.
 - Export Vue components and their public types together from `@artisan-toolbox/front-awesome/components`.
 - Add a Vue `ButtonGroup.vue` wrapper and use Web Awesome types for button and group attributes.
-- Add an opt-in color mode manager to the Vue plugin and a `Theme.vue` component for custom light, dark, and system controls.
+- Add an opt-in color mode manager to the Vue plugin and an `Appearance.vue` component for custom light, dark, and system controls.
 - Add a Laravel `Toast` facade and a browser toast initializer for Mosaicast events and Inertia session flash.
 - Use a shared `WebAwesome\Variant` enum for standard Web Awesome variants in PHP.
 - Start a toast factory with `Toast::brand()`, `Toast::success()`, `Toast::warning()`, `Toast::danger()`, or `Toast::neutral()`. Call `flash()` or `dispatch()` on the returned factory to send it.

@@ -4,7 +4,7 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue';
-import type { ButtonGroupProps } from '../WebAwesome/buttonProps';
+import type { ButtonGroupProps } from '../../WebAwesome/buttonProps';
 
 interface Props extends /* @vue-ignore */ ButtonGroupProps {}
 
