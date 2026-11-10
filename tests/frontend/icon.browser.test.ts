@@ -137,7 +137,7 @@ test('loads real SVGs, forwards original events, and inherits application stylin
 
 test('retains native custom library options and name precedence over src', async () => {
     const { registerIconLibrary, unregisterIconLibrary } =
-        await import('@awesome.me/webawesome/dist/components/icon/library.js');
+        await import('#front-awesome-webawesome/components/icon/library.js');
     const requests: string[][] = [];
     registerIconLibrary('front-awesome-test', {
         resolver: (name, family, variant) => {

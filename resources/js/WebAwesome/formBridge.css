@@ -1,0 +1,117 @@
+.fa-form-field-frame-inactive {
+    display: contents;
+}
+
+.fa-form-field-frame {
+    display: inline-grid;
+    grid-template-columns: minmax(0, 1fr);
+    min-inline-size: 0;
+    max-inline-size: 100%;
+    vertical-align: middle;
+}
+
+.fa-form-field-frame--intrinsic > :first-child {
+    justify-self: start;
+}
+
+.fa-form-field-frame--intrinsic > .fa-form-error {
+    inline-size: 0;
+    min-inline-size: 100%;
+}
+
+.fa-form-field-frame--block {
+    display: grid;
+    inline-size: 100%;
+}
+
+.fa-form-error {
+    margin-block-start: var(--wa-space-2xs, 0.5em);
+    color: var(--wa-color-danger-on-quiet);
+    font-size: var(--wa-form-control-hint-font-size, 0.875em);
+    font-family: var(--wa-font-family-body, inherit);
+    line-height: var(--wa-line-height-normal, 1.5);
+    overflow-wrap: anywhere;
+}
+
+.fa-form-error-message {
+    display: block;
+}
+
+.fa-form-invalid {
+    --wa-form-control-label-color: var(--wa-color-danger-on-quiet);
+    --wa-form-control-hint-color: var(--wa-color-danger-on-quiet);
+    --wa-form-control-value-color: var(--wa-color-danger-on-quiet);
+    --wa-form-control-placeholder-color: var(--wa-color-danger-on-quiet);
+    --wa-form-control-border-color: var(--wa-color-danger-border-loud);
+    --wa-form-control-background-color: var(--wa-color-danger-fill-quiet);
+    --wa-form-control-activated-color: var(--wa-color-danger-fill-loud);
+    --wa-color-focus: var(--wa-color-danger-border-loud);
+}
+
+.fa-form-invalid[data-fa-form-error-style='form-control']::part(input-wrapper),
+.fa-form-invalid[data-fa-form-error-style='form-control']::part(number-input),
+.fa-form-invalid[data-fa-form-error-style='form-control']::part(textarea-wrapper),
+.fa-form-invalid[data-fa-form-error-style='form-control']::part(tag-input),
+.fa-form-invalid[data-fa-form-error-style='form-control']::part(combobox),
+.fa-form-invalid[data-fa-form-error-style='form-control']::part(segment),
+.fa-form-invalid[data-fa-form-error-style='form-control']::part(dropzone) {
+    border-color: var(--wa-color-danger-border-loud);
+    background-color: var(--wa-color-danger-fill-quiet);
+}
+
+.fa-form-invalid[data-fa-form-error-style='form-control']::part(trigger) {
+    border-color: var(--wa-color-danger-border-loud);
+}
+
+.fa-form-invalid[data-fa-form-error-style='form-control']::part(label),
+.fa-form-invalid[data-fa-form-error-style='form-control']::part(form-control-label),
+.fa-form-invalid[data-fa-form-error-style='form-control']::part(hint),
+.fa-form-invalid[data-fa-form-error-style='form-control']::part(input),
+.fa-form-invalid[data-fa-form-error-style='form-control']::part(textarea),
+.fa-form-invalid[data-fa-form-error-style='form-control']::part(display-input),
+.fa-form-invalid[data-fa-form-error-style='form-control']::part(combobox-input),
+.fa-form-invalid[data-fa-form-error-style='form-control']::part(segment),
+.fa-form-invalid[data-fa-form-error-style='form-control']::part(segment-literal),
+.fa-form-invalid[data-fa-form-error-style='form-control']::part(start),
+.fa-form-invalid[data-fa-form-error-style='form-control']::part(end),
+.fa-form-invalid[data-fa-form-error-style='form-control']::part(clear-button),
+.fa-form-invalid[data-fa-form-error-style='form-control']::part(password-toggle-button),
+.fa-form-invalid[data-fa-form-error-style='form-control']::part(expand-icon),
+.fa-form-invalid[data-fa-form-error-style='form-control']::part(expand-button),
+.fa-form-invalid[data-fa-form-error-style='form-control']::part(stepper-increment),
+.fa-form-invalid[data-fa-form-error-style='form-control']::part(stepper-decrement),
+.fa-form-invalid[data-fa-form-error-style='form-control']::part(dropzone-icon),
+.fa-form-invalid[data-fa-form-error-style='form-control']::part(dropzone-text) {
+    color: var(--wa-color-danger-on-quiet);
+}
+
+.fa-form-invalid[data-fa-form-error-style='symbols'] {
+    --symbol-color: var(--wa-color-danger-on-quiet);
+    --symbol-color-active: var(--wa-color-danger-on-quiet);
+}
+
+.fa-form-invalid[data-fa-form-error-style='calendar'] {
+    --wa-color-text-normal: var(--wa-color-danger-on-quiet);
+    --wa-color-text-quiet: var(--wa-color-danger-on-quiet);
+    --wa-color-brand-fill-loud: var(--wa-color-danger-fill-loud);
+    --wa-color-brand-on-loud: var(--wa-color-danger-on-loud);
+    --wa-color-brand-fill-quiet: var(--wa-color-danger-fill-quiet);
+    --wa-color-brand-fill-normal: var(--wa-color-danger-fill-normal);
+    --wa-color-brand-on-quiet: var(--wa-color-danger-on-quiet);
+}
+
+.fa-form-invalid[data-fa-form-error-style='calendar']::part(date-picker) {
+    border-color: var(--wa-color-danger-border-loud);
+    background-color: var(--wa-color-danger-fill-quiet);
+}
+
+@media (forced-colors: active) {
+    .fa-form-field-frame--invalid,
+    .fa-form-invalid {
+        --wa-color-focus: Highlight;
+    }
+
+    .fa-form-error {
+        color: CanvasText;
+    }
+}

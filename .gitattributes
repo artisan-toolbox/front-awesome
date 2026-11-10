@@ -22,3 +22,7 @@
 /config/maintainer.php         export-ignore
 /config/maintainer_secrets.php export-ignore
 /.npmrc             export-ignore
+
+/.audit export-ignore
+
+/.vitest-attachments export-ignore

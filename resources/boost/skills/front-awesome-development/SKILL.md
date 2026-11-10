@@ -1,6 +1,6 @@
 ---
 name: front-awesome-development
-description: Use Front Awesome Vue components in a Laravel and Inertia application with Vite, Web Awesome, Tailwind CSS, VueUse, and Mosaicast.
+description: Use Front Awesome Vue and Inertia form controls, two-way models, validation, layouts, icons, and theme integrations in Laravel applications.
 ---
 
 # Front Awesome development
@@ -39,7 +39,7 @@ To change the default icons for toasts sent from Laravel, run `php artisan vendo
 
 ## Web Awesome component imports
 
-The Web Awesome wrappers live under `components/WebAwesome`. Import `Button`, `ButtonGroup`, `Input`, `Page`, `Icon`, and their prop types from `@artisan-toolbox/front-awesome/components/WebAwesome`, or import an individual wrapper such as `@artisan-toolbox/front-awesome/components/WebAwesome/Input.vue`. Existing `components` named imports and direct `.vue` imports remain available. `Appearance` stays in `@artisan-toolbox/front-awesome/components` because it controls the application appearance.
+The Web Awesome wrappers live under `components/WebAwesome`. The source preview includes wrappers for all 73 Web Awesome Core 3.14 components. Confirm the installed revision before use. Import components such as `Checkbox`, `Select`, `Option`, `Dialog`, `Card`, `Button`, `ButtonGroup`, `Input`, `Page`, and `Icon`, and their prop types from `@artisan-toolbox/front-awesome/components/WebAwesome`, or import an individual wrapper such as `@artisan-toolbox/front-awesome/components/WebAwesome/Input.vue`. Existing `components` named imports and direct `.vue` imports remain available. `Appearance` stays in `@artisan-toolbox/front-awesome/components` because it controls the application appearance.
 
 ## Page layouts
 
@@ -67,11 +67,11 @@ import { Page } from '@artisan-toolbox/front-awesome/components/WebAwesome';
 
 Build the application and open the page. The header, navigation, main content, and footer share one layout. Below 600px of page width, Menu opens the same navigation in a drawer. Page registers `wa-page` after browser mount and adds no styles, classes, theme, or application layout policy.
 
-Place native `slot="header"`, `slot="navigation"`, and other region attributes on elements inside Vue's default slot. Use semantic `main`, `header`, and `footer` elements. Do not use `slot="main"` or Vue `#header` templates. Keep one navigation tree. Native `menu` replaces the responsive navigation behavior.
+Place native `slot="header"`, `slot="navigation"`, and other region attributes on elements inside Vue's default slot. Use semantic `main`, `header`, and `footer` elements. Do not use `slot="main"`. Vue named region slots such as `#header` are also supported. Keep one navigation tree. Native `menu` replaces the responsive navigation behavior.
 
-Use `mobile-breakpoint` as the layout input and read the native `view` attribute as output. Use `navigation-placement="end"` for the mobile drawer's end placement. Bare `nav-open` and `disable-navigation-toggle` flags and bound false values preserve native boolean presence. Native toggles and dismissal change the element state; there is no `v-model` binding, and view changes close navigation. When `disable-navigation-toggle` is omitted, Web Awesome detects custom toggles and navigation content. `disable-sticky="header aside"` disables those sticky regions, and `nonce` is forwarded for CSP.
+Use `mobile-breakpoint` as the layout input and read the native `view` attribute as output. Use `navigation-placement="end"` for the mobile drawer's end placement. Bare `nav-open` and `disable-navigation-toggle` flags and bound false values preserve native boolean presence. Use `v-model:navOpen` to synchronize navigation with Vue state. Native toggles, dismissal, and responsive view changes update that model. The responsive `view` output is read-only. When `disable-navigation-toggle` is omitted, Web Awesome detects custom toggles and navigation content. `disable-sticky="header aside"` disables those sticky regions, and `nonce` is forwarded for CSP.
 
-Import `PageProps` from the root or either component barrel for upstream-derived options and HTML attributes. Direct `components/Page.vue` and `components/WebAwesome/Page.vue` imports also work. Native drawer methods remain on the rendered `wa-page` element after `customElements.whenDefined('wa-page')` resolves. See the [Page layout guide](https://atb.dev.br/docs/front-awesome/page/) for required styles, all regions, and responsive width recipes.
+Import `PageProps` from the root or either component barrel for upstream-derived options and HTML attributes. Direct `components/Page.vue` and `components/WebAwesome/Page.vue` imports also work. Native drawer methods remain on the rendered `wa-page` element after `customElements.whenDefined('wa-page')` resolves. See the [Page layout guide](https://atb.dev.br/docs/front-awesome/web-awesome/components/layout#page) for required styles, all regions, and responsive width recipes.
 
 ## Label content and show contextual help
 
@@ -96,11 +96,11 @@ import { Tag, Tooltip } from '@artisan-toolbox/front-awesome/components/WebAweso
 
 The page shows a small success tag. Hovering or focusing the link shows the help text. The application owns links, colors, spacing, IDs, and theme tokens. The wrappers add no classes, styles, or visual defaults. Tag's default slot is its label. Setting `with-remove` shows the native remove button and emits the original `wa-remove` Event. Remove the item in application state if desired. The native event alone does not delete the tag.
 
-The opt-in shared Tailwind theme restores the native tag host padding and border that Preflight resets. Application padding and border utilities still take precedence. Keep icon and label spacing in your application composition rather than changing the wrapper's defaults.
+The opt-in shared Tailwind theme restores native host margins, padding, and borders across the Core and Pro catalogs where Preflight resets them. Application padding and border utilities still take precedence. Keep icon and label spacing in your application composition rather than changing the wrapper's defaults.
 
 Tooltip's default slot is its noninteractive body. Its `for` prop references a separate target ID in the same document or shadow root. Mount the target with the tooltip. If a missing target appears later, change `for` to bind it. Retargeting and unmounting remove the tooltip's `aria-labelledby` contribution from the old target. Keep interactive actions outside the tooltip.
 
-Use bare booleans or bound true and false for `pill`, `with-remove`, `disabled`, `open`, and `without-arrow`. Numeric `showDelay`/`show-delay` and `hideDelay`/`hide-delay` aliases preserve zero. Omitting delays preserves native defaults. Listen for `@wa-show`, `@wa-after-show`, `@wa-hide`, and `@wa-after-hide`; callbacks receive the original native Event and retain cancellation. `open` is a native property, not a `v-model:open` binding.
+Use bare booleans or bound true and false for `pill`, `with-remove`, `disabled`, `open`, and `without-arrow`. Numeric `showDelay`/`show-delay` and `hideDelay`/`hide-delay` aliases preserve zero. Omitting delays preserves native defaults. Listen for `@wa-show`, `@wa-after-show`, `@wa-hide`, and `@wa-after-hide`; callbacks receive the original native Event and retain cancellation. Use `v-model:open` to synchronize Vue state with native visibility.
 
 For manual control, set `trigger="manual"`. A Vue component ref is a Vue instance. Read its `$el`, verify it is an HTMLElement, await `customElements.whenDefined('wa-tooltip')` and the native host's `updateComplete`, then call native `show()` or `hide()`. These methods are not exposed directly on the Vue instance. Do not await a canceled or disabled native transition as though its promise must settle.
 
@@ -133,7 +133,7 @@ Build the application and open the page. Clicking the button opens the panel. Ta
 
 Place the focusable trigger before the Popover in the same document or shadow root. Use `Button` with `type="button"` and no `href`, or a native button. A link trigger also navigates when clicked. The `for` option binds an existing target ID. If a missing target appears later, change `for` to bind it. Retargeting and unmounting remove the old target listener.
 
-The default slot supports interactive content. Native `placement`, numeric `distance` and `skidding`, and bare or bound `open` and `without-arrow` options pass through. Omitting options preserves upstream defaults. The original `@wa-show` and `@wa-hide` Events remain cancelable. `@wa-after-show` and `@wa-after-hide` signal completed transitions. `open` is native state, without a `v-model:open` contract.
+The default slot supports interactive content. Native `placement`, numeric `distance` and `skidding`, and bare or bound `open` and `without-arrow` options pass through. Omitting options preserves upstream defaults. The original `@wa-show` and `@wa-hide` Events remain cancelable. `@wa-after-show` and `@wa-after-hide` signal completed transitions. Use `v-model:open` for two-way native visibility.
 
 For imperative control, use the Vue instance's `$el` after `customElements.whenDefined('wa-popover')` and the native host's `updateComplete`. Call the native `show()` and `hide()` methods on that host. A canceled transition suppresses its after event, so do not await its native promise as though it must settle. Initially open panels follow the installed Web Awesome version's initial-open behavior. Use an ordinary trigger action when relying on normal focus and dismissal lifecycle behavior.
 
@@ -166,7 +166,7 @@ The first icon uses Web Awesome's default icon library. The second loads a trust
 
 Provide `label` for an informative icon. Omit it for a decorative icon next to equivalent text. Pass native options such as `canvas="auto"`, numeric `:rotate="45"`, `flip`, `animation`, `family`, `variant`, and `library`. Custom libraries retain their own family and variant names. Native name and library resolution takes precedence over `src` when both resolve. `swap-opacity` and the upstream deprecated `auto-width` support bare attributes and bound booleans. Prefer `canvas="auto"` over `auto-width` for new code.
 
-Use `@wa-load` and `@wa-error` to receive the original native events. These events do not fire for sprite-sheet libraries. Keep custom library registration in the application using its selected Web Awesome edition. Selecting Web Awesome Pro does not supply Font Awesome Pro icon credentials. Read the [Icon guide](https://atb.dev.br/docs/front-awesome/icon/) for source, styling, and event examples.
+Use `@wa-load` and `@wa-error` to receive the original native events. These events do not fire for sprite-sheet libraries. Keep custom library registration in the application using its selected Web Awesome edition. Selecting Web Awesome Pro does not supply Font Awesome Pro icon credentials. Read the [Icon guide](https://atb.dev.br/docs/front-awesome/web-awesome/components/media#icon) for source, styling, and event examples.
 
 ## Select the application appearance
 
@@ -192,14 +192,14 @@ Clicking **Toggle appearance** switches between light and dark and saves the cho
 
 Run the application build and verify both buttons in the browser. Read the [appearance guide](https://atb.dev.br/docs/front-awesome/vue-plugin#add-a-theme-selector) for the complete contract.
 
-## Bind a text input
+## Bind controls and show validation
 
-Use `Input` from `@artisan-toolbox/front-awesome/components` after completing the installation above. Choose one value owner per input. Use unmodified `v-model` for a Vue value, or pass an Inertia `useForm` object with a dotted `field-name` for an existing text field.
+Use `Input` from `@artisan-toolbox/front-awesome/components` after completing the installation above. Choose one value owner per control. Use unmodified `v-model` for a Vue value, or pass an Inertia `useForm` object with a dotted `field` for existing form data. `field-name` remains a compatible alias. Input requires one binding; other data-entry wrappers also preserve their native unbound API.
 
 ```vue
 <template>
     <Input v-model="search" label="Search" with-clear />
-    <Input :form="form" field-name="users.0.name" label="Name" required />
+    <Input :form="form" field="users.0.name" label="Name" required />
 </template>
 
 <script setup>
@@ -220,9 +220,25 @@ Inertia errors use the flat `form.errors[fieldName]` entry. Nonempty string mess
 
 Pass Web Awesome attributes, native event listeners, and default slotted children through the wrapper. Named Vue slots map to Web Awesome slots, including `label`, `start`, `end`, and `hint`. `form="profile-form"` remains the native HTML form association when used with `v-model`. `defaultValue` sets the independent native reset baseline. A native form reset updates the bound Vue or Inertia value after Web Awesome resets the element.
 
-Run the application's build, type in both inputs, call `form.reset()`, and set then clear a `users.0.name` error. Confirm that the values, hint, and danger appearance follow those changes. Read the [Input guide](https://atb.dev.br/docs/front-awesome/input/) for the full contract and the reusable `useFormBridge` composable.
+Run the application's build, type in both inputs, call `form.reset()`, and set then clear a `users.0.name` error. Confirm that the values, hint, and danger appearance follow those changes. Read the [Forms binding guide](https://atb.dev.br/docs/front-awesome/web-awesome/components/forms#use-v-model) for live examples, value domains, manual validation, and the reusable `useFormBridge` composable.
+
+The shared binding covers Input, Checkbox, Switch, RadioGroup, ColorPicker, KnownDate, NumberInput, OtpInput, Rating, Select, Slider, TagInput, Textarea, TimeInput, and the Pro Combobox, DateInput, DatePicker, and FileInput. Bind the owning group, not its Radio or Option children. CheckboxGroup is a grouping container; bind its individual Checkbox controls.
+
+Use boolean fields for Checkbox and Switch, finite numbers for Rating and Slider, and `File[]` for FileInput. NumberInput remains `string | null`. Single Select and Combobox fields must accept `string | null`; multiple fields must accept `string[] | null`. Bound null clears current selection while preserving reset defaults; multiple mode normalizes an empty selection to an empty array. Date controls can accept Dates but commit strings, and TagInput commits string arrays. Field types must accept both the setter input and native output. Collection values must contain supported entries at every array position. Sparse arrays are rejected; an empty array remains valid where the control accepts a collection. Never combine a primary model with `:form`, or supply a competing current `value`, `checked`, or `files` prop. Native reset defaults are separate inputs.
+
+All bound data-entry controls show the flat `form.errors[field]` messages and danger appearance. Errors clear when the application clears them, not automatically on input. For a Vue-only model, pass `:failed="true"` for danger appearance or a nonempty string or string array for appearance and escaped messages. `false` or an empty array clears only manual validation. Vue Boolean prop casting treats a bare `failed` and `:failed="''"` as true. Manual false cannot hide server errors. Rating and DatePicker render messages outside their interactive host because upstream has no hint slot. A stable presentation element preserves their native host and focus when validation is activated later. Its inactive mode uses `display: contents` without group semantics. Their component ref's `$el` still returns the native host. DatePicker contributes no native FormData entry. Some native focused controls do not forward host ARIA attributes to their internal input; inspect actual focused semantics in accessibility-sensitive compositions.
+
+Import `useFormBridge` from `@artisan-toolbox/front-awesome` for a custom text control. Its writable `value` routes edits to the active owner; `errors` and `invalid` expose presentation state. The generic overload accepts separate `acceptsWrite` and `acceptsRead` guards for non-text values. Their predicates infer both value domains even when the emit callback ignores its argument; omitting both guards keeps the legacy text overload. With `optional: true`, inspect the discriminated `source` or `isBound` before accessing `value`. Your custom control owns escaped error rendering, its label, ARIA relationships, and styles. See the runnable custom-control example in the Forms guide.
+
+## Synchronize component state
+
+Use `v-model:page` on Pagination, `v-model:active` on TabGroup or Stepper, `v-model:open` on overlays, and `v-model:navOpen` on Page. Native events and their cancellation remain intact. Modifiers are unsupported. Omitted models preserve native uncontrolled behavior. Read the [complete named model reference](https://atb.dev.br/docs/front-awesome/web-awesome/components#named-models) before choosing other state ports, including DataGrid, media, and secondary form-control state. DataGrid pages are zero-based; Pagination pages are one-based. Browser playback policy still applies to Video.
 
 ## Shared application branding
+
+Verify slotted Tailwind utilities as well as native parts. Web Awesome 3.14 AccordionItem, Card, Details, Dialog, Divider and Drawer use a local `--spacing` property. Tailwind uses the same name for numeric spacing. Container values can change padding and gaps in slotted content; the shared theme does not rename either public input. Review local `fa-theme` scopes before adopting those containers, and do not add per-container CSS resets or mutate shadow internals to conceal a mismatch.
+
+Use slotted button text or a labeled Icon for an accessible name. In the installed 3.14 native Button, host attributes are not all forwarded to its internal focusable button. Keep native controls when a custom disclosure or toggle needs `aria-expanded` or `aria-pressed` directly on that focusable element. Check the actual accessible tree rather than assuming a host attribute reaches the control.
 
 Publish the editable branding file with `php artisan vendor:publish --tag=front-awesome-branding`. Import `@artisan-toolbox/front-awesome/tailwind.css` followed by `./branding.css` in the application's CSS entry. Import that CSS before `@artisan-toolbox/front-awesome/web-awesome-tailwind` in JavaScript. Keep the package adapters imported and edit only application branding. Ordinary republishing preserves your file.
 
@@ -234,6 +250,62 @@ For optional PrimeVue 4 styled mode, install `primevue` and `@primeuix/themes`, 
 
 The updated development preview maps all 22 Aura physical color ramps to Tailwind and keeps Aura's component-specific shade choices. Surfaces use gray. Warning buttons, badges, and tags use orange, while warning messages and toasts use yellow. The template includes an orange ramp alongside yellow. Customize both to align their warning families. Recheck the rendered components, interaction states, and contrast in light and dark modes after changing palettes.
 
-Read the [shared theme guide](https://atb.dev.br/docs/front-awesome/shared-theme/), [branding reference](https://atb.dev.br/docs/front-awesome/branding/), and [wa-page guide](https://atb.dev.br/docs/front-awesome/page/) for mappings, shadow limitations, and responsive recipes. Existing `styles.css` and `web-awesome.css` remain available for application-owned theme setups.
+Read the [shared theme guide](https://atb.dev.br/docs/front-awesome/shared-theme/), [branding reference](https://atb.dev.br/docs/front-awesome/branding/), and [wa-page guide](https://atb.dev.br/docs/front-awesome/web-awesome/components/layout#page) for mappings, shadow limitations, and responsive recipes. Existing `styles.css` and `web-awesome.css` remain available for application-owned theme setups.
 
 Run the application's `npm run build` after changing branding, then check the rendered button and light and dark modes in the browser.
+
+## Use the complete Core catalog
+
+The new wrappers are source-preview APIs. They are not present in the published `1.0.0-alpha.1` archive. All Core wrappers share the `components/WebAwesome` and `components` barrels and both direct `.vue` export paths. Prop types such as `CheckboxProps` and `SelectProps` are available from the root and component barrels. The 17 Pro-only wrappers use the separate `@artisan-toolbox/front-awesome/components/WebAwesome/Pro` barrel. Their prop types are exported there, and their direct `components/<Name>.vue` and `components/WebAwesome/<Name>.vue` paths remain available. This separation keeps Core imports usable without a Pro installation.
+
+After the installation and style setup above, place this in a Vue page:
+
+```vue
+<template>
+    <Checkbox v-model="subscribed">
+        Email updates
+        <template #hint>You can change this later.</template>
+    </Checkbox>
+    <Select v-model="delivery" label="Delivery">
+        <Option value="weekly">Weekly</Option>
+        <Option value="monthly">Monthly</Option>
+    </Select>
+    <p>{{ subscribed ? 'Subscribed' : 'Unsubscribed' }}. Delivery {{ delivery }}.</p>
+</template>
+
+<script setup>
+import { ref } from 'vue';
+import { Checkbox, Select, Option } from '@artisan-toolbox/front-awesome/components/WebAwesome';
+
+const subscribed = ref(false);
+const delivery = ref('weekly');
+</script>
+```
+
+The page shows an unchecked checkbox and a weekly delivery choice. Changing either control updates the paragraph. Native `input` and `change` handlers receive the original event. Check its target type before reading values in TypeScript. Existing `Input` retains its required `v-model` or Inertia form contract. Other wrappers expose native values and events without requiring an Inertia form.
+
+New wrappers accept Vue named slots as well as native `slot` attributes on default-slot children. Named text content receives a span so the browser can assign its slot. For structured content such as options, tabs and tree items, keep the native parent-child arrangement. Use a single native element or single-root component for named slot content.
+
+Use `checked`, `selected` and `value` for current state. When upstream separates these from `defaultChecked`, `defaultSelected` or `defaultValue`, initial scalar inputs establish native reset attributes unless an explicit default overrides them. Complex values such as arrays, Dates, and FormData stay on current properties and retain native property-reset behavior. Supply a supported native default explicitly when the reset must restore a complex current value. Do not pass arrays to a textual `defaultValue`. Subsequent current-state changes do not redefine reset defaults. Pass the native `form` attribute as a form ID string. Rich values, element references and callbacks reach native properties after browser registration. Methods remain on the component ref's `$el`; wait for `customElements.whenDefined()` before invoking them.
+
+The application owns its theme, classes, layout and loading decisions. Browse the [component groups and working Vue examples](https://atb.dev.br/docs/front-awesome/web-awesome/components/).
+
+## Use a licensed Pro component
+
+Configure the official Pro registry and its environment-based token, then install `@web.awesome.me/webawesome-pro` in the consuming application. Keep tokens outside browser code. Select `frontAwesome({ webAwesome: 'pro' })` in Vite and use that same edition for direct upstream imports.
+
+```vue
+<template>
+    <DatePicker v-model="selected" />
+    <p>Selected date {{ selected }}</p>
+</template>
+
+<script setup>
+import { ref } from 'vue';
+import { DatePicker } from '@artisan-toolbox/front-awesome/components/WebAwesome/Pro';
+
+const selected = ref('2026-11-09');
+</script>
+```
+
+The calendar highlights November 9, 2026. Selecting another day updates the paragraph. If the application imports this wrapper without its licensed dependency, Front Awesome reports that the component requires Web Awesome Pro during the build and through Vite's development error reporting. The wrapper does not supply a license or silently substitute a Core element.

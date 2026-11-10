@@ -13,3 +13,4 @@ export type { TagProps } from '../../WebAwesome/tagProps';
 export type { TooltipProps } from '../../WebAwesome/tooltipProps';
 export { default as Popover } from './Popover.vue';
 export type { PopoverProps } from '../../WebAwesome/popoverProps';
+export * from './generated';

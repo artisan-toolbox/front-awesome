@@ -5,7 +5,7 @@ import { createFrontAwesome } from '@artisan-toolbox/front-awesome';
 import { Appearance as NamedAppearance } from '@artisan-toolbox/front-awesome/components';
 import Appearance from '@artisan-toolbox/front-awesome/components/Appearance.vue';
 
-vi.mock('@awesome.me/webawesome/dist/components/toast/toast.js', () => ({}));
+vi.mock('#front-awesome-webawesome/components/toast/toast.js', () => ({}));
 
 const renderer = createRenderer<object, object>({
     createElement: () => ({}),

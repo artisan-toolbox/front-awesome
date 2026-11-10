@@ -1,3 +1,4 @@
+export type * from './WebAwesome/componentProps';
 import { createMosaicast } from '@artisan-toolbox/mosaicast';
 import type { MosaicastPluginOptions } from '@artisan-toolbox/mosaicast';
 import type { Plugin } from 'vue';
@@ -13,7 +14,19 @@ export type { ToastService } from './WebAwesome/toast';
 export type { AppearancePreference } from './appearance';
 export type { ButtonGroupProps, ButtonProps } from './WebAwesome/buttonProps';
 export { useFormBridge } from './WebAwesome/useFormBridge';
-export type { FormBindingProps, FormBridgeValue, TextFieldName } from './WebAwesome/useFormBridge';
+export type {
+    CompatibleField,
+    ControlBindingProps,
+    ControlBridgeOptions,
+    ControlBridgeProps,
+    FormBindingProps,
+    FormBridge,
+    FormBridgeFailed,
+    FormBridgeSource,
+    FormBridgeValue,
+    FormFieldAlias,
+    TextFieldName,
+} from './WebAwesome/useFormBridge';
 export type { InputAttributes, InputProps } from './WebAwesome/inputProps';
 export type { IconProps } from './WebAwesome/iconProps';
 export type { TagProps } from './WebAwesome/tagProps';

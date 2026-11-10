@@ -7,7 +7,16 @@ import { frontAwesome } from '@artisan-toolbox/front-awesome/vite';
 
 export default defineConfig({
     root: 'tests/frontend',
-    plugins: [frontAwesome(), tailwindcss(), vue()],
+    cacheDir: resolve(
+        import.meta.dirname,
+        'node_modules/.vite',
+        process.env.FRONT_AWESOME_PRO ? 'pro' : 'core',
+    ),
+    plugins: [
+        frontAwesome({ webAwesome: process.env.FRONT_AWESOME_PRO ? 'pro' : 'core' }),
+        tailwindcss(),
+        vue(),
+    ],
     build: {
         outDir: resolve(import.meta.dirname, 'build/frontend'),
         emptyOutDir: true,
@@ -42,15 +51,36 @@ export default defineConfig({
                 extends: true,
                 test: {
                     name: 'unit',
-                    include: ['tests/frontend/**/*.test.ts'],
-                    exclude: ['tests/frontend/**/*.browser.test.ts'],
+                    include: [
+                        'tests/frontend/**/*.test.ts',
+                        ...(process.env.FRONT_AWESOME_PRO ? ['tests/pro/**/*.test.ts'] : []),
+                    ],
+                    exclude: [
+                        'tests/frontend/**/*.browser.test.ts',
+                        'tests/pro/**/*.browser.test.ts',
+                    ],
                 },
             },
             {
                 extends: true,
-                optimizeDeps: { include: ['@artisan-toolbox/mosaicast', 'vue/server-renderer'] },
+                optimizeDeps: {
+                    noDiscovery: true,
+                    include: [
+                        '@artisan-toolbox/mosaicast',
+                        'vue/server-renderer',
+                        'vue',
+                        '@inertiajs/vue3',
+                        'lit',
+                        'vite-plus/test',
+                    ],
+                },
                 test: {
-                    include: ['tests/frontend/**/*.browser.test.ts'],
+                    include: [
+                        'tests/frontend/**/*.browser.test.ts',
+                        ...(process.env.FRONT_AWESOME_PRO
+                            ? ['tests/pro/**/*.browser.test.ts']
+                            : []),
+                    ],
                     browser: {
                         enabled: true,
                         headless: true,
@@ -64,7 +94,16 @@ export default defineConfig({
         ],
         coverage: {
             include: ['resources/js/**/*.{mjs,ts,vue}'],
-            exclude: ['resources/js/**/*.d.ts'],
+            exclude: [
+                'resources/js/**/*.d.ts',
+                ...(!process.env.FRONT_AWESOME_PRO
+                    ? [
+                          'resources/js/components/WebAwesomePro/**',
+                          'resources/js/WebAwesome/proComponentProps.ts',
+                          'resources/js/WebAwesome/proComponentDefinitions.ts',
+                      ]
+                    : []),
+            ],
             reporter: ['text', 'html'],
             reportsDirectory: 'build/coverage/frontend',
         },

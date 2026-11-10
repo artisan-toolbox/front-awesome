@@ -2,6 +2,7 @@ import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
 
 const internalWebAwesome = '#front-awesome-webawesome';
+const internalProWebAwesome = '#front-awesome-webawesome-pro';
 const corePackage = '@awesome.me/webawesome';
 const proPackage = '@web.awesome.me/webawesome-pro';
 
@@ -23,14 +24,14 @@ function findDist(requireFromApp, packageName, required = false) {
 }
 
 export function frontAwesome({ webAwesome } = {}) {
+    let licensedDist;
     return {
         name: 'front-awesome:web-awesome',
+        enforce: 'pre',
         config(config) {
             const requireFromApp = createRequire(resolve(config.root ?? '.', 'package.json'));
-            const proDist =
-                webAwesome === 'core'
-                    ? undefined
-                    : findDist(requireFromApp, proPackage, webAwesome === 'pro');
+            licensedDist = findDist(requireFromApp, proPackage, webAwesome === 'pro');
+            const proDist = webAwesome === 'core' ? undefined : licensedDist;
             const dist = proDist ?? findDist(requireFromApp, corePackage);
 
             return {
@@ -44,6 +45,16 @@ export function frontAwesome({ webAwesome } = {}) {
                     ],
                 },
             };
+        },
+        resolveId(source) {
+            if (!source.startsWith(`${internalProWebAwesome}/`)) return;
+            if (!licensedDist) {
+                const component = source.split('/')[2] ?? 'This component';
+                throw new Error(
+                    `Front Awesome ${component} requires Web Awesome Pro. Install @web.awesome.me/webawesome-pro with your licensed registry configuration before importing this component.`,
+                );
+            }
+            return resolve(licensedDist, source.slice(internalProWebAwesome.length + 1));
         },
         configResolved(config) {
             for (const plugin of config.plugins) {

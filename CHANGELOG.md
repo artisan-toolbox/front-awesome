@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+- Infer non-text form bridge value types from its guards even when an emit callback ignores its argument, while preserving the legacy text overload.
+
+- Reject sparse value collections and incomplete model listener arrays before writing to a control or form. Preserve valid empty collections and existing dense-value behavior.
+
+- Add shared two-way Vue and Inertia binding to all data-entry wrappers, compatible dotted `field`/`field-name` aliases, typed value domains, server error messages and danger appearance. Add manual `failed` validation for native and model-bound controls, retaining Input's required binding contract and native reset defaults.
+- Preserve live projected slot content and in-place structured model edits. Keep Rating and DatePicker hosts stable when binding or failure state is enabled after mount, using a neutral presentation element with an inactive contents frame that retains native refs and geometry.
+- Add reviewed named models for mutable native state, including Pagination pages, TabGroup/Stepper active items, overlay visibility, Page navigation, data grids and media. Preserve native events and cancellation, optional inputs and unbound usage. Verify generated SFCs with the Vue macro compiler as well as TypeScript.
+
+- Point consumer skill guidance to the consolidated Page and Icon category references.
+
+- Document the Web Awesome 3.14 host-ARIA and slotted spacing boundaries found while adopting the public components in the documentation application. Keep native accessibility and scoped branding contracts explicit.
+
+- Keep complex current values on native properties instead of copying them into textual reset defaults. Preserve native reset behavior for Tag Input arrays and date/time Date bindings; accept explicit supported collection defaults on Select.
+
+- Restore native host spacing and borders across the full Web Awesome catalog in the optional Tailwind theme. Remove the Button wrapper's imposed display class so native geometry remains consistent.
+
+- Complete the Web Awesome 3.14 Core Vue catalog with 65 additional source-preview wrappers, optional upstream-derived prop types, direct imports, native events, Vue named slots, and a shared registration-safe adapter. Existing Input binding and other wrapper contracts remain unchanged. Add 17 Pro-only wrappers through a separate public barrel and direct imports. Importing a Pro wrapper without the licensed dependency reports an explicit build/development setup error.
+- Add reproducible wrapper generation, upstream example inventories, optional-prop compiler fixtures, and native browser parity coverage.
+
 - Restore Web Awesome Tag padding and borders removed by Tailwind Preflight in the optional shared theme, while preserving application utility overrides.
 
 - Make Page option optionality explicit for IDE inspection while retaining upstream option types and native defaults.

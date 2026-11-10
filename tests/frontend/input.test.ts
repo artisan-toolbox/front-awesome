@@ -134,3 +134,24 @@ test('renders SSR attributes, native form association, named slots, and escaped 
     );
     expect(modelHtml).toContain('form="profile"');
 });
+
+test('keeps validation hints authoritative when a caller supplies a native hint through another Vue slot', async () => {
+    const form = useForm({ name: '' });
+    form.setError('name', 'Name is required.');
+    const html = await renderToString(
+        createSSRApp({
+            render: () =>
+                h(
+                    Input<{ name: string }>,
+                    { form, fieldName: 'name' },
+                    {
+                        start: () =>
+                            h('span', { slot: 'hint' }, 'Caller hint must not hide the error.'),
+                    },
+                ),
+        }),
+    );
+    expect(html).toContain('Name is required.');
+    expect(html).not.toContain('Caller hint must not hide the error.');
+    expect(html).toContain('role="alert"');
+});

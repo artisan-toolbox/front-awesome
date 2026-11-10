@@ -23,7 +23,7 @@ try {
     for (const prime of [false, true]) {
         const plugins = [
             vue(),
-            frontAwesome(),
+            frontAwesome({ webAwesome: 'core' }),
             tailwindcss(),
             {
                 name: 'theme-consumer-entry',

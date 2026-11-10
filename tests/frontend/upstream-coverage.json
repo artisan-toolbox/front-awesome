@@ -1,0 +1,1765 @@
+{
+  "upstream": [
+    {
+      "edition": "core",
+      "version": "3.14.0",
+      "examples": 647
+    },
+    {
+      "edition": "pro",
+      "version": "3.14.0",
+      "examples": 259
+    }
+  ],
+  "assertions": [
+    "Compiled public wrapper imports",
+    "Original scalar property state",
+    "Host display, font, and color",
+    "Host width and height",
+    "Shadow part structure"
+  ],
+  "scriptSetup": {
+    "executedExamples": 256,
+    "examplesWithoutExecutableScripts": 644,
+    "additionalPrerequisites": [
+      {
+        "id": "otp-input-17",
+        "component": "OtpInput",
+        "limitations": ["requires-browser-sms-credentials"],
+        "isolatedVerification": {
+          "testFile": "tests/frontend/upstream-prerequisites.browser.test.ts",
+          "branches": ["Synthetic credential autofill", "Credential request cancellation"],
+          "environmentLimit": "Physical SMS transport is outside the synthetic credential service fixture."
+        }
+      },
+      {
+        "id": "popup-1",
+        "component": "Popup",
+        "limitations": [
+          "unshipped-element",
+          "Upstream example references unshipped wa-combobox; preserved as native markup."
+        ],
+        "isolatedVerification": {
+          "testFile": "tests/pro/upstream-prerequisites.browser.test.ts",
+          "branches": [
+            "Real Pro Combobox keyboard selection",
+            "Original placement, distance, and arrow callbacks",
+            "Native and Vue popup dimensions"
+          ],
+          "environmentLimit": "The original Core reference needs a licensed Pro Combobox component."
+        }
+      },
+      {
+        "id": "popup-4",
+        "component": "Popup",
+        "limitations": [
+          "unshipped-element",
+          "Upstream example references unshipped wa-combobox; preserved as native markup."
+        ],
+        "isolatedVerification": {
+          "testFile": "tests/pro/upstream-prerequisites.browser.test.ts",
+          "branches": [
+            "Real Pro Combobox keyboard selection",
+            "Original placement, distance, and arrow callbacks",
+            "Native and Vue popup dimensions"
+          ],
+          "environmentLimit": "The original Core reference needs a licensed Pro Combobox component."
+        }
+      },
+      {
+        "id": "popup-7",
+        "component": "Popup",
+        "limitations": [
+          "unshipped-element",
+          "Upstream example references unshipped wa-combobox; preserved as native markup."
+        ],
+        "isolatedVerification": {
+          "testFile": "tests/pro/upstream-prerequisites.browser.test.ts",
+          "branches": [
+            "Real Pro Combobox keyboard selection",
+            "Original placement, distance, and arrow callbacks",
+            "Native and Vue popup dimensions"
+          ],
+          "environmentLimit": "The original Core reference needs a licensed Pro Combobox component."
+        }
+      },
+      {
+        "id": "popup-8",
+        "component": "Popup",
+        "limitations": [
+          "unshipped-element",
+          "Upstream example references unshipped wa-combobox; preserved as native markup."
+        ],
+        "isolatedVerification": {
+          "testFile": "tests/pro/upstream-prerequisites.browser.test.ts",
+          "branches": [
+            "Real Pro Combobox keyboard selection",
+            "Original placement, distance, and arrow callbacks",
+            "Native and Vue popup dimensions"
+          ],
+          "environmentLimit": "The original Core reference needs a licensed Pro Combobox component."
+        }
+      },
+      {
+        "id": "data-grid-31",
+        "component": "DataGrid",
+        "limitations": ["requires-application-api-endpoint"],
+        "isolatedVerification": {
+          "testFile": "tests/pro/upstream-prerequisites.browser.test.ts",
+          "branches": [
+            "Exact request URL and AbortSignal",
+            "Orders response and loading state",
+            "Empty search results"
+          ],
+          "environmentLimit": "The deterministic orders response verifies the request boundary. Production API availability is outside this fixture."
+        }
+      }
+    ]
+  },
+  "interactionScope": "Every upstream example renders and its supported setup executes. Dedicated browser tests exercise component families. The examples are not all replayed interaction by interaction.",
+  "externalAssets": "External source URLs remain in the original examples. Parity checks do not assert that every external CDN, remote image, remote document, or media file loads successfully. Dedicated interactions use local content where possible.",
+  "references": "Action test references identify defined behavioral assertions. Run the browser suites to verify their results.",
+  "components": [
+    {
+      "name": "Accordion",
+      "tag": "wa-accordion",
+      "edition": "core",
+      "ownReferenceExamples": 15,
+      "renderedInExamples": 16,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "expands accordion sections and selects tree items without losing nested content"
+        }
+      ]
+    },
+    {
+      "name": "AccordionItem",
+      "tag": "wa-accordion-item",
+      "edition": "core",
+      "ownReferenceExamples": 1,
+      "renderedInExamples": 16,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/models.browser.test.ts",
+          "title": "cancelled open requests reconcile the model and retain the original cancelable event"
+        },
+        {
+          "file": "tests/frontend/reset.browser.test.ts",
+          "title": "preserves interactive open states, content geometry and focus with corrected Preflight"
+        },
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "expands accordion sections and selects tree items without losing nested content"
+        }
+      ]
+    },
+    {
+      "name": "AnimatedImage",
+      "tag": "wa-animated-image",
+      "edition": "core",
+      "ownReferenceExamples": 4,
+      "renderedInExamples": 4,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/models.browser.test.ts",
+          "title": "cancelled open requests reconcile the model and retain the original cancelable event"
+        },
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "toggles local animated media and zooms an inline frame through their visible controls"
+        }
+      ]
+    },
+    {
+      "name": "Animation",
+      "tag": "wa-animation",
+      "edition": "core",
+      "ownReferenceExamples": 5,
+      "renderedInExamples": 5,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/models.browser.test.ts",
+          "title": "Animation commits actual finish state and unrelated renders do not restart playback"
+        },
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "navigates carousel slides and starts animation only after an action"
+        }
+      ]
+    },
+    {
+      "name": "Avatar",
+      "tag": "wa-avatar",
+      "edition": "core",
+      "ownReferenceExamples": 6,
+      "renderedInExamples": 8,
+      "actionTestReferences": []
+    },
+    {
+      "name": "Badge",
+      "tag": "wa-badge",
+      "edition": "core",
+      "ownReferenceExamples": 10,
+      "renderedInExamples": 18,
+      "actionTestReferences": []
+    },
+    {
+      "name": "Breadcrumb",
+      "tag": "wa-breadcrumb",
+      "edition": "core",
+      "ownReferenceExamples": 6,
+      "renderedInExamples": 7,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "adjusts comparison with its keyboard handle and preserves breadcrumb navigation"
+        }
+      ]
+    },
+    {
+      "name": "BreadcrumbItem",
+      "tag": "wa-breadcrumb-item",
+      "edition": "core",
+      "ownReferenceExamples": 1,
+      "renderedInExamples": 7,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "adjusts comparison with its keyboard handle and preserves breadcrumb navigation"
+        }
+      ]
+    },
+    {
+      "name": "Button",
+      "tag": "wa-button",
+      "edition": "core",
+      "ownReferenceExamples": 14,
+      "renderedInExamples": 155,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/appearance.browser.test.ts",
+          "title": "mounts the appearance selector and keeps both styling systems in sync with the saved choice"
+        },
+        {
+          "file": "tests/frontend/button.browser.test.ts",
+          "title": "preserves boolean bindings before and after Web Awesome registers the button"
+        },
+        {
+          "file": "tests/frontend/popover.browser.test.ts",
+          "title": "accepts the public Button trigger and preserves autofocus and native close links"
+        },
+        {
+          "file": "tests/frontend/reset.browser.test.ts",
+          "title": "detects the broken open dropdown without the correction and restores its native dimensions"
+        },
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "opens a dropdown from its projected trigger and forwards item selection"
+        }
+      ]
+    },
+    {
+      "name": "ButtonGroup",
+      "tag": "wa-button-group",
+      "edition": "core",
+      "ownReferenceExamples": 8,
+      "renderedInExamples": 8,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/appearance.browser.test.ts",
+          "title": "mounts the appearance selector and keeps both styling systems in sync with the saved choice"
+        }
+      ]
+    },
+    {
+      "name": "Callout",
+      "tag": "wa-callout",
+      "edition": "core",
+      "ownReferenceExamples": 6,
+      "renderedInExamples": 9,
+      "actionTestReferences": []
+    },
+    {
+      "name": "Card",
+      "tag": "wa-card",
+      "edition": "core",
+      "ownReferenceExamples": 8,
+      "renderedInExamples": 10,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/form-validation.browser.test.ts",
+          "title": "keeps a fallback control assigned to its native parent slot while errors activate and clear"
+        },
+        {
+          "file": "tests/frontend/native-slot-updates.browser.test.ts",
+          "title": "refreshes projected parent slots without remounting native child controls"
+        },
+        {
+          "file": "tests/pro/models.browser.test.ts",
+          "title": "DatePicker keeps its native slot and stable frame through validation using ${namedSlot ? 'Vue named slots' : 'native slot attributes'}"
+        }
+      ]
+    },
+    {
+      "name": "Carousel",
+      "tag": "wa-carousel",
+      "edition": "core",
+      "ownReferenceExamples": 12,
+      "renderedInExamples": 12,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/models.browser.test.ts",
+          "title": "Carousel uses its public method and native committed event for currentSlide"
+        },
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "navigates carousel slides and starts animation only after an action"
+        }
+      ]
+    },
+    {
+      "name": "CarouselItem",
+      "tag": "wa-carousel-item",
+      "edition": "core",
+      "ownReferenceExamples": 0,
+      "renderedInExamples": 12,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "navigates carousel slides and starts animation only after an action"
+        }
+      ]
+    },
+    {
+      "name": "Checkbox",
+      "tag": "wa-checkbox",
+      "edition": "core",
+      "ownReferenceExamples": 8,
+      "renderedInExamples": 15,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/adapter.browser.test.ts",
+          "title": "initializes native checkbox defaults before registration and respects optional presence booleans"
+        },
+        {
+          "file": "tests/frontend/adapter.browser.test.ts",
+          "title": "keeps current checked state separate from explicit reset defaults and preserves interaction on unrelated renders"
+        },
+        {
+          "file": "tests/frontend/adapter.browser.test.ts",
+          "title": "defaultChecked alone initializes the native state without acting as a live checked binding"
+        },
+        {
+          "file": "tests/frontend/adapter.browser.test.ts",
+          "title": "stops imposing removed property bindings and applies them again when supplied anew"
+        },
+        {
+          "file": "tests/frontend/adapter.browser.test.ts",
+          "title": "uses the latest queued properties and abandons deferred writes after unmount"
+        },
+        {
+          "file": "tests/frontend/adapter.browser.test.ts",
+          "title": "supports explicit native property aliases and exposes the custom element through the wrapper ref"
+        },
+        {
+          "file": "tests/frontend/adapter.browser.test.ts",
+          "title": "preserves the native hint fallback when a conditional named slot is empty"
+        },
+        {
+          "file": "tests/frontend/models.browser.test.ts",
+          "title": "Inertia fields, errors and both form resets follow the actual native reset result"
+        },
+        {
+          "file": "tests/frontend/models.browser.test.ts",
+          "title": "pending registration reads the latest bound model and ignores native initialization events"
+        },
+        {
+          "file": "tests/frontend/native-slot-updates.browser.test.ts",
+          "title": "refreshes projected parent slots without remounting native child controls"
+        },
+        {
+          "file": "tests/frontend/reset.browser.test.ts",
+          "title": "preserves changed and disabled form controls, keyboard sliders and steps under Preflight"
+        },
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "toggles public checkbox and switch controls and emits their user input events"
+        },
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "keeps grouped checkbox and switch choices independently submittable"
+        }
+      ]
+    },
+    {
+      "name": "CheckboxGroup",
+      "tag": "wa-checkbox-group",
+      "edition": "core",
+      "ownReferenceExamples": 8,
+      "renderedInExamples": 8,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "keeps grouped checkbox and switch choices independently submittable"
+        }
+      ]
+    },
+    {
+      "name": "ColorPicker",
+      "tag": "wa-color-picker",
+      "edition": "core",
+      "ownReferenceExamples": 13,
+      "renderedInExamples": 14,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/reset.browser.test.ts",
+          "title": "preserves interactive open states, content geometry and focus with corrected Preflight"
+        },
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "opens a color picker only after activation and keeps random selection count valid"
+        }
+      ]
+    },
+    {
+      "name": "Comparison",
+      "tag": "wa-comparison",
+      "edition": "core",
+      "ownReferenceExamples": 2,
+      "renderedInExamples": 2,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/models.browser.test.ts",
+          "title": "${item.name} synchronizes its public value domain without altering native event identity"
+        },
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "adjusts comparison with its keyboard handle and preserves breadcrumb navigation"
+        }
+      ]
+    },
+    {
+      "name": "CopyButton",
+      "tag": "wa-copy-button",
+      "edition": "core",
+      "ownReferenceExamples": 11,
+      "renderedInExamples": 13,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "reports copy source errors and creates dismissible toasts after user activation"
+        },
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "copies text successfully through a trusted browser activation"
+        }
+      ]
+    },
+    {
+      "name": "Details",
+      "tag": "wa-details",
+      "edition": "core",
+      "ownReferenceExamples": 9,
+      "renderedInExamples": 9,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/models.browser.test.ts",
+          "title": "cancelled open requests reconcile the model and retain the original cancelable event"
+        },
+        {
+          "file": "tests/frontend/reset.browser.test.ts",
+          "title": "preserves interactive open states, content geometry and focus with corrected Preflight"
+        },
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "opens details and resizes split panels with keyboard navigation"
+        }
+      ]
+    },
+    {
+      "name": "Dialog",
+      "tag": "wa-dialog",
+      "edition": "core",
+      "ownReferenceExamples": 11,
+      "renderedInExamples": 11,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/reset.browser.test.ts",
+          "title": "preserves interactive open states, content geometry and focus with corrected Preflight"
+        },
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "opens and closes dialogs and drawers through the documented public native methods"
+        }
+      ]
+    },
+    {
+      "name": "Divider",
+      "tag": "wa-divider",
+      "edition": "core",
+      "ownReferenceExamples": 12,
+      "renderedInExamples": 78,
+      "actionTestReferences": []
+    },
+    {
+      "name": "Drawer",
+      "tag": "wa-drawer",
+      "edition": "core",
+      "ownReferenceExamples": 13,
+      "renderedInExamples": 13,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/page.browser.test.ts",
+          "title": "uses one navigation tree on desktop and mobile and retains native toggle and drawer methods"
+        },
+        {
+          "file": "tests/frontend/reset.browser.test.ts",
+          "title": "preserves interactive open states, content geometry and focus with corrected Preflight"
+        },
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "opens and closes dialogs and drawers through the documented public native methods"
+        }
+      ]
+    },
+    {
+      "name": "Dropdown",
+      "tag": "wa-dropdown",
+      "edition": "core",
+      "ownReferenceExamples": 13,
+      "renderedInExamples": 17,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/models.browser.test.ts",
+          "title": "DropdownItem reads its owning dropdown selection without forwarding unrelated item state"
+        },
+        {
+          "file": "tests/frontend/reset.browser.test.ts",
+          "title": "detects the broken open dropdown without the correction and restores its native dimensions"
+        },
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "opens a dropdown from its projected trigger and forwards item selection"
+        }
+      ]
+    },
+    {
+      "name": "DropdownItem",
+      "tag": "wa-dropdown-item",
+      "edition": "core",
+      "ownReferenceExamples": 1,
+      "renderedInExamples": 18,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/models.browser.test.ts",
+          "title": "DropdownItem reads its owning dropdown selection without forwarding unrelated item state"
+        },
+        {
+          "file": "tests/frontend/reset.browser.test.ts",
+          "title": "detects the broken open dropdown without the correction and restores its native dimensions"
+        },
+        {
+          "file": "tests/frontend/reset.browser.test.ts",
+          "title": "allows application utilities to override the shared host correction"
+        },
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "opens a dropdown from its projected trigger and forwards item selection"
+        }
+      ]
+    },
+    {
+      "name": "FormatBytes",
+      "tag": "wa-format-bytes",
+      "edition": "core",
+      "ownReferenceExamples": 4,
+      "renderedInExamples": 4,
+      "actionTestReferences": []
+    },
+    {
+      "name": "FormatDate",
+      "tag": "wa-format-date",
+      "edition": "core",
+      "ownReferenceExamples": 4,
+      "renderedInExamples": 4,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/adapter.browser.test.ts",
+          "title": "preserves object inputs, exact native attribute names and consumer presentation"
+        }
+      ]
+    },
+    {
+      "name": "FormatNumber",
+      "tag": "wa-format-number",
+      "edition": "core",
+      "ownReferenceExamples": 4,
+      "renderedInExamples": 4,
+      "actionTestReferences": []
+    },
+    {
+      "name": "Icon",
+      "tag": "wa-icon",
+      "edition": "core",
+      "ownReferenceExamples": 41,
+      "renderedInExamples": 131,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/appearance.browser.test.ts",
+          "title": "mounts the appearance selector and keeps both styling systems in sync with the saved choice"
+        },
+        {
+          "file": "tests/frontend/icon.browser.test.ts",
+          "title": "preserves boolean presence and numeric rotation before registration and through live updates"
+        },
+        {
+          "file": "tests/frontend/icon.browser.test.ts",
+          "title": "loads real SVGs, forwards original events, and inherits application styling and accessibility"
+        },
+        {
+          "file": "tests/frontend/icon.browser.test.ts",
+          "title": "retains native custom library options and name precedence over src"
+        }
+      ]
+    },
+    {
+      "name": "Include",
+      "tag": "wa-include",
+      "edition": "core",
+      "ownReferenceExamples": 4,
+      "renderedInExamples": 4,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "loads local include content and renders script-backed Markdown with public wrappers"
+        }
+      ]
+    },
+    {
+      "name": "Input",
+      "tag": "wa-input",
+      "edition": "core",
+      "ownReferenceExamples": 15,
+      "renderedInExamples": 23,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/form-validation.browser.test.ts",
+          "title": "preserves Input hint content for boolean failure and restores caller ARIA after messages"
+        },
+        {
+          "file": "tests/frontend/input.browser.test.ts",
+          "title": "preserves false booleans before registration and live bindings, attrs, slots, and native events after upgrade"
+        },
+        {
+          "file": "tests/frontend/input.browser.test.ts",
+          "title": "preserves the native reset baseline and propagates native resets to the Vue owner"
+        },
+        {
+          "file": "tests/frontend/input.browser.test.ts",
+          "title": "preserves bare presence attributes and native required and pattern validity"
+        },
+        {
+          "file": "tests/frontend/input.browser.test.ts",
+          "title": "hydrates existing markup and safely handles immediate unmount"
+        },
+        {
+          "file": "tests/frontend/input.browser.test.ts",
+          "title": "preserves nullable owners and explicit custom validity independently from automatic errors"
+        },
+        {
+          "file": "tests/frontend/native-slot-updates.browser.test.ts",
+          "title": "Input refreshes projected parent slot closures while preserving the native host and edited model"
+        },
+        {
+          "file": "tests/frontend/reset.browser.test.ts",
+          "title": "preserves changed and disabled form controls, keyboard sliders and steps under Preflight"
+        }
+      ]
+    },
+    {
+      "name": "IntersectionObserver",
+      "tag": "wa-intersection-observer",
+      "edition": "core",
+      "ownReferenceExamples": 5,
+      "renderedInExamples": 5,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "forwards real mutation, resize, and intersection observer events from projected elements"
+        }
+      ]
+    },
+    {
+      "name": "KnownDate",
+      "tag": "wa-known-date",
+      "edition": "core",
+      "ownReferenceExamples": 13,
+      "renderedInExamples": 13,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/models.browser.test.ts",
+          "title": "pending registration reads the latest bound model and ignores native initialization events"
+        },
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "preserves Date object bindings and editable date/time public values"
+        }
+      ]
+    },
+    {
+      "name": "Markdown",
+      "tag": "wa-markdown",
+      "edition": "core",
+      "ownReferenceExamples": 8,
+      "renderedInExamples": 8,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "loads local include content and renders script-backed Markdown with public wrappers"
+        }
+      ]
+    },
+    {
+      "name": "MutationObserver",
+      "tag": "wa-mutation-observer",
+      "edition": "core",
+      "ownReferenceExamples": 2,
+      "renderedInExamples": 2,
+      "actionTestReferences": []
+    },
+    {
+      "name": "NumberInput",
+      "tag": "wa-number-input",
+      "edition": "core",
+      "ownReferenceExamples": 16,
+      "renderedInExamples": 16,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/reset.browser.test.ts",
+          "title": "preserves changed and disabled form controls, keyboard sliders and steps under Preflight"
+        },
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "handles textarea and number input edits and restores their form reset values"
+        }
+      ]
+    },
+    {
+      "name": "Option",
+      "tag": "wa-option",
+      "edition": "core",
+      "ownReferenceExamples": 1,
+      "renderedInExamples": 59,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/adapter.browser.test.ts",
+          "title": "passes arrays and callbacks as native properties and leaves options as direct children"
+        },
+        {
+          "file": "tests/frontend/adapter.browser.test.ts",
+          "title": "forwards original cancelable events exactly once and projects named slots without wrapping default children"
+        },
+        {
+          "file": "tests/frontend/adapter.browser.test.ts",
+          "title": "preserves scalar reset attributes and explicitly supplied collection defaults"
+        },
+        {
+          "file": "tests/frontend/reset.browser.test.ts",
+          "title": "preserves interactive open states, content geometry and focus with corrected Preflight"
+        },
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "selects multiple options with a custom tag callback and preserves radio selection"
+        },
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro Combobox matches native server callback requests and keyboard selection"
+        },
+        {
+          "file": "tests/pro/upstream-prerequisites.browser.test.ts",
+          "title": "runs original Core ${id} placement controls with licensed Pro Combobox"
+        }
+      ]
+    },
+    {
+      "name": "OtpInput",
+      "tag": "wa-otp-input",
+      "edition": "core",
+      "ownReferenceExamples": 22,
+      "renderedInExamples": 22,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "completes OTP input and adds tags through native input and keyboard events"
+        }
+      ]
+    },
+    {
+      "name": "Page",
+      "tag": "wa-page",
+      "edition": "core",
+      "ownReferenceExamples": 5,
+      "renderedInExamples": 5,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/models.browser.test.ts",
+          "title": "cancelled open requests reconcile the model and retain the original cancelable event"
+        },
+        {
+          "file": "tests/frontend/page.browser.test.ts",
+          "title": "preserves booleans and native options before registration, after registration, and through live updates"
+        },
+        {
+          "file": "tests/frontend/page.browser.test.ts",
+          "title": "uses one navigation tree on desktop and mobile and retains native toggle and drawer methods"
+        }
+      ]
+    },
+    {
+      "name": "Pagination",
+      "tag": "wa-pagination",
+      "edition": "core",
+      "ownReferenceExamples": 19,
+      "renderedInExamples": 19,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/models.browser.test.ts",
+          "title": "${item.name} synchronizes its public value domain without altering native event identity"
+        },
+        {
+          "file": "tests/frontend/reset.browser.test.ts",
+          "title": "preserves changed and disabled form controls, keyboard sliders and steps under Preflight"
+        },
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "navigates pagination and honors a cancelable page change listener"
+        }
+      ]
+    },
+    {
+      "name": "Popover",
+      "tag": "wa-popover",
+      "edition": "core",
+      "ownReferenceExamples": 8,
+      "renderedInExamples": 8,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/native-slot-updates.browser.test.ts",
+          "title": "refreshes projected parent slots without remounting native child controls"
+        },
+        {
+          "file": "tests/frontend/popover.browser.test.ts",
+          "title": "preserves presence booleans and numeric offsets before registration, after registration and during updates"
+        },
+        {
+          "file": "tests/frontend/popover.browser.test.ts",
+          "title": "accepts the public Button trigger and preserves autofocus and native close links"
+        },
+        {
+          "file": "tests/frontend/popover.browser.test.ts",
+          "title": "retargets existing IDs, leaves missing targets unbound and removes old anchor listeners on unmount"
+        },
+        {
+          "file": "tests/frontend/popover.browser.test.ts",
+          "title": "uses the same DOM root, rebinds after reconnect and preserves native one-open behavior"
+        },
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro Video waits for user action, plays local media, pauses, mutes and seeks through its public controls"
+        }
+      ]
+    },
+    {
+      "name": "Popup",
+      "tag": "wa-popup",
+      "edition": "core",
+      "ownReferenceExamples": 14,
+      "renderedInExamples": 14,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/adapter.browser.test.ts",
+          "title": "preserves object inputs, exact native attribute names and consumer presentation"
+        },
+        {
+          "file": "tests/pro/upstream-prerequisites.browser.test.ts",
+          "title": "runs original Core ${id} placement controls with licensed Pro Combobox"
+        }
+      ]
+    },
+    {
+      "name": "ProgressBar",
+      "tag": "wa-progress-bar",
+      "edition": "core",
+      "ownReferenceExamples": 5,
+      "renderedInExamples": 5,
+      "actionTestReferences": []
+    },
+    {
+      "name": "ProgressRing",
+      "tag": "wa-progress-ring",
+      "edition": "core",
+      "ownReferenceExamples": 6,
+      "renderedInExamples": 6,
+      "actionTestReferences": []
+    },
+    {
+      "name": "QrCode",
+      "tag": "wa-qr-code",
+      "edition": "core",
+      "ownReferenceExamples": 9,
+      "renderedInExamples": 9,
+      "actionTestReferences": []
+    },
+    {
+      "name": "Radio",
+      "tag": "wa-radio",
+      "edition": "core",
+      "ownReferenceExamples": 1,
+      "renderedInExamples": 13,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "selects multiple options with a custom tag callback and preserves radio selection"
+        }
+      ]
+    },
+    {
+      "name": "RadioGroup",
+      "tag": "wa-radio-group",
+      "edition": "core",
+      "ownReferenceExamples": 11,
+      "renderedInExamples": 13,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/reset.browser.test.ts",
+          "title": "preserves changed and disabled form controls, keyboard sliders and steps under Preflight"
+        },
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "selects multiple options with a custom tag callback and preserves radio selection"
+        }
+      ]
+    },
+    {
+      "name": "RandomContent",
+      "tag": "wa-random-content",
+      "edition": "core",
+      "ownReferenceExamples": 8,
+      "renderedInExamples": 8,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "opens a color picker only after activation and keeps random selection count valid"
+        }
+      ]
+    },
+    {
+      "name": "Rating",
+      "tag": "wa-rating",
+      "edition": "core",
+      "ownReferenceExamples": 14,
+      "renderedInExamples": 16,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/form-errors-matrix.browser.test.ts",
+          "title": "${item.name} binds real Inertia values and restores server and manual errors in ${mode}"
+        },
+        {
+          "file": "tests/frontend/form-validation.browser.test.ts",
+          "title": "retains explicit Rating width and restores caller ARIA after errors clear"
+        },
+        {
+          "file": "tests/frontend/form-validation.browser.test.ts",
+          "title": "keeps an unbound Rating in an inert contents frame without a presentation group"
+        },
+        {
+          "file": "tests/frontend/form-validation.browser.test.ts",
+          "title": "keeps a fallback control assigned to its native parent slot while errors activate and clear"
+        },
+        {
+          "file": "tests/frontend/models.browser.test.ts",
+          "title": "Rating retains its host, native value and focus when validation activates and the source changes"
+        },
+        {
+          "file": "tests/frontend/models.browser.test.ts",
+          "title": "Rating keeps its native slot and transparent frame assignment through validation using ${namedSlot ? 'Vue named slots' : 'native slot attributes'}"
+        },
+        {
+          "file": "tests/frontend/reset.browser.test.ts",
+          "title": "preserves changed and disabled form controls, keyboard sliders and steps under Preflight"
+        },
+        {
+          "file": "tests/frontend/reset.browser.test.ts",
+          "title": "maps visible rating symbols to their values inside a vertical demo layout"
+        },
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "updates ratings and sliders through keyboard controls and applies value formatter callbacks"
+        }
+      ]
+    },
+    {
+      "name": "RelativeTime",
+      "tag": "wa-relative-time",
+      "edition": "core",
+      "ownReferenceExamples": 4,
+      "renderedInExamples": 4,
+      "actionTestReferences": []
+    },
+    {
+      "name": "ResizeObserver",
+      "tag": "wa-resize-observer",
+      "edition": "core",
+      "ownReferenceExamples": 1,
+      "renderedInExamples": 1,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "forwards real mutation, resize, and intersection observer events from projected elements"
+        }
+      ]
+    },
+    {
+      "name": "Scroller",
+      "tag": "wa-scroller",
+      "edition": "core",
+      "ownReferenceExamples": 5,
+      "renderedInExamples": 5,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "scrolls overflowing content with End and Home keyboard actions"
+        }
+      ]
+    },
+    {
+      "name": "Select",
+      "tag": "wa-select",
+      "edition": "core",
+      "ownReferenceExamples": 18,
+      "renderedInExamples": 32,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/adapter.browser.test.ts",
+          "title": "passes arrays and callbacks as native properties and leaves options as direct children"
+        },
+        {
+          "file": "tests/frontend/adapter.browser.test.ts",
+          "title": "forwards original cancelable events exactly once and projects named slots without wrapping default children"
+        },
+        {
+          "file": "tests/frontend/adapter.browser.test.ts",
+          "title": "preserves scalar reset attributes and explicitly supplied collection defaults"
+        },
+        {
+          "file": "tests/frontend/form-errors-matrix.browser.test.ts",
+          "title": "Select clears a nullable owner against an explicit empty native reset default"
+        },
+        {
+          "file": "tests/frontend/models.browser.test.ts",
+          "title": "Rating retains its host, native value and focus when validation activates and the source changes"
+        },
+        {
+          "file": "tests/frontend/reset.browser.test.ts",
+          "title": "detects the broken open dropdown without the correction and restores its native dimensions"
+        },
+        {
+          "file": "tests/frontend/reset.browser.test.ts",
+          "title": "preserves interactive open states, content geometry and focus with corrected Preflight"
+        },
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "selects multiple options with a custom tag callback and preserves radio selection"
+        }
+      ]
+    },
+    {
+      "name": "Skeleton",
+      "tag": "wa-skeleton",
+      "edition": "core",
+      "ownReferenceExamples": 6,
+      "renderedInExamples": 6,
+      "actionTestReferences": []
+    },
+    {
+      "name": "Slider",
+      "tag": "wa-slider",
+      "edition": "core",
+      "ownReferenceExamples": 18,
+      "renderedInExamples": 24,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/reset.browser.test.ts",
+          "title": "preserves changed and disabled form controls, keyboard sliders and steps under Preflight"
+        },
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "updates ratings and sliders through keyboard controls and applies value formatter callbacks"
+        }
+      ]
+    },
+    {
+      "name": "Spinner",
+      "tag": "wa-spinner",
+      "edition": "core",
+      "ownReferenceExamples": 5,
+      "renderedInExamples": 6,
+      "actionTestReferences": []
+    },
+    {
+      "name": "SplitPanel",
+      "tag": "wa-split-panel",
+      "edition": "core",
+      "ownReferenceExamples": 11,
+      "renderedInExamples": 11,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/models.browser.test.ts",
+          "title": "${item.name} synchronizes its public value domain without altering native event identity"
+        },
+        {
+          "file": "tests/frontend/reset.browser.test.ts",
+          "title": "preserves changed and disabled form controls, keyboard sliders and steps under Preflight"
+        },
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "opens details and resizes split panels with keyboard navigation"
+        }
+      ]
+    },
+    {
+      "name": "Step",
+      "tag": "wa-step",
+      "edition": "core",
+      "ownReferenceExamples": 1,
+      "renderedInExamples": 22,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "activates tab panels and clickable steps through their public slotted children"
+        }
+      ]
+    },
+    {
+      "name": "Stepper",
+      "tag": "wa-stepper",
+      "edition": "core",
+      "ownReferenceExamples": 21,
+      "renderedInExamples": 22,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/models.browser.test.ts",
+          "title": "${item.name} synchronizes its public value domain without altering native event identity"
+        },
+        {
+          "file": "tests/frontend/reset.browser.test.ts",
+          "title": "preserves changed and disabled form controls, keyboard sliders and steps under Preflight"
+        },
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "activates tab panels and clickable steps through their public slotted children"
+        }
+      ]
+    },
+    {
+      "name": "Switch",
+      "tag": "wa-switch",
+      "edition": "core",
+      "ownReferenceExamples": 7,
+      "renderedInExamples": 18,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/reset.browser.test.ts",
+          "title": "preserves changed and disabled form controls, keyboard sliders and steps under Preflight"
+        },
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "toggles public checkbox and switch controls and emits their user input events"
+        },
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "keeps grouped checkbox and switch choices independently submittable"
+        },
+        {
+          "file": "tests/pro/upstream-prerequisites.browser.test.ts",
+          "title": "runs original Core ${id} placement controls with licensed Pro Combobox"
+        }
+      ]
+    },
+    {
+      "name": "Tab",
+      "tag": "wa-tab",
+      "edition": "core",
+      "ownReferenceExamples": 0,
+      "renderedInExamples": 7,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/reset.browser.test.ts",
+          "title": "preserves interactive open states, content geometry and focus with corrected Preflight"
+        },
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "activates tab panels and clickable steps through their public slotted children"
+        }
+      ]
+    },
+    {
+      "name": "TabGroup",
+      "tag": "wa-tab-group",
+      "edition": "core",
+      "ownReferenceExamples": 7,
+      "renderedInExamples": 7,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/models.browser.test.ts",
+          "title": "${item.name} synchronizes its public value domain without altering native event identity"
+        },
+        {
+          "file": "tests/frontend/reset.browser.test.ts",
+          "title": "preserves interactive open states, content geometry and focus with corrected Preflight"
+        },
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "activates tab panels and clickable steps through their public slotted children"
+        }
+      ]
+    },
+    {
+      "name": "TabPanel",
+      "tag": "wa-tab-panel",
+      "edition": "core",
+      "ownReferenceExamples": 0,
+      "renderedInExamples": 7,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "activates tab panels and clickable steps through their public slotted children"
+        }
+      ]
+    },
+    {
+      "name": "Tag",
+      "tag": "wa-tag",
+      "edition": "core",
+      "ownReferenceExamples": 7,
+      "renderedInExamples": 10,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/reset.browser.test.ts",
+          "title": "allows application utilities to override the shared host correction"
+        },
+        {
+          "file": "tests/frontend/tag.browser.test.ts",
+          "title": "preserves bare and bound boolean aliases before and after registration and live updates"
+        },
+        {
+          "file": "tests/frontend/tag.browser.test.ts",
+          "title": "forwards original remove events once and leaves removal to application state"
+        },
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro Combobox submits multiple choices and removes a selected tag"
+        }
+      ]
+    },
+    {
+      "name": "TagInput",
+      "tag": "wa-tag-input",
+      "edition": "core",
+      "ownReferenceExamples": 22,
+      "renderedInExamples": 22,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/adapter.browser.test.ts",
+          "title": "keeps rich current values out of textual reset defaults and matches native form resets"
+        },
+        {
+          "file": "tests/frontend/models.browser.test.ts",
+          "title": "pending registration reads the latest bound model and ignores native initialization events"
+        },
+        {
+          "file": "tests/frontend/models.browser.test.ts",
+          "title": "Rating retains its host, native value and focus when validation activates and the source changes"
+        },
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "completes OTP input and adds tags through native input and keyboard events"
+        }
+      ]
+    },
+    {
+      "name": "Textarea",
+      "tag": "wa-textarea",
+      "edition": "core",
+      "ownReferenceExamples": 13,
+      "renderedInExamples": 15,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/adapter.browser.test.ts",
+          "title": "preserves textarea current values, reset values and enumerated boolean converters"
+        },
+        {
+          "file": "tests/frontend/models.browser.test.ts",
+          "title": "Inertia fields, errors and both form resets follow the actual native reset result"
+        },
+        {
+          "file": "tests/frontend/reset.browser.test.ts",
+          "title": "preserves changed and disabled form controls, keyboard sliders and steps under Preflight"
+        },
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "handles textarea and number input edits and restores their form reset values"
+        }
+      ]
+    },
+    {
+      "name": "TimeInput",
+      "tag": "wa-time-input",
+      "edition": "core",
+      "ownReferenceExamples": 18,
+      "renderedInExamples": 18,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/adapter.browser.test.ts",
+          "title": "keeps rich current values out of textual reset defaults and matches native form resets"
+        },
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "preserves Date object bindings and editable date/time public values"
+        }
+      ]
+    },
+    {
+      "name": "Toast",
+      "tag": "wa-toast",
+      "edition": "core",
+      "ownReferenceExamples": 12,
+      "renderedInExamples": 12,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "reports copy source errors and creates dismissible toasts after user activation"
+        }
+      ]
+    },
+    {
+      "name": "ToastItem",
+      "tag": "wa-toast-item",
+      "edition": "core",
+      "ownReferenceExamples": 10,
+      "renderedInExamples": 10,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "reports copy source errors and creates dismissible toasts after user activation"
+        }
+      ]
+    },
+    {
+      "name": "Tooltip",
+      "tag": "wa-tooltip",
+      "edition": "core",
+      "ownReferenceExamples": 7,
+      "renderedInExamples": 11,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/tooltip.browser.test.ts",
+          "title": "preserves booleans and numeric aliases before registration, after registration and through updates"
+        },
+        {
+          "file": "tests/frontend/tooltip.browser.test.ts",
+          "title": "keeps missing targets unbound until for changes and supports same-root target IDs"
+        }
+      ]
+    },
+    {
+      "name": "Tree",
+      "tag": "wa-tree",
+      "edition": "core",
+      "ownReferenceExamples": 7,
+      "renderedInExamples": 7,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "expands accordion sections and selects tree items without losing nested content"
+        }
+      ]
+    },
+    {
+      "name": "TreeItem",
+      "tag": "wa-tree-item",
+      "edition": "core",
+      "ownReferenceExamples": 0,
+      "renderedInExamples": 7,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/models.browser.test.ts",
+          "title": "cancelled open requests reconcile the model and retain the original cancelable event"
+        },
+        {
+          "file": "tests/frontend/reset.browser.test.ts",
+          "title": "preserves interactive open states, content geometry and focus with corrected Preflight"
+        },
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "expands accordion sections and selects tree items without losing nested content"
+        }
+      ]
+    },
+    {
+      "name": "ZoomableFrame",
+      "tag": "wa-zoomable-frame",
+      "edition": "core",
+      "ownReferenceExamples": 11,
+      "renderedInExamples": 11,
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/upstream-interactions.browser.test.ts",
+          "title": "toggles local animated media and zooms an inline frame through their visible controls"
+        }
+      ]
+    },
+    {
+      "name": "BarChart",
+      "tag": "wa-bar-chart",
+      "edition": "pro",
+      "ownReferenceExamples": 13,
+      "renderedInExamples": 13,
+      "actionTestReferences": [
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro DataGrid matches native keyboard reordering, resizing, column filters and state restoration"
+        },
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro ${tag} paints a real canvas, executes configured click callbacks and updates reactive config"
+        }
+      ]
+    },
+    {
+      "name": "BubbleChart",
+      "tag": "wa-bubble-chart",
+      "edition": "pro",
+      "ownReferenceExamples": 11,
+      "renderedInExamples": 11,
+      "actionTestReferences": [
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro DataGrid matches native keyboard reordering, resizing, column filters and state restoration"
+        },
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro ${tag} paints a real canvas, executes configured click callbacks and updates reactive config"
+        }
+      ]
+    },
+    {
+      "name": "Chart",
+      "tag": "wa-chart",
+      "edition": "pro",
+      "ownReferenceExamples": 17,
+      "renderedInExamples": 17,
+      "actionTestReferences": [
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro DataGrid matches native keyboard reordering, resizing, column filters and state restoration"
+        },
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro ${tag} paints a real canvas, executes configured click callbacks and updates reactive config"
+        }
+      ]
+    },
+    {
+      "name": "Combobox",
+      "tag": "wa-combobox",
+      "edition": "pro",
+      "ownReferenceExamples": 30,
+      "renderedInExamples": 34,
+      "actionTestReferences": [
+        {
+          "file": "tests/pro/form-errors-matrix.browser.test.ts",
+          "title": "Combobox clears a nullable owner against an explicit empty native reset default"
+        },
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro Combobox filters text, skips disabled options, selects with the keyboard and clears FormData"
+        },
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro Combobox submits multiple choices and removes a selected tag"
+        },
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro Combobox matches native server callback requests and keyboard selection"
+        },
+        {
+          "file": "tests/pro/upstream-prerequisites.browser.test.ts",
+          "title": "runs original Core ${id} placement controls with licensed Pro Combobox"
+        }
+      ]
+    },
+    {
+      "name": "DataGrid",
+      "tag": "wa-data-grid",
+      "edition": "pro",
+      "ownReferenceExamples": 38,
+      "renderedInExamples": 37,
+      "actionTestReferences": [
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro DataGrid sorts, selects, expands details, paginates and filters real rows"
+        },
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro DataGrid matches native keyboard reordering, resizing, column filters and state restoration"
+        },
+        {
+          "file": "tests/pro/models.browser.test.ts",
+          "title": "DataGrid binds rich state ports independently and reads canonical values from the owned grid"
+        },
+        {
+          "file": "tests/pro/models.browser.test.ts",
+          "title": "DataGrid applies in-place reactive nested filter edits through the original public setter value"
+        },
+        {
+          "file": "tests/pro/upstream-prerequisites.browser.test.ts",
+          "title": "runs the original event-style grid source with an isolated orders API request boundary"
+        }
+      ]
+    },
+    {
+      "name": "DateInput",
+      "tag": "wa-date-input",
+      "edition": "pro",
+      "ownReferenceExamples": 26,
+      "renderedInExamples": 26,
+      "actionTestReferences": [
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro DateInput selects from its popup, submits, preserves user state and resets to its default"
+        },
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro DateInput matches native range selection, constraints and prevented reset"
+        }
+      ]
+    },
+    {
+      "name": "DatePicker",
+      "tag": "wa-date-picker",
+      "edition": "pro",
+      "ownReferenceExamples": 34,
+      "renderedInExamples": 32,
+      "actionTestReferences": [
+        {
+          "file": "tests/pro/form-validation.browser.test.ts",
+          "title": "retains the responsive calendar host and focused day through errors in a stable block frame"
+        },
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro DatePicker enforces constraints and callbacks, selects a Date, and navigates with the keyboard"
+        },
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro DatePicker selects a range and restores it when a new range is cancelled"
+        },
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro DateInput selects from its popup, submits, preserves user state and resets to its default"
+        },
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro DateInput matches native range selection, constraints and prevented reset"
+        },
+        {
+          "file": "tests/pro/models.browser.test.ts",
+          "title": "DatePicker focusedDate converts the native local Date detail without a UTC day shift"
+        },
+        {
+          "file": "tests/pro/models.browser.test.ts",
+          "title": "DatePicker retains its host, selected value and focused day when validation activates"
+        },
+        {
+          "file": "tests/pro/models.browser.test.ts",
+          "title": "DatePicker keeps its native slot and stable frame through validation using ${namedSlot ? 'Vue named slots' : 'native slot attributes'}"
+        }
+      ]
+    },
+    {
+      "name": "DoughnutChart",
+      "tag": "wa-doughnut-chart",
+      "edition": "pro",
+      "ownReferenceExamples": 7,
+      "renderedInExamples": 7,
+      "actionTestReferences": [
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro DataGrid matches native keyboard reordering, resizing, column filters and state restoration"
+        },
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro ${tag} paints a real canvas, executes configured click callbacks and updates reactive config"
+        }
+      ]
+    },
+    {
+      "name": "FileInput",
+      "tag": "wa-file-input",
+      "edition": "pro",
+      "ownReferenceExamples": 17,
+      "renderedInExamples": 17,
+      "actionTestReferences": [
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro FileInput accepts matching files, rejects other types, submits File objects and removes them"
+        },
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro FileInput handles rich files, unrelated updates, external clearing and required validation"
+        },
+        {
+          "file": "tests/pro/models.browser.test.ts",
+          "title": "FileInput renders an in-place File array mutation without replacing its original setter value"
+        }
+      ]
+    },
+    {
+      "name": "LineChart",
+      "tag": "wa-line-chart",
+      "edition": "pro",
+      "ownReferenceExamples": 14,
+      "renderedInExamples": 14,
+      "actionTestReferences": [
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro DataGrid matches native keyboard reordering, resizing, column filters and state restoration"
+        },
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro ${tag} paints a real canvas, executes configured click callbacks and updates reactive config"
+        }
+      ]
+    },
+    {
+      "name": "PieChart",
+      "tag": "wa-pie-chart",
+      "edition": "pro",
+      "ownReferenceExamples": 6,
+      "renderedInExamples": 6,
+      "actionTestReferences": [
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro DataGrid matches native keyboard reordering, resizing, column filters and state restoration"
+        },
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro ${tag} paints a real canvas, executes configured click callbacks and updates reactive config"
+        }
+      ]
+    },
+    {
+      "name": "PolarAreaChart",
+      "tag": "wa-polar-area-chart",
+      "edition": "pro",
+      "ownReferenceExamples": 6,
+      "renderedInExamples": 6,
+      "actionTestReferences": [
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro DataGrid matches native keyboard reordering, resizing, column filters and state restoration"
+        },
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro ${tag} paints a real canvas, executes configured click callbacks and updates reactive config"
+        }
+      ]
+    },
+    {
+      "name": "RadarChart",
+      "tag": "wa-radar-chart",
+      "edition": "pro",
+      "ownReferenceExamples": 10,
+      "renderedInExamples": 10,
+      "actionTestReferences": [
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro DataGrid matches native keyboard reordering, resizing, column filters and state restoration"
+        },
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro ${tag} paints a real canvas, executes configured click callbacks and updates reactive config"
+        }
+      ]
+    },
+    {
+      "name": "ScatterChart",
+      "tag": "wa-scatter-chart",
+      "edition": "pro",
+      "ownReferenceExamples": 11,
+      "renderedInExamples": 11,
+      "actionTestReferences": [
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro DataGrid matches native keyboard reordering, resizing, column filters and state restoration"
+        },
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro ${tag} paints a real canvas, executes configured click callbacks and updates reactive config"
+        }
+      ]
+    },
+    {
+      "name": "Sparkline",
+      "tag": "wa-sparkline",
+      "edition": "pro",
+      "ownReferenceExamples": 8,
+      "renderedInExamples": 8,
+      "actionTestReferences": [
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro Sparkline renders accessible SVG and redraws its public data and curve inputs"
+        }
+      ]
+    },
+    {
+      "name": "Video",
+      "tag": "wa-video",
+      "edition": "pro",
+      "ownReferenceExamples": 7,
+      "renderedInExamples": 11,
+      "actionTestReferences": [
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro Video waits for user action, plays local media, pauses, mutes and seeks through its public controls"
+        },
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro VideoPlaylist navigates local videos with visible controls and emits the changed video"
+        },
+        {
+          "file": "tests/pro/models.browser.test.ts",
+          "title": "Video playing uses real public play and pause methods and emits only after native playback events"
+        }
+      ]
+    },
+    {
+      "name": "VideoPlaylist",
+      "tag": "wa-video-playlist",
+      "edition": "pro",
+      "ownReferenceExamples": 4,
+      "renderedInExamples": 4,
+      "actionTestReferences": [
+        {
+          "file": "tests/pro/interactions.browser.test.ts",
+          "title": "Pro VideoPlaylist navigates local videos with visible controls and emits the changed video"
+        },
+        {
+          "file": "tests/pro/models.browser.test.ts",
+          "title": "VideoPlaylist uses goTo and its committed currentIndex detail for activeIndex"
+        }
+      ]
+    }
+  ]
+}

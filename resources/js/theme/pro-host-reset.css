@@ -1,0 +1,26 @@
+@layer base {
+    :where(
+        wa-bar-chart,
+        wa-bubble-chart,
+        wa-chart,
+        wa-combobox,
+        wa-data-grid,
+        wa-date-input,
+        wa-date-picker,
+        wa-doughnut-chart,
+        wa-file-input,
+        wa-line-chart,
+        wa-pie-chart,
+        wa-polar-area-chart,
+        wa-radar-chart,
+        wa-scatter-chart,
+        wa-sparkline,
+        wa-video,
+        wa-video-playlist
+    ) {
+        box-sizing: revert-layer;
+        margin: revert-layer;
+        padding: revert-layer;
+        border: revert-layer;
+    }
+}

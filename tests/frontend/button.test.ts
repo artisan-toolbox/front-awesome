@@ -11,7 +11,7 @@ test('renders a Web Awesome button with the app slot and attributes during SSR',
 
     const html = await renderToString(app);
 
-    expect(html).toContain('<wa-button class="inline-flex" variant="brand">');
+    expect(html).toContain('<wa-button variant="brand">');
     expect(html).toContain('Save changes');
 });
 

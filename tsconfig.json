@@ -11,6 +11,11 @@
     "resources/js/**/*.ts",
     "resources/js/**/*.vue",
     "tests/frontend/**/*.ts",
+    "tests/frontend/**/*.vue",
     "vite.config.ts"
+  ],
+  "exclude": [
+    "resources/js/components/WebAwesomePro/**",
+    "resources/js/WebAwesome/proComponentProps.ts"
   ]
 }

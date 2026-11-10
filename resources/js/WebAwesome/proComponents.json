@@ -1,0 +1,2392 @@
+[
+  {
+    "name": "BarChart",
+    "tag": "wa-bar-chart",
+    "attributes": [
+      {
+        "attribute": "type",
+        "property": "type",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "orientation",
+        "property": "orientation",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "label",
+        "property": "label",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "description",
+        "property": "description",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "x-label",
+        "property": "xLabel",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "y-label",
+        "property": "yLabel",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "legend-position",
+        "property": "legendPosition",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "stacked",
+        "property": "stacked",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "index-axis",
+        "property": "indexAxis",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "grid",
+        "property": "grid",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "min",
+        "property": "min",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "max",
+        "property": "max",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "without-animation",
+        "property": "withoutAnimation",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "without-legend",
+        "property": "withoutLegend",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "without-tooltip",
+        "property": "withoutTooltip",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "plugins",
+        "property": "plugins",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "dir",
+        "property": "dir",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "lang",
+        "property": "lang",
+        "boolean": false,
+        "enumerated": false
+      }
+    ],
+    "properties": ["config"],
+    "events": [],
+    "formAssociated": false,
+    "slots": [""],
+    "models": [],
+    "generated": true
+  },
+  {
+    "name": "BubbleChart",
+    "tag": "wa-bubble-chart",
+    "attributes": [
+      {
+        "attribute": "type",
+        "property": "type",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "label",
+        "property": "label",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "description",
+        "property": "description",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "x-label",
+        "property": "xLabel",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "y-label",
+        "property": "yLabel",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "legend-position",
+        "property": "legendPosition",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "stacked",
+        "property": "stacked",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "index-axis",
+        "property": "indexAxis",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "grid",
+        "property": "grid",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "min",
+        "property": "min",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "max",
+        "property": "max",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "without-animation",
+        "property": "withoutAnimation",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "without-legend",
+        "property": "withoutLegend",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "without-tooltip",
+        "property": "withoutTooltip",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "plugins",
+        "property": "plugins",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "dir",
+        "property": "dir",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "lang",
+        "property": "lang",
+        "boolean": false,
+        "enumerated": false
+      }
+    ],
+    "properties": ["config"],
+    "events": [],
+    "formAssociated": false,
+    "slots": [""],
+    "models": [],
+    "generated": true
+  },
+  {
+    "name": "Chart",
+    "tag": "wa-chart",
+    "attributes": [
+      {
+        "attribute": "label",
+        "property": "label",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "description",
+        "property": "description",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "type",
+        "property": "type",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "x-label",
+        "property": "xLabel",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "y-label",
+        "property": "yLabel",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "legend-position",
+        "property": "legendPosition",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "stacked",
+        "property": "stacked",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "index-axis",
+        "property": "indexAxis",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "grid",
+        "property": "grid",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "min",
+        "property": "min",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "max",
+        "property": "max",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "without-animation",
+        "property": "withoutAnimation",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "without-legend",
+        "property": "withoutLegend",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "without-tooltip",
+        "property": "withoutTooltip",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "plugins",
+        "property": "plugins",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "dir",
+        "property": "dir",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "lang",
+        "property": "lang",
+        "boolean": false,
+        "enumerated": false
+      }
+    ],
+    "properties": ["config"],
+    "events": [],
+    "formAssociated": false,
+    "slots": [""],
+    "models": [],
+    "generated": true
+  },
+  {
+    "name": "Combobox",
+    "tag": "wa-combobox",
+    "attributes": [
+      {
+        "attribute": "name",
+        "property": "name",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "value",
+        "property": "defaultValue",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "size",
+        "property": "size",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "placeholder",
+        "property": "placeholder",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "multiple",
+        "property": "multiple",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "max-options-visible",
+        "property": "maxOptionsVisible",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "disabled",
+        "property": "disabled",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "with-clear",
+        "property": "withClear",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "open",
+        "property": "open",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "appearance",
+        "property": "appearance",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "pill",
+        "property": "pill",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "label",
+        "property": "label",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "placement",
+        "property": "placement",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "hint",
+        "property": "hint",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "with-label",
+        "property": "withLabel",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "with-hint",
+        "property": "withHint",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "required",
+        "property": "required",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "allow-custom-value",
+        "property": "allowCustomValue",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "allow-create",
+        "property": "allowCreate",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "server",
+        "property": "server",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "loading",
+        "property": "loading",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "filter-debounce",
+        "property": "filterDebounce",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "autocapitalize",
+        "property": "autocapitalize",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "autocorrect",
+        "property": "autocorrect",
+        "boolean": true,
+        "enumerated": true
+      },
+      {
+        "attribute": "inputmode",
+        "property": "inputmode",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "enterkeyhint",
+        "property": "enterkeyhint",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "spellcheck",
+        "property": "spellcheck",
+        "boolean": true,
+        "enumerated": true
+      },
+      {
+        "attribute": "custom-error",
+        "property": "customError",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "dir",
+        "property": "dir",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "lang",
+        "property": "lang",
+        "boolean": false,
+        "enumerated": false
+      }
+    ],
+    "properties": ["value", "defaultValue", "inputValue", "filter", "dataSource", "getTag"],
+    "events": [
+      "input",
+      "change",
+      "request",
+      "focus",
+      "blur",
+      "wa-clear",
+      "wa-show",
+      "wa-after-show",
+      "wa-hide",
+      "wa-after-hide",
+      "wa-create",
+      "wa-invalid",
+      "wa-options-request",
+      "wa-options-error"
+    ],
+    "formAssociated": true,
+    "slots": [
+      "",
+      "label",
+      "start",
+      "end",
+      "clear-icon",
+      "expand-icon",
+      "hint",
+      "loading",
+      "no-results",
+      "empty",
+      "error"
+    ],
+    "models": [
+      {
+        "name": "modelValue",
+        "property": "value",
+        "write": "selection",
+        "read": "selection",
+        "events": ["input"],
+        "form": true,
+        "writer": {
+          "kind": "nullable-selection"
+        }
+      },
+      {
+        "name": "open",
+        "property": "open",
+        "write": "boolean",
+        "read": "boolean",
+        "events": ["wa-after-show", "wa-after-hide"],
+        "form": false
+      }
+    ],
+    "generated": true
+  },
+  {
+    "name": "DataGrid",
+    "tag": "wa-data-grid",
+    "attributes": [
+      {
+        "attribute": "row-key",
+        "property": "rowKey",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "selectable",
+        "property": "selectable",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "paginate",
+        "property": "paginate",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "page-size",
+        "property": "pageSize",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "page",
+        "property": "page",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "without-sort-removal",
+        "property": "withoutSortRemoval",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "sort-desc-first",
+        "property": "sortDescFirst",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "max-multi-sort",
+        "property": "maxMultiSort",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "with-search",
+        "property": "withSearch",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "resizable",
+        "property": "resizable",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "reorderable",
+        "property": "reorderable",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "pinnable",
+        "property": "pinnable",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "with-column-menu",
+        "property": "withColumnMenu",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "with-columns-menu",
+        "property": "withColumnsMenu",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "striped",
+        "property": "striped",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "child-rows",
+        "property": "childRows",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "filter-from-leaf-rows",
+        "property": "filterFromLeafRows",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "group-by",
+        "property": "groupBy",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "server",
+        "property": "server",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "filter-debounce",
+        "property": "filterDebounce",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "total",
+        "property": "total",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "loading",
+        "property": "loading",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "label",
+        "property": "label",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "appearance",
+        "property": "appearance",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "size",
+        "property": "size",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "dir",
+        "property": "dir",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "lang",
+        "property": "lang",
+        "boolean": false,
+        "enumerated": false
+      }
+    ],
+    "properties": [
+      "data",
+      "columns",
+      "selectableRows",
+      "pageSizeOptions",
+      "searchTerm",
+      "rowDetail",
+      "rowClass",
+      "dataSource",
+      "searchFn",
+      "sort",
+      "columnOrder",
+      "selectedKeys",
+      "selectedRows",
+      "expandedKeys",
+      "filters"
+    ],
+    "events": [
+      "request",
+      "wa-sort-change",
+      "wa-row-select",
+      "wa-page-change",
+      "wa-filter-change",
+      "wa-row-expand",
+      "wa-row-collapse",
+      "wa-data-request",
+      "wa-data-error",
+      "wa-column-move",
+      "wa-column-resize",
+      "wa-column-visibility-change",
+      "wa-column-pin",
+      "wa-cell-click",
+      "wa-cell-contextmenu"
+    ],
+    "formAssociated": false,
+    "slots": ["empty", "no-results", "loading"],
+    "models": [
+      {
+        "name": "page",
+        "property": "page",
+        "write": "number",
+        "read": "number",
+        "events": ["wa-page-change"],
+        "form": false
+      },
+      {
+        "name": "pageSize",
+        "property": "pageSize",
+        "write": "number",
+        "read": "number",
+        "events": ["wa-page-change"],
+        "form": false
+      },
+      {
+        "name": "sort",
+        "property": "sort",
+        "write": "sort",
+        "read": "sort",
+        "events": ["wa-sort-change"],
+        "form": false
+      },
+      {
+        "name": "filters",
+        "property": "filters",
+        "write": "filters",
+        "read": "filters",
+        "events": ["wa-filter-change"],
+        "form": false
+      },
+      {
+        "name": "searchTerm",
+        "property": "searchTerm",
+        "write": "string",
+        "read": "string",
+        "events": ["wa-filter-change"],
+        "form": false
+      },
+      {
+        "name": "selectedKeys",
+        "property": "selectedKeys",
+        "write": "keys",
+        "read": "keys",
+        "events": ["wa-row-select"],
+        "form": false
+      },
+      {
+        "name": "selectedRows",
+        "property": "selectedRows",
+        "write": "records",
+        "read": "records",
+        "events": ["wa-row-select"],
+        "form": false
+      },
+      {
+        "name": "expandedKeys",
+        "property": "expandedKeys",
+        "write": "keys",
+        "read": "keys",
+        "events": ["wa-row-expand", "wa-row-collapse"],
+        "form": false
+      },
+      {
+        "name": "columnOrder",
+        "property": "columnOrder",
+        "write": "strings",
+        "read": "strings",
+        "events": ["wa-column-move"],
+        "form": false
+      }
+    ],
+    "generated": true
+  },
+  {
+    "name": "DateInput",
+    "tag": "wa-date-input",
+    "attributes": [
+      {
+        "attribute": "name",
+        "property": "name",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "value",
+        "property": "defaultValue",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "disabled",
+        "property": "disabled",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "required",
+        "property": "required",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "readonly",
+        "property": "readonly",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "size",
+        "property": "size",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "appearance",
+        "property": "appearance",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "pill",
+        "property": "pill",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "label",
+        "property": "label",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "hint",
+        "property": "hint",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "autocomplete",
+        "property": "autocomplete",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "with-clear",
+        "property": "withClear",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "with-label",
+        "property": "withLabel",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "with-hint",
+        "property": "withHint",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "mode",
+        "property": "mode",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "min",
+        "property": "min",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "max",
+        "property": "max",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "today",
+        "property": "today",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "first-day-of-week",
+        "property": "firstDayOfWeek",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "disabled-dates",
+        "property": "disabledDates",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "disabled-days-of-week",
+        "property": "disabledDaysOfWeek",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "disable-past",
+        "property": "disablePast",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "disable-future",
+        "property": "disableFuture",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "min-range",
+        "property": "minRange",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "max-range",
+        "property": "maxRange",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "months",
+        "property": "months",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "page-by",
+        "property": "pageBy",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "with-outside-days",
+        "property": "withOutsideDays",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "with-week-numbers",
+        "property": "withWeekNumbers",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "weekday-format",
+        "property": "weekdayFormat",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "open",
+        "property": "open",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "placement",
+        "property": "placement",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "distance",
+        "property": "distance",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "custom-error",
+        "property": "customError",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "dir",
+        "property": "dir",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "lang",
+        "property": "lang",
+        "boolean": false,
+        "enumerated": false
+      }
+    ],
+    "properties": ["value", "isDateDisabled", "dayContent"],
+    "events": [
+      "input",
+      "change",
+      "focus",
+      "blur",
+      "wa-clear",
+      "wa-show",
+      "wa-after-show",
+      "wa-hide",
+      "wa-after-hide",
+      "wa-invalid"
+    ],
+    "formAssociated": true,
+    "slots": [
+      "label",
+      "hint",
+      "start",
+      "end",
+      "clear-icon",
+      "expand-icon",
+      "footer",
+      "previous-icon",
+      "next-icon",
+      "day-YYYY-MM-DD"
+    ],
+    "models": [
+      {
+        "name": "modelValue",
+        "property": "value",
+        "write": "dateInput",
+        "read": "string",
+        "events": ["input"],
+        "form": true
+      },
+      {
+        "name": "open",
+        "property": "open",
+        "write": "boolean",
+        "read": "boolean",
+        "events": ["wa-after-show", "wa-after-hide"],
+        "form": false
+      }
+    ],
+    "generated": true
+  },
+  {
+    "name": "DatePicker",
+    "tag": "wa-date-picker",
+    "attributes": [
+      {
+        "attribute": "mode",
+        "property": "mode",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "value",
+        "property": "value",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "min",
+        "property": "min",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "max",
+        "property": "max",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "today",
+        "property": "today",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "focused-date",
+        "property": "focusedDate",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "view",
+        "property": "view",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "months",
+        "property": "months",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "page-by",
+        "property": "pageBy",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "first-day-of-week",
+        "property": "firstDayOfWeek",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "with-outside-days",
+        "property": "withOutsideDays",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "with-week-numbers",
+        "property": "withWeekNumbers",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "weekday-format",
+        "property": "weekdayFormat",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "disabled",
+        "property": "disabled",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "readonly",
+        "property": "readonly",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "disabled-dates",
+        "property": "disabledDates",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "disabled-days-of-week",
+        "property": "disabledDaysOfWeek",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "disable-past",
+        "property": "disablePast",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "disable-future",
+        "property": "disableFuture",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "min-range",
+        "property": "minRange",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "max-range",
+        "property": "maxRange",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "size",
+        "property": "size",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "locale",
+        "property": "locale",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "dir",
+        "property": "dir",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "lang",
+        "property": "lang",
+        "boolean": false,
+        "enumerated": false
+      }
+    ],
+    "properties": ["isDateDisabled", "dayContent"],
+    "events": ["input", "change", "wa-focus-day", "wa-view-change"],
+    "formAssociated": false,
+    "slots": ["previous-icon", "next-icon", "header", "footer"],
+    "models": [
+      {
+        "name": "modelValue",
+        "property": "value",
+        "write": "datePicker",
+        "read": "string",
+        "events": ["input"],
+        "form": true
+      },
+      {
+        "name": "view",
+        "property": "view",
+        "write": "dateView",
+        "read": "dateView",
+        "events": ["wa-view-change"],
+        "form": false
+      },
+      {
+        "name": "focusedDate",
+        "property": "focusedDate",
+        "write": "string",
+        "read": "string",
+        "events": ["wa-focus-day"],
+        "form": false,
+        "reader": {
+          "kind": "local-date-detail",
+          "key": "date"
+        }
+      }
+    ],
+    "generated": true
+  },
+  {
+    "name": "DoughnutChart",
+    "tag": "wa-doughnut-chart",
+    "attributes": [
+      {
+        "attribute": "type",
+        "property": "type",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "label",
+        "property": "label",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "description",
+        "property": "description",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "x-label",
+        "property": "xLabel",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "y-label",
+        "property": "yLabel",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "legend-position",
+        "property": "legendPosition",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "stacked",
+        "property": "stacked",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "index-axis",
+        "property": "indexAxis",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "grid",
+        "property": "grid",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "min",
+        "property": "min",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "max",
+        "property": "max",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "without-animation",
+        "property": "withoutAnimation",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "without-legend",
+        "property": "withoutLegend",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "without-tooltip",
+        "property": "withoutTooltip",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "plugins",
+        "property": "plugins",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "dir",
+        "property": "dir",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "lang",
+        "property": "lang",
+        "boolean": false,
+        "enumerated": false
+      }
+    ],
+    "properties": ["config"],
+    "events": [],
+    "formAssociated": false,
+    "slots": [""],
+    "models": [],
+    "generated": true
+  },
+  {
+    "name": "FileInput",
+    "tag": "wa-file-input",
+    "attributes": [
+      {
+        "attribute": "size",
+        "property": "size",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "label",
+        "property": "label",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "hint",
+        "property": "hint",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "multiple",
+        "property": "multiple",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "accept",
+        "property": "accept",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "required",
+        "property": "required",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "capture",
+        "property": "capture",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "with-label",
+        "property": "withLabel",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "with-hint",
+        "property": "withHint",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "name",
+        "property": "name",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "disabled",
+        "property": "disabled",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "custom-error",
+        "property": "customError",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "dir",
+        "property": "dir",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "lang",
+        "property": "lang",
+        "boolean": false,
+        "enumerated": false
+      }
+    ],
+    "properties": ["files"],
+    "events": ["input", "change", "focus", "blur", "wa-invalid"],
+    "formAssociated": true,
+    "slots": ["label", "hint", "dropzone"],
+    "models": [
+      {
+        "name": "modelValue",
+        "property": "files",
+        "write": "files",
+        "read": "files",
+        "events": ["change"],
+        "form": true
+      }
+    ],
+    "generated": true
+  },
+  {
+    "name": "LineChart",
+    "tag": "wa-line-chart",
+    "attributes": [
+      {
+        "attribute": "type",
+        "property": "type",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "label",
+        "property": "label",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "description",
+        "property": "description",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "x-label",
+        "property": "xLabel",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "y-label",
+        "property": "yLabel",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "legend-position",
+        "property": "legendPosition",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "stacked",
+        "property": "stacked",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "index-axis",
+        "property": "indexAxis",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "grid",
+        "property": "grid",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "min",
+        "property": "min",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "max",
+        "property": "max",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "without-animation",
+        "property": "withoutAnimation",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "without-legend",
+        "property": "withoutLegend",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "without-tooltip",
+        "property": "withoutTooltip",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "plugins",
+        "property": "plugins",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "dir",
+        "property": "dir",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "lang",
+        "property": "lang",
+        "boolean": false,
+        "enumerated": false
+      }
+    ],
+    "properties": ["config"],
+    "events": [],
+    "formAssociated": false,
+    "slots": [""],
+    "models": [],
+    "generated": true
+  },
+  {
+    "name": "PieChart",
+    "tag": "wa-pie-chart",
+    "attributes": [
+      {
+        "attribute": "type",
+        "property": "type",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "label",
+        "property": "label",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "description",
+        "property": "description",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "x-label",
+        "property": "xLabel",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "y-label",
+        "property": "yLabel",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "legend-position",
+        "property": "legendPosition",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "stacked",
+        "property": "stacked",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "index-axis",
+        "property": "indexAxis",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "grid",
+        "property": "grid",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "min",
+        "property": "min",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "max",
+        "property": "max",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "without-animation",
+        "property": "withoutAnimation",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "without-legend",
+        "property": "withoutLegend",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "without-tooltip",
+        "property": "withoutTooltip",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "plugins",
+        "property": "plugins",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "dir",
+        "property": "dir",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "lang",
+        "property": "lang",
+        "boolean": false,
+        "enumerated": false
+      }
+    ],
+    "properties": ["config"],
+    "events": [],
+    "formAssociated": false,
+    "slots": [""],
+    "models": [],
+    "generated": true
+  },
+  {
+    "name": "PolarAreaChart",
+    "tag": "wa-polar-area-chart",
+    "attributes": [
+      {
+        "attribute": "type",
+        "property": "type",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "label",
+        "property": "label",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "description",
+        "property": "description",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "x-label",
+        "property": "xLabel",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "y-label",
+        "property": "yLabel",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "legend-position",
+        "property": "legendPosition",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "stacked",
+        "property": "stacked",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "index-axis",
+        "property": "indexAxis",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "grid",
+        "property": "grid",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "min",
+        "property": "min",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "max",
+        "property": "max",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "without-animation",
+        "property": "withoutAnimation",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "without-legend",
+        "property": "withoutLegend",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "without-tooltip",
+        "property": "withoutTooltip",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "plugins",
+        "property": "plugins",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "dir",
+        "property": "dir",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "lang",
+        "property": "lang",
+        "boolean": false,
+        "enumerated": false
+      }
+    ],
+    "properties": ["config"],
+    "events": [],
+    "formAssociated": false,
+    "slots": [""],
+    "models": [],
+    "generated": true
+  },
+  {
+    "name": "RadarChart",
+    "tag": "wa-radar-chart",
+    "attributes": [
+      {
+        "attribute": "type",
+        "property": "type",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "label",
+        "property": "label",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "description",
+        "property": "description",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "x-label",
+        "property": "xLabel",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "y-label",
+        "property": "yLabel",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "legend-position",
+        "property": "legendPosition",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "stacked",
+        "property": "stacked",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "index-axis",
+        "property": "indexAxis",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "grid",
+        "property": "grid",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "min",
+        "property": "min",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "max",
+        "property": "max",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "without-animation",
+        "property": "withoutAnimation",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "without-legend",
+        "property": "withoutLegend",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "without-tooltip",
+        "property": "withoutTooltip",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "plugins",
+        "property": "plugins",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "dir",
+        "property": "dir",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "lang",
+        "property": "lang",
+        "boolean": false,
+        "enumerated": false
+      }
+    ],
+    "properties": ["config"],
+    "events": [],
+    "formAssociated": false,
+    "slots": [""],
+    "models": [],
+    "generated": true
+  },
+  {
+    "name": "ScatterChart",
+    "tag": "wa-scatter-chart",
+    "attributes": [
+      {
+        "attribute": "type",
+        "property": "type",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "label",
+        "property": "label",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "description",
+        "property": "description",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "x-label",
+        "property": "xLabel",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "y-label",
+        "property": "yLabel",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "legend-position",
+        "property": "legendPosition",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "stacked",
+        "property": "stacked",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "index-axis",
+        "property": "indexAxis",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "grid",
+        "property": "grid",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "min",
+        "property": "min",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "max",
+        "property": "max",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "without-animation",
+        "property": "withoutAnimation",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "without-legend",
+        "property": "withoutLegend",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "without-tooltip",
+        "property": "withoutTooltip",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "plugins",
+        "property": "plugins",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "dir",
+        "property": "dir",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "lang",
+        "property": "lang",
+        "boolean": false,
+        "enumerated": false
+      }
+    ],
+    "properties": ["config"],
+    "events": [],
+    "formAssociated": false,
+    "slots": [""],
+    "models": [],
+    "generated": true
+  },
+  {
+    "name": "Sparkline",
+    "tag": "wa-sparkline",
+    "attributes": [
+      {
+        "attribute": "label",
+        "property": "label",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "data",
+        "property": "data",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "appearance",
+        "property": "appearance",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "trend",
+        "property": "trend",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "curve",
+        "property": "curve",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "dir",
+        "property": "dir",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "lang",
+        "property": "lang",
+        "boolean": false,
+        "enumerated": false
+      }
+    ],
+    "properties": [],
+    "events": [],
+    "formAssociated": false,
+    "slots": [],
+    "models": [],
+    "generated": true
+  },
+  {
+    "name": "Video",
+    "tag": "wa-video",
+    "attributes": [
+      {
+        "attribute": "controls",
+        "property": "controls",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "thumbnails",
+        "property": "thumbnails",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "src",
+        "property": "src",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "poster",
+        "property": "poster",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "title",
+        "property": "title",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "playing",
+        "property": "playing",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "muted",
+        "property": "muted",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "volume",
+        "property": "volume",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "duration",
+        "property": "duration",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "currentTime",
+        "property": "currentTime",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "autoplay",
+        "property": "autoplay",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "loop",
+        "property": "loop",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "autoplay-muted",
+        "property": "autoplayMuted",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "autoplay-on-visible",
+        "property": "autoplayOnVisible",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "preload",
+        "property": "preload",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "icon-library",
+        "property": "iconLibrary",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "dir",
+        "property": "dir",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "lang",
+        "property": "lang",
+        "boolean": false,
+        "enumerated": false
+      }
+    ],
+    "properties": [],
+    "events": ["timeupdate", "play", "pause", "volumechange", "error", "ended", "loadedmetadata"],
+    "formAssociated": false,
+    "slots": [
+      "",
+      "controls-start",
+      "controls-after-play",
+      "poster-icon",
+      "play-icon",
+      "pause-icon",
+      "volume-icon",
+      "mute-icon",
+      "fullscreen-icon",
+      "exit-fullscreen-icon"
+    ],
+    "models": [
+      {
+        "name": "playing",
+        "property": "playing",
+        "write": "boolean",
+        "read": "boolean",
+        "events": ["play", "pause", "ended", "error"],
+        "form": false,
+        "writer": {
+          "kind": "boolean-method",
+          "on": "play",
+          "off": "pause"
+        }
+      },
+      {
+        "name": "currentTime",
+        "property": "currentTime",
+        "write": "number",
+        "read": "number",
+        "events": ["timeupdate"],
+        "form": false
+      },
+      {
+        "name": "volume",
+        "property": "volume",
+        "write": "number",
+        "read": "number",
+        "events": ["volumechange"],
+        "form": false
+      },
+      {
+        "name": "muted",
+        "property": "muted",
+        "write": "boolean",
+        "read": "boolean",
+        "events": ["volumechange"],
+        "form": false
+      }
+    ],
+    "generated": true
+  },
+  {
+    "name": "VideoPlaylist",
+    "tag": "wa-video-playlist",
+    "attributes": [
+      {
+        "attribute": "controls",
+        "property": "controls",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "icon-library",
+        "property": "iconLibrary",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "dir",
+        "property": "dir",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "lang",
+        "property": "lang",
+        "boolean": false,
+        "enumerated": false
+      }
+    ],
+    "properties": [],
+    "events": ["wa-video-change"],
+    "formAssociated": false,
+    "slots": [""],
+    "models": [
+      {
+        "name": "activeIndex",
+        "property": "activeIndex",
+        "write": "number",
+        "read": "number",
+        "events": ["wa-video-change"],
+        "form": false,
+        "type": "number",
+        "writer": {
+          "kind": "method",
+          "method": "goTo"
+        },
+        "reader": {
+          "kind": "detail",
+          "key": "currentIndex"
+        }
+      }
+    ],
+    "generated": true
+  }
+]

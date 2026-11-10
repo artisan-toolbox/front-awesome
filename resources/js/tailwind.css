@@ -2,6 +2,8 @@
 /* Retain native theme inputs referenced at runtime by the optional PrimeVue preset. */
 @import 'tailwindcss' theme(static);
 @import './theme/tokens.css';
+@import './theme/core-host-reset.css';
+@import './theme/pro-host-reset.css';
 @source './components';
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -11,11 +13,6 @@
     body {
         background-color: var(--wa-color-surface-default);
         color: var(--wa-color-text-normal);
-    }
-
-    wa-tag {
-        padding: revert-layer;
-        border: revert-layer;
     }
 
     wa-page

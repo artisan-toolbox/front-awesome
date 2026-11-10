@@ -1,6 +1,5 @@
 <template>
     <wa-button
-        class="inline-flex"
         :disabled.attr="disabled ? '' : null"
         :loading.attr="loading ? '' : null"
         :pill.attr="pill ? '' : null"

@@ -12,3 +12,5 @@ composer.lock
 node_modules/
 /config/maintainer_secrets.php
 config/maintainer_secrets.php
+
+/.vitest-attachments/

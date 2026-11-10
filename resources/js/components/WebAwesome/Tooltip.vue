@@ -1,30 +1,44 @@
 <template>
-    <wa-tooltip
-        :disabled.attr="disabled ? '' : null"
-        :open.attr="open ? '' : null"
-        :without-arrow.attr="withoutArrow ? '' : null"
-        :show-delay.attr="showDelay"
-        :hide-delay.attr="hideDelay"
-    >
-        <slot />
+    <wa-tooltip ref="element" v-bind="bindings()">
+        <component :is="slotContent" :nodes="slotNodes()" />
     </wa-tooltip>
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
-import type { TooltipProps } from '../../WebAwesome/tooltipProps';
+import type { TooltipProps } from '../../WebAwesome/componentProps';
+import { useWebAwesome } from '../../WebAwesome/useWebAwesome';
+import { tooltipDefinition } from '../../WebAwesome/componentDefinitions';
+import type WaTooltip from '@awesome.me/webawesome/dist/components/tooltip/tooltip.js';
+import { useWebAwesomeModel } from '../../WebAwesome/useWebAwesomeModel';
+import { modelDomains } from '../../WebAwesome/modelDomains';
 
 interface Props extends /* @vue-ignore */ TooltipProps {
-    disabled?: boolean;
-    open?: boolean;
-    withoutArrow?: boolean;
-    showDelay?: TooltipProps['showDelay'];
-    hideDelay?: TooltipProps['hideDelay'];
+    open?: WaTooltip['open'];
 }
 
-defineProps<Props>();
-
-onMounted(async () => {
-    await import('#front-awesome-webawesome/components/tooltip/tooltip.js');
-});
+defineOptions({ inheritAttrs: false });
+const props = defineProps<Props>();
+const emit = defineEmits<{
+    'update:open': [value: WaTooltip['open']];
+}>();
+const { bindings, slotContent, slotNodes } = useWebAwesome(
+    [tooltipDefinition],
+    'wa-tooltip',
+    () => import('#front-awesome-webawesome/components/tooltip/tooltip.js'),
+    {
+        props,
+        models: [
+            useWebAwesomeModel<WaTooltip['open'], WaTooltip['open']>(props, {
+                name: 'open',
+                property: 'open',
+                events: ['wa-after-show', 'wa-after-hide'],
+                form: false,
+                componentName: 'Tooltip',
+                acceptsWrite: modelDomains.boolean,
+                acceptsRead: modelDomains.boolean,
+                emitValue: (value) => emit('update:open', value),
+            }),
+        ],
+    },
+);
 </script>

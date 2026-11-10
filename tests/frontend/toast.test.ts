@@ -5,7 +5,7 @@ import { createApp, createRenderer } from 'vue';
 import { createFrontAwesome, useToast } from '@artisan-toolbox/front-awesome';
 import { initializeFlashToast } from '@artisan-toolbox/front-awesome/WebAwesome/flashToast';
 
-vi.mock('@awesome.me/webawesome/dist/components/toast/toast.js', () => ({}));
+vi.mock('#front-awesome-webawesome/components/toast/toast.js', () => ({}));
 
 const renderer = createRenderer<object, object>({
     createElement: () => ({}),

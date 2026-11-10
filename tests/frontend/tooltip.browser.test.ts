@@ -219,7 +219,7 @@ test('delegates manual methods through the Vue host and retains cancelable origi
     expect(instance.value?.$el).toBe(tooltip);
     const host: unknown = instance.value?.$el;
     const { default: NativeTooltip } =
-        await import('@awesome.me/webawesome/dist/components/tooltip/tooltip.js');
+        await import('#front-awesome-webawesome/components/tooltip/tooltip.js');
     if (!(host instanceof NativeTooltip)) throw new Error('Expected the native tooltip host.');
     await host.show();
     expect(tooltip.open).toBe(true);

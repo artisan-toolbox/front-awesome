@@ -78,7 +78,7 @@ test('normalizes bare and bound kebab-case booleans before custom element regist
                 }),
         }),
     );
-    expect(html).toBe('<wa-page mobile-breakpoint="600px" nav-open><!--[--><!--]--></wa-page>');
+    expect(html).toBe('<wa-page nav-open mobile-breakpoint="600px"><!--[--><!--]--></wa-page>');
 });
 
 test('derives public page options from upstream and excludes its implementation state', () => {

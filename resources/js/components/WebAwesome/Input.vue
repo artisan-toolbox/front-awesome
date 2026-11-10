@@ -5,11 +5,12 @@
         :value.attr="resetValue()"
         :form.attr="typeof props.form === 'string' ? props.form : null"
         :aria-invalid="invalid ? 'true' : attrs['aria-invalid']"
+        :aria-errormessage="errorMessage()"
         :data-fa-invalid="invalid ? '' : null"
         :class="{ 'fa-input-invalid': invalid }"
     >
-        <component :is="slotContent" />
-        <span v-if="invalid" slot="hint" role="alert">
+        <component :is="slotContent" :nodes="slotNodes()" />
+        <span v-if="errors.length" :id="messageId" slot="hint" role="alert">
             <span v-for="(message, index) in errors" :key="index" class="fa-input-error">{{
                 message
             }}</span>
@@ -19,21 +20,17 @@
 
 <script setup lang="ts" generic="T extends object">
 import {
-    cloneVNode,
-    createTextVNode,
-    Fragment,
-    h,
-    isVNode,
     mergeProps,
     onBeforeUnmount,
     onMounted,
     shallowRef,
     useAttrs,
+    useId,
     useSlots,
     useTemplateRef,
     watchEffect,
 } from 'vue';
-import type { VNode } from 'vue';
+import { projectNativeSlot } from '../../WebAwesome/nativeSlots';
 import type WaInput from '@awesome.me/webawesome/dist/components/input/input.js';
 import type { InputAttributes } from '../../WebAwesome/inputProps';
 import { inputBooleanAttributes } from '../../WebAwesome/inputProps';
@@ -51,6 +48,15 @@ const slots = useSlots();
 const { value, errors, invalid } = useFormBridge(props, {
     emitValue: (next) => emit('update:modelValue', next),
 });
+const messageId = `fa-input-error-${useId()}`;
+function errorMessage() {
+    const caller = attrs['aria-errormessage'];
+    return errors.value.length
+        ? [...new Set([typeof caller === 'string' ? caller : '', messageId].filter(Boolean))].join(
+              ' ',
+          )
+        : caller;
+}
 const element = useTemplateRef<WaInput>('element');
 const registered = shallowRef(false);
 const initialValue = value.value;
@@ -105,7 +111,7 @@ function rootBindings() {
                   : 'true';
     delete bindings.autocorrect;
     delete bindings.spellcheck;
-    if (invalid.value) bindings.hint = '';
+    if (errors.value.length) bindings.hint = '';
     return mergeProps({ onInput: onInput }, bindings);
 }
 
@@ -113,32 +119,19 @@ function onInput(event: Event) {
     if (event.currentTarget === element.value && element.value) value.value = element.value.value;
 }
 
-function projectSlot(nodes: VNode[], name?: string): VNode[] {
-    return nodes.flatMap((node) => {
-        if (node.type === Fragment && Array.isArray(node.children))
-            return projectSlot(
-                node.children.flatMap((child) => {
-                    if (isVNode(child)) return [child];
-                    if (typeof child === 'string' || typeof child === 'number')
-                        return [createTextVNode(String(child))];
-                    return [];
-                }),
-                name,
-            );
-        if (invalid.value && (name === 'hint' || node.props?.slot === 'hint')) return [];
-        if (!name) return [node];
-        return [
-            typeof node.type === 'string' || typeof node.type === 'object'
-                ? cloneVNode(node, { slot: name })
-                : h('span', { slot: name }, [node]),
-        ];
-    });
-}
-
-const slotContent = () =>
+const slotNodes = () =>
     Object.entries(slots).flatMap(([name, slot]) =>
-        projectSlot(slot?.() ?? [], name === 'default' ? undefined : name),
+        projectNativeSlot(
+            slot?.() ?? [],
+            name === 'default' ? undefined : name,
+            errors.value.length ? ['hint'] : [],
+        ),
     );
+
+function slotContent(props: { nodes?: ReturnType<typeof slotNodes> } = {}) {
+    return props.nodes ?? slotNodes();
+}
+slotContent.props = ['nodes'];
 
 watchEffect(() => {
     const input = element.value;

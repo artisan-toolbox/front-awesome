@@ -271,7 +271,7 @@ test('retains original cancelable native events, callback casing and successful 
     await ready(popover);
     const host: unknown = instance.value?.$el;
     const { default: NativePopover } =
-        await import('@awesome.me/webawesome/dist/components/popover/popover.js');
+        await import('#front-awesome-webawesome/components/popover/popover.js');
     if (!(host instanceof NativePopover)) throw new Error('Expected native Popover host.');
     expect(host).toBe(popover);
     await host.show();
