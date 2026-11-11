@@ -89,7 +89,7 @@ export function frontAwesome({ webAwesome, translations = false } = {}) {
             exporter?.watch(server);
         },
         closeBundle() {
-            exporter?.close();
+            return exporter?.close();
         },
         configResolved(config) {
             for (const plugin of config.plugins) {

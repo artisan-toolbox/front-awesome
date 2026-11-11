@@ -18,8 +18,8 @@ export function translationExport(options) {
     const watched = new Set();
 
     async function exportCatalog() {
-        active = new AbortController();
-        const { stdout } = await execute(
+        const controller = new AbortController();
+        const execution = execute(
             settings.php ?? process.env.PHP_BINARY ?? 'php',
             [
                 settings.artisan ?? 'artisan',
@@ -29,20 +29,30 @@ export function translationExport(options) {
                 '--no-ansi',
                 '--no-interaction',
             ],
-            { cwd, signal: active.signal, maxBuffer: 1024 * 1024 },
+            { cwd, signal: controller.signal, maxBuffer: 1024 * 1024 },
         );
-        const parsed = JSON.parse(stdout.trim());
-        if (
-            !parsed ||
-            typeof parsed.output !== 'string' ||
-            typeof parsed.types !== 'string' ||
-            !Array.isArray(parsed.watchPaths) ||
-            !parsed.watchPaths.every((path) => typeof path === 'string')
-        ) {
-            throw new Error('Front Awesome translation export returned an invalid manifest.');
+        const finished = execution.child
+            ? new Promise((resolve) => execution.child.once('close', resolve))
+            : Promise.resolve();
+        active = { controller, finished };
+        try {
+            const { stdout } = await execution;
+            const parsed = JSON.parse(stdout.trim());
+            if (
+                !parsed ||
+                typeof parsed.output !== 'string' ||
+                typeof parsed.types !== 'string' ||
+                !Array.isArray(parsed.watchPaths) ||
+                !parsed.watchPaths.every((path) => typeof path === 'string')
+            ) {
+                throw new Error('Front Awesome translation export returned an invalid manifest.');
+            }
+            manifest = parsed;
+            if (server) watchPaths();
+        } finally {
+            await finished;
+            active = undefined;
         }
-        manifest = parsed;
-        if (server) watchPaths();
     }
 
     function watchPaths() {
@@ -100,11 +110,14 @@ export function translationExport(options) {
             watchPaths();
             server.watcher.on('all', onChange);
         },
-        close() {
+        async close() {
             closed = true;
+            pending = false;
             clearTimeout(timer);
-            active?.abort();
             server?.watcher.off('all', onChange);
+            active?.controller.abort();
+            await active?.finished;
+            await running;
         },
     };
 }

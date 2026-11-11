@@ -343,6 +343,8 @@ Keep messages in Laravel PHP and JSON language files. The package always exports
 
 In the root Blade document, render `<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">`. In the existing Vite plugin, enable `frontAwesome({ webAwesome: 'core', translations: true })`, or select the installed licensed Pro edition. A custom executable or directory uses `translations: { php, artisan, cwd }`. Vite automatically exports before normal startup and builds.
 
+For a programmatic Vite server, await `server.close()` before removing its working directory. Shutdown cancels queued exports, aborts the active exporter, and waits for its process and output streams to close. Intentional shutdown cancellation does not report a translation error.
+
 In the frontend entry, install the catalog through the existing Front Awesome plugin call:
 
 ```js

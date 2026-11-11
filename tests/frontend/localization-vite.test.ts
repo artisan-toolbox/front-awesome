@@ -1,4 +1,5 @@
 import { mkdir, mkdtemp, readFile, realpath, rm, writeFile } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { build, createServer, type ViteDevServer } from 'vite';
@@ -8,6 +9,7 @@ import { createLocalization } from '../../resources/js/localization';
 
 const php = process.env.PHP_BINARY ?? 'php';
 const artisan = resolve(import.meta.dirname, 'fixtures/localization/artisan.php');
+const exportProcess = resolve(import.meta.dirname, 'fixtures/localization/export-process.mjs');
 
 async function fixture() {
     const root = await realpath(await mkdtemp(join(tmpdir(), 'front-awesome-translations-')));
@@ -31,6 +33,16 @@ async function applicationMessage(root: string, value: string) {
 async function close(server: ViteDevServer | undefined, root: string) {
     await server?.close();
     await rm(root, { recursive: true, force: true });
+}
+
+function processExists(pid: number) {
+    try {
+        process.kill(pid, 0);
+        return true;
+    } catch (error) {
+        if (error instanceof Error && 'code' in error && error.code === 'ESRCH') return false;
+        throw error;
+    }
 }
 
 test('exports through the real Laravel command before a clean Vite build scans JSON imports', async () => {
@@ -95,6 +107,30 @@ test('fails a build when the exporter fails and leaves the prior catalog intact'
         expect(await text(root)).toBe('{"prior":true}');
     } finally {
         await rm(root, { recursive: true, force: true });
+    }
+});
+
+test('reports invalid executable arguments without leaving an unhandled rejection', async () => {
+    const root = await fixture();
+    try {
+        const plugin = frontAwesome({
+            translations: {
+                // @ts-expect-error Verify the error exposed to JavaScript consumers.
+                php: 42,
+                artisan,
+            },
+        });
+        await expect(
+            build({
+                root,
+                configFile: false,
+                logLevel: 'silent',
+                plugins: [plugin],
+                build: { write: false, rolldownOptions: { input: join(root, 'entry.js') } },
+            }),
+        ).rejects.toThrow('The "file" argument must be of type string');
+    } finally {
+        await close(undefined, root);
     }
 });
 
@@ -203,6 +239,49 @@ test('serializes active exports and runs a trailing export for changes during a 
         );
         await expect(readFile(join(root, 'overlapping-export'), 'utf8')).rejects.toThrow();
     } finally {
+        await close(server, root);
+    }
+});
+
+test('waits for an aborted exporter to exit before server close resolves', async () => {
+    const root = await fixture();
+    let server: ViteDevServer | undefined;
+    let closing: Promise<void> | undefined;
+    try {
+        await applicationMessage(root, 'Initial');
+        server = await createServer({
+            root,
+            configFile: false,
+            logLevel: 'silent',
+            plugins: [
+                frontAwesome({ translations: { php: process.execPath, artisan: exportProcess } }),
+            ],
+            server: { middlewareMode: true, hmr: false, watch: { usePolling: true, interval: 25 } },
+            optimizeDeps: { noDiscovery: true },
+        });
+        await expect
+            .poll(() => server?.watcher.getWatched()[join(root, 'lang/en')])
+            .toContain('app.php');
+        await writeFile(join(root, 'hold-export'), '1');
+        await applicationMessage(root, 'Active export');
+        await expect.poll(() => existsSync(join(root, 'export-pid'))).toBe(true);
+        const pid = Number(await readFile(join(root, 'export-pid'), 'utf8'));
+        expect(pid).toBeGreaterThan(0);
+        const send = vi.spyOn(server.ws, 'send');
+        let runningAtClose = true;
+        closing = server.close().then(() => {
+            runningAtClose = processExists(pid);
+        });
+        await expect
+            .poll(() => existsSync(join(root, 'export-stopping')) || !processExists(pid))
+            .toBe(true);
+        await rm(join(root, 'hold-export'));
+        await closing;
+        expect(runningAtClose).toBe(false);
+        expect(send.mock.calls).not.toContainEqual([expect.objectContaining({ type: 'error' })]);
+    } finally {
+        await rm(join(root, 'hold-export'), { force: true });
+        await closing;
         await close(server, root);
     }
 });
