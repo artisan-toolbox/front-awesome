@@ -18,10 +18,10 @@ final class ExportTranslations extends Command
     public function handle(TranslationExporter $exporter): int
     {
         try {
-            $output = $this->option('output');
+            $output = $this->input->getOption('output');
 
             throw_if($output !== null && ! is_string($output), InvalidArgumentException::class, 'The output option must be a file path.');
-            $node = $this->option('node');
+            $node = $this->input->getOption('node');
 
             throw_if($node !== null && ! is_string($node), InvalidArgumentException::class, 'The node option must be an executable name or path.');
             $manifest = $exporter->export($output, $node);

@@ -40,6 +40,22 @@ it('registers translations and their dedicated publish tag', function (): void {
     expect(__('front-awesome::printing.title'))->toBe('Print documents');
 });
 
+it('rejects non-string programmatic command options without replacing translation artifacts', function (string $option, mixed $value, string $message): void {
+    [$manifest] = exportedTranslations();
+    $before = [file_get_contents($manifest['output']), file_get_contents($manifest['types'])];
+
+    expect(Artisan::call('front-awesome:export-translations', [$option => $value]))->toBe(1);
+    expect(Artisan::output())->toContain($message);
+    expect([file_get_contents($manifest['output']), file_get_contents($manifest['types'])])->toBe($before);
+})->with([
+    'boolean output' => ['--output', false, 'The output option must be a file path.'],
+    'array output' => ['--output', ['catalog.json'], 'The output option must be a file path.'],
+    'numeric output' => ['--output', 42, 'The output option must be a file path.'],
+    'boolean node' => ['--node', false, 'The node option must be an executable name or path.'],
+    'array node' => ['--node', ['node'], 'The node option must be an executable name or path.'],
+    'numeric node' => ['--node', 42, 'The node option must be an executable name or path.'],
+]);
+
 it('uses the application fallback environment when exporting translations', function (?string $environment, string $expected): void {
     (new Filesystem)->ensureDirectoryExists($this->translationDirectory);
     $process = new Process([

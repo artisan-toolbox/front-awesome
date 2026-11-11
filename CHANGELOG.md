@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Validate raw Symfony input for translation command options, retaining failure messages and existing artifacts for invalid programmatic Artisan values. Load the package service provider during PHPStan bootstrap so registered CLI signatures are checked on every platform. Let every CI matrix job finish after a sibling fails.
+
 - Wait for a cancelled translation exporter to finish and close its output streams before Vite shutdown resolves. Cancel queued exports and retain silent shutdown cancellation, releasing process resources before consumers remove temporary working directories on Windows.
 
 - Require Illuminate Translation 13.36 or later within 13.x to preserve numeric JSON translation keys during export. Applications on Laravel 13.0 through 13.35 must update Laravel before upgrading this preview. Keep the prefer-lowest CI lane and the numeric-key regression test unchanged.
