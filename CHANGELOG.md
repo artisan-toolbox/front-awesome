@@ -1,5 +1,41 @@
 # Changelog
 
+## [1.0.0-alpha.2] - 2026-11-11
+
+### Features
+
+- **Request-aware preferences and printing localization (breaking change)** (`89b282a`)
+  Introduces a breaking feature that adds request-aware preferences and printing localization. The request-aware behavior likely changes how preferences are selected/resolved in the context of the current request rather than globally, and the printing localization likely ensures printing-related text/locale is correctly localized. Why it matters: printing localization and preference selection are user-visible and correctness-sensitive, especially in multi-tenant or per-request scenarios (e.g., different locale/theme/formatting). User impact: printing-related UI/content should be better localized and preferences should reflect request context. Compatibility: this is marked feat! (breaking change), indicating some behavior or interface contract has changed—consumers may need to adjust how preferences are provided/resolved and how localization for print is configured/expected. Migration: review integration points for preference resolution and any print/localization wiring that may have changed.
+
+### Fixes
+
+- **Validate raw Symfony input for translation exports** (`1e6d40e`)
+  Fixes translation export logic by validating raw Symfony input before it is used for generating translation outputs. This matters because malformed or unexpected raw input can produce incorrect export files, incomplete translations, or export-time errors. The fix hardens the export pipeline and prevents downstream issues in localization workflows. User impact: more reliable translation export results and fewer localization-related regressions. Compatibility: no API changes are implied, but export outputs may become more correct/strict when invalid input previously slipped through; no migration should be needed beyond correcting any upstream input inconsistencies.
+
+- **Wait for aborted export to finish on close** (`722fb60`)
+  Fixes localization export shutdown behavior by ensuring that when an export is closed/aborted, the export process is waited on to finish cleanly rather than terminating prematurely. This matters because premature close can leave partial/locked state, incomplete files, or UI desynchronization. User impact: prevents corrupted/incomplete export artifacts and improves reliability of the export close flow. Compatibility: no public API changes; only lifecycle/termination correctness is improved. Migration: none.
+
+- **Align Vite Plus/Vitest and PHPStan Carbon stubs** (`0251a5f`)
+  Aligns local tooling stubs so Vite Plus/Vitest and PHPStan Carbon type expectations match. This matters because mismatched stubs can lead to type-check disagreements, failing CI type checks, or incorrect editor/autocomplete signals. User impact is indirect: more consistent developer experience and fewer CI failures due to tooling/type drift. Compatibility: no runtime behavior changes. Migration: none, but developers should pull the updated tooling expectations as CI may now enforce the aligned stubs.
+
+### Documentation
+
+- **Add documentation adoption audit and verification docs** (`e861941`)
+  Adds documentation-only audit/verification documentation describing how to adopt “public Front Awesome components” across the documentation application and how to verify the adoption. This includes an adoption plan process with phased migration, a definition-of-done checklist, constraints to avoid per-page CSS workarounds or duplicate state controllers, and a verification approach with explicit adoption levels and evidence boundaries. User impact: none at runtime; it improves transparency and repeatability for documentation UI component adoption. Compatibility/migration: none for end-users; documentation maintainers should follow the new audit/verification procedures when making component adoption changes.
+
+### Refactoring
+
+- **Rename Theme preview API to Appearance and add WebAwesome wrappers** (`d7775bb`)
+  Refactors the Theme preview API by renaming it to Appearance, and adds WebAwesome wrappers to support usage patterns. Why it matters: renaming the public/internal API surface affects how preview theming is requested/configured, and wrapper additions provide standardized integration points. User impact: developers integrating/using the preview functionality must update to the new Appearance naming; the wrapper additions should make adoption smoother and more consistent. Compatibility: breaking/refactor-risk for integrations because the API rename likely requires code changes. Migration: update all references from the old Theme preview API to the new Appearance API; ensure any wrapper usage aligns with the new contract.
+
+### Tests
+
+- **Wait for dynamic imports and viewport parity in browser tests** (`fe8c787`)
+  Updates the frontend browser test strategy to better handle asynchronous dynamic imports and ensure consistent viewport parity. This matters because flaky timing/viewport mismatches can cause nondeterministic failures and false negatives during UI verification, especially when component code is loaded lazily or layout depends on viewport-related rendering. User impact is limited to CI/test reliability: it reduces spurious failures without changing runtime behavior or public APIs. Compatibility impact is none; no migration is required.
+
+- **Grant Playwright clipboard permissions and verify copy** (`ddc0a46`)
+  Modifies the frontend Playwright browser test setup to grant clipboard permissions and adds/strengthens assertions for copy-to-clipboard behavior. This matters because clipboard interactions are commonly blocked by browsers unless explicit permissions are granted, leading to tests that fail in some environments but pass in others. The change improves determinism and coverage for user-facing copy flows. User impact: more trustworthy verification of copy UI features; no production code/API behavior is changed. Compatibility/migration: none.
+
 ## Unreleased
 
 - Keep native and Vue parity examples visible in the same viewport and wait for the public active tab panel before comparing TabGroup state, colors, and dimensions.
