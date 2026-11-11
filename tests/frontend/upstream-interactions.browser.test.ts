@@ -614,6 +614,7 @@ test('copies text successfully through a trusted browser activation', async () =
     await userEvent.click(button);
     await expect.poll(() => copied).toBe('Copied through the public wrapper');
     expect(copy.status).toBe('success');
+    expect(await navigator.clipboard.readText()).toBe('Copied through the public wrapper');
 });
 
 test('toggles local animated media and zooms an inline frame through their visible controls', async () => {

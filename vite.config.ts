@@ -86,6 +86,9 @@ export default defineConfig({
                         headless: true,
                         provider: playwright({
                             launchOptions: { executablePath: process.env.CHROMIUM_EXECUTABLE },
+                            contextOptions: {
+                                permissions: ['clipboard-read', 'clipboard-write'],
+                            },
                         }),
                         instances: [{ browser: 'chromium', name: 'chromium' }],
                     },

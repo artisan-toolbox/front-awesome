@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Grant clipboard permissions to the Playwright test context and verify the copied text through the real Clipboard API, including in Chromium headless shell.
 - Validate raw Symfony input for translation command options, retaining failure messages and existing artifacts for invalid programmatic Artisan values. Load the package service provider during PHPStan bootstrap so registered CLI signatures are checked on every platform. Let every CI matrix job finish after a sibling fails.
 
 - Wait for a cancelled translation exporter to finish and close its output streams before Vite shutdown resolves. Cancel queued exports and retain silent shutdown cancellation, releasing process resources before consumers remove temporary working directories on Windows.
