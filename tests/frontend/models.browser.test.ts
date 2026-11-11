@@ -1,4 +1,4 @@
-import { expect, onTestFinished, test } from 'vite-plus/test';
+import { expect, onTestFinished, test, vi } from 'vite-plus/test';
 import { createApp, defineComponent, h, nextTick, reactive, shallowReactive } from 'vue';
 import type { Component } from 'vue';
 import { useWebAwesome } from '../../resources/js/WebAwesome/useWebAwesome';
@@ -29,6 +29,7 @@ function host(container: HTMLElement, tag: string) {
     return element;
 }
 async function ready(element: HTMLElement) {
+    await vi.dynamicImportSettled();
     await customElements.whenDefined(element.localName);
     await nextTick();
     await new Promise(requestAnimationFrame);

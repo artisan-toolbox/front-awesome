@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
-import { beforeAll, expect, test } from 'vite-plus/test';
+import { beforeAll, expect, test, vi } from 'vite-plus/test';
 import { userEvent } from 'vite-plus/test/browser';
 import '#front-awesome-webawesome/styles/themes/default.css';
 import preflight from 'tailwindcss/preflight.css?raw';
@@ -55,6 +55,7 @@ beforeAll(async () => {
 });
 
 async function settle(root: HTMLElement) {
+    await vi.dynamicImportSettled();
     for (let round = 0; round < 3; round++) {
         await Promise.all(
             [...root.querySelectorAll<HTMLElement>('*')].map((host) =>

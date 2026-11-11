@@ -1,4 +1,4 @@
-import { expect, onTestFinished, test } from 'vite-plus/test';
+import { expect, onTestFinished, test, vi } from 'vite-plus/test';
 import { page } from 'vitest/browser';
 import { createApp, h, nextTick, reactive } from 'vue';
 import type { Component } from 'vue';
@@ -22,6 +22,7 @@ function mount(component: Component) {
 }
 
 async function ready(input: WaInput) {
+    await vi.dynamicImportSettled();
     await customElements.whenDefined('wa-input');
     await nextTick();
     await input.updateComplete;

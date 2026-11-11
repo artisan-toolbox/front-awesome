@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Keep native and Vue parity examples visible in the same viewport and wait for the public active tab panel before comparing TabGroup state, colors, and dimensions.
+- Wait for dynamic imports in browser readiness helpers and observable checkbox binding and form-data initialization, with a controlled delayed-loader scenario covering current values, reset defaults, user interaction, and unrelated Vue renders.
 - Grant clipboard permissions to the Playwright test context and verify the copied text through the real Clipboard API, including in Chromium headless shell.
 - Validate raw Symfony input for translation command options, retaining failure messages and existing artifacts for invalid programmatic Artisan values. Load the package service provider during PHPStan bootstrap so registered CLI signatures are checked on every platform. Let every CI matrix job finish after a sibling fails.
 

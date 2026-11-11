@@ -1,4 +1,4 @@
-import { expect, onTestFinished, test } from 'vite-plus/test';
+import { expect, onTestFinished, test, vi } from 'vite-plus/test';
 import { page, userEvent } from 'vitest/browser';
 import { createApp, h, nextTick, reactive, shallowRef } from 'vue';
 import type { Component, ComponentPublicInstance } from 'vue';
@@ -22,6 +22,7 @@ function mount(component: Component) {
 }
 
 async function ready(popover: WaPopover) {
+    await vi.dynamicImportSettled();
     await customElements.whenDefined('wa-popover');
     await nextTick();
     await popover.updateComplete;

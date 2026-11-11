@@ -348,7 +348,7 @@
         },
         {
           "file": "tests/frontend/adapter.browser.test.ts",
-          "title": "keeps current checked state separate from explicit reset defaults and preserves interaction on unrelated renders"
+          "title": "keeps current checked state separate from explicit reset defaults and preserves interaction on unrelated renders with a ${loading} loader"
         },
         {
           "file": "tests/frontend/adapter.browser.test.ts",

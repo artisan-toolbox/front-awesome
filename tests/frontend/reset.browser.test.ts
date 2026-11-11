@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
-import { beforeAll, expect, onTestFinished, test } from 'vite-plus/test';
+import { beforeAll, expect, onTestFinished, test, vi } from 'vite-plus/test';
 import { page, userEvent } from 'vite-plus/test/browser';
 import { Rating } from '@artisan-toolbox/front-awesome/components/WebAwesome';
 import { createApp, h } from 'vue';
@@ -62,6 +62,7 @@ function stylesheet(css: string) {
 }
 
 async function settle(root: HTMLElement) {
+    await vi.dynamicImportSettled();
     const hosts = [...root.querySelectorAll<HTMLElement>('*')].filter((host) =>
         coreTags.has(host.localName),
     );

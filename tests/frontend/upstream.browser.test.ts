@@ -1,8 +1,11 @@
 /// <reference types="vite/client" />
-import { expect, test, vi } from 'vite-plus/test';
+import { beforeAll, expect, test, vi } from 'vite-plus/test';
+import { page } from 'vitest/browser';
 import { scenarioScripts } from './upstream-scripts';
 import { createApp, h, nextTick } from 'vue';
 import type { Component } from 'vue';
+import type WaTabGroup from '@awesome.me/webawesome/dist/components/tab-group/tab-group.js';
+import type WaTabPanel from '@awesome.me/webawesome/dist/components/tab-panel/tab-panel.js';
 import inventory from './upstream-scenarios.json';
 import definitions from '../../resources/js/WebAwesome/components.json';
 import './app.css';
@@ -13,7 +16,12 @@ const fixtures = import.meta.glob<{ default: Component }>('./upstream/*.vue');
 
 const byTag = new Map(definitions.map((definition) => [definition.tag, definition]));
 
+beforeAll(async () => {
+    await page.viewport(1600, 1000);
+});
+
 async function settle(root: HTMLElement) {
+    await vi.dynamicImportSettled();
     await nextTick();
     const elements = [...root.querySelectorAll<HTMLElement>('[data-upstream-index]')].filter(
         (element) => byTag.has(element.localName),
@@ -76,8 +84,29 @@ for (const component of inventory.components) {
             const app = createApp({ render: () => h(fixture, { scenario: scenario.id }) });
             app.mount(wrapped);
             try {
+                for (const example of [native, wrapped]) {
+                    expect(example.getBoundingClientRect().left).toBeGreaterThanOrEqual(0);
+                    expect(example.getBoundingClientRect().right).toBeLessThanOrEqual(
+                        window.innerWidth,
+                    );
+                }
                 await settle(native);
                 await settle(wrapped);
+                if (component.name === 'TabGroup') {
+                    const groups = [...host.querySelectorAll<WaTabGroup>('wa-tab-group')];
+                    expect(groups.length).toBeGreaterThan(0);
+                    await expect
+                        .poll(() =>
+                            groups.every((group) =>
+                                [
+                                    ...group.querySelectorAll<WaTabPanel>(':scope > wa-tab-panel'),
+                                ].some((panel) => panel.active && panel.name === group.active),
+                            ),
+                        )
+                        .toBe(true);
+                    await settle(native);
+                    await settle(wrapped);
+                }
                 randomness.mockRestore();
                 if (scenario.scriptExecution === 'scoped') {
                     await scripts.run(native, scenario.scripts);

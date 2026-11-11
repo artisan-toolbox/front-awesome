@@ -1,4 +1,4 @@
-import { expect, onTestFinished, test } from 'vite-plus/test';
+import { expect, onTestFinished, test, vi } from 'vite-plus/test';
 import { createApp, h, nextTick, reactive } from 'vue';
 import type { Component } from 'vue';
 import type WaIcon from '@awesome.me/webawesome/dist/components/icon/icon.js';
@@ -24,6 +24,7 @@ function mount(component: Component) {
 }
 
 async function ready(icon: WaIcon) {
+    await vi.dynamicImportSettled();
     await customElements.whenDefined('wa-icon');
     await nextTick();
     await icon.updateComplete;

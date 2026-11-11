@@ -1,4 +1,4 @@
-import { expect, onTestFinished, test } from 'vite-plus/test';
+import { expect, onTestFinished, test, vi } from 'vite-plus/test';
 import { createApp, h, nextTick, reactive } from 'vue';
 import type { Component } from 'vue';
 import type WaPage from '@awesome.me/webawesome/dist/components/page/page.js';
@@ -21,6 +21,7 @@ function mount(component: Component) {
 }
 
 async function ready(page: WaPage) {
+    await vi.dynamicImportSettled();
     await customElements.whenDefined('wa-page');
     await nextTick();
     await page.updateComplete;

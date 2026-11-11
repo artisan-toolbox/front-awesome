@@ -1,4 +1,4 @@
-import { expect, onTestFinished, test } from 'vite-plus/test';
+import { expect, onTestFinished, test, vi } from 'vite-plus/test';
 import {
     createCommentVNode,
     createApp,
@@ -43,10 +43,28 @@ function find<T extends HTMLElement>(container: HTMLElement, tag: string): T {
 }
 
 async function ready(element: HTMLElement & { updateComplete: Promise<boolean> }) {
+    await vi.dynamicImportSettled();
     await customElements.whenDefined(element.localName);
     await nextTick();
     await new Promise(requestAnimationFrame);
     await element.updateComplete;
+}
+
+function deferredCheckbox(load: () => Promise<unknown>) {
+    return defineComponent({
+        inheritAttrs: false,
+        setup() {
+            const { bindings, slotContent } = useWebAwesome(
+                [checkboxDefinition],
+                'wa-checkbox',
+                async () => {
+                    await import('#front-awesome-webawesome/components/checkbox/checkbox.js');
+                    await load();
+                },
+            );
+            return () => h('wa-checkbox', { ref: 'element', ...bindings() }, slotContent());
+        },
+    });
 }
 
 test('initializes native checkbox defaults before registration and respects optional presence booleans', async () => {
@@ -82,46 +100,60 @@ test('initializes native checkbox defaults before registration and respects opti
     }
 });
 
-test('keeps current checked state separate from explicit reset defaults and preserves interaction on unrelated renders', async () => {
-    const state = reactive({ checked: true, count: 0 });
-    const { container } = mount({
-        render: () =>
-            h('form', [
-                h(Checkbox, {
-                    checked: state.checked,
-                    defaultChecked: false,
-                    name: 'consent',
-                    value: 'yes',
-                    'data-count': state.count,
-                }),
-            ]),
+for (const loading of ['registered', 'pending']) {
+    test(`keeps current checked state separate from explicit reset defaults and preserves interaction on unrelated renders with a ${loading} loader`, async () => {
+        let release: () => void = () => {};
+        const gate = new Promise<void>((resolve) => {
+            release = resolve;
+        });
+        onTestFinished(release);
+        const component: Component =
+            loading === 'pending' ? deferredCheckbox(() => gate) : Checkbox;
+        const state = reactive({ checked: true, count: 0 });
+        const { container } = mount({
+            render: () =>
+                h('form', [
+                    h(component, {
+                        checked: state.checked,
+                        defaultChecked: false,
+                        name: 'consent',
+                        value: 'yes',
+                        'data-count': state.count,
+                    }),
+                ]),
+        });
+        const checkbox = find<WaCheckbox>(container, 'wa-checkbox');
+        const form = find<HTMLFormElement>(container, 'form');
+        await ready(checkbox);
+        release();
+        await expect
+            .poll(() => ({
+                checked: checkbox.checked,
+                defaultChecked: checkbox.defaultChecked,
+                consent: new FormData(form).get('consent'),
+            }))
+            .toEqual({ checked: true, defaultChecked: false, consent: 'yes' });
+        checkbox.click();
+        await ready(checkbox);
+        expect(checkbox.checked).toBe(false);
+        state.count++;
+        await ready(checkbox);
+        expect(checkbox.checked).toBe(false);
+        state.checked = false;
+        await ready(checkbox);
+        state.checked = true;
+        await ready(checkbox);
+        expect(checkbox.checked).toBe(true);
+        form.addEventListener('reset', (event) => event.preventDefault(), { once: true });
+        form.reset();
+        await ready(checkbox);
+        expect(checkbox.checked).toBe(true);
+        form.reset();
+        await ready(checkbox);
+        expect(checkbox.checked).toBe(false);
+        expect(new FormData(form).has('consent')).toBe(false);
     });
-    const checkbox = find<WaCheckbox>(container, 'wa-checkbox');
-    const form = find<HTMLFormElement>(container, 'form');
-    await ready(checkbox);
-    expect(checkbox.checked).toBe(true);
-    expect(checkbox.defaultChecked).toBe(false);
-    expect(new FormData(form).get('consent')).toBe('yes');
-    checkbox.click();
-    await ready(checkbox);
-    expect(checkbox.checked).toBe(false);
-    state.count++;
-    await ready(checkbox);
-    expect(checkbox.checked).toBe(false);
-    state.checked = false;
-    await ready(checkbox);
-    state.checked = true;
-    await ready(checkbox);
-    expect(checkbox.checked).toBe(true);
-    form.addEventListener('reset', (event) => event.preventDefault(), { once: true });
-    form.reset();
-    await ready(checkbox);
-    expect(checkbox.checked).toBe(true);
-    form.reset();
-    await ready(checkbox);
-    expect(checkbox.checked).toBe(false);
-    expect(new FormData(form).has('consent')).toBe(false);
-});
+}
 
 test('defaultChecked alone initializes the native state without acting as a live checked binding', async () => {
     const state = reactive({ count: 0 });
@@ -300,17 +332,7 @@ test('uses the latest queued properties and abandons deferred writes after unmou
     const gate = new Promise<void>((resolve) => {
         release = resolve;
     });
-    const delayed = defineComponent({
-        inheritAttrs: false,
-        setup() {
-            const { bindings, slotContent } = useWebAwesome(
-                [checkboxDefinition],
-                'wa-checkbox',
-                () => gate,
-            );
-            return () => h('wa-checkbox', { ref: 'element', ...bindings() }, slotContent());
-        },
-    });
+    const delayed = deferredCheckbox(() => gate);
     const state = reactive({ checked: false });
     const { container, app } = mount({ render: () => h(markRaw(delayed), state) });
     const checkbox = find<WaCheckbox>(container, 'wa-checkbox');

@@ -1,4 +1,4 @@
-import { expect, onTestFinished, test } from 'vite-plus/test';
+import { expect, onTestFinished, test, vi } from 'vite-plus/test';
 import { userEvent } from 'vitest/browser';
 import { createApp, h, nextTick } from 'vue';
 import type { VNode } from 'vue';
@@ -66,6 +66,7 @@ function element<T extends keyof HTMLElementTagNameMap>(root: HTMLElement, tag: 
 }
 
 async function settle(root: HTMLElement) {
+    await vi.dynamicImportSettled();
     await nextTick();
     const elements = [...root.querySelectorAll('*')].filter((entry) =>
         entry.localName.startsWith('wa-'),

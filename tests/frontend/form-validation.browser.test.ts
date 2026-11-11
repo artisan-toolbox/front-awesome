@@ -1,4 +1,4 @@
-import { expect, onTestFinished, test } from 'vite-plus/test';
+import { expect, onTestFinished, test, vi } from 'vite-plus/test';
 import { createApp, h, nextTick, reactive, shallowRef } from 'vue';
 import type { Component, ComponentPublicInstance } from 'vue';
 import type WaRating from '@awesome.me/webawesome/dist/components/rating/rating.js';
@@ -20,6 +20,7 @@ function mount(component: Component) {
 }
 
 async function ready(element: WaRating | WaInput) {
+    await vi.dynamicImportSettled();
     await customElements.whenDefined(element.localName);
     await nextTick();
     await element.updateComplete;

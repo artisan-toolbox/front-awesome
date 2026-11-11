@@ -1,4 +1,4 @@
-import { expect, onTestFinished, test } from 'vite-plus/test';
+import { expect, onTestFinished, test, vi } from 'vite-plus/test';
 import { createApp, h, nextTick, reactive, shallowRef } from 'vue';
 import type { Component, ComponentPublicInstance } from 'vue';
 import type WaTooltip from '@awesome.me/webawesome/dist/components/tooltip/tooltip.js';
@@ -20,6 +20,7 @@ function mount(component: Component) {
 }
 
 async function ready(tooltip: WaTooltip) {
+    await vi.dynamicImportSettled();
     await customElements.whenDefined('wa-tooltip');
     await nextTick();
     await tooltip.updateComplete;

@@ -1,4 +1,4 @@
-import { expect, onTestFinished, test } from 'vite-plus/test';
+import { expect, onTestFinished, test, vi } from 'vite-plus/test';
 import { createApp, h, nextTick, reactive } from 'vue';
 import type { Component } from 'vue';
 import type WaTag from '@awesome.me/webawesome/dist/components/tag/tag.js';
@@ -20,6 +20,7 @@ function mount(component: Component) {
 }
 
 async function ready(tag: WaTag) {
+    await vi.dynamicImportSettled();
     await customElements.whenDefined('wa-tag');
     await nextTick();
     await tag.updateComplete;
