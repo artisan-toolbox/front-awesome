@@ -274,11 +274,11 @@
     "@tailwindcss/vite": "^4.3.4",
     "@types/node": "^24.13.3",
     "@vitejs/plugin-vue": "^6.0.0",
-    "@vitest/browser-playwright": "4.1.11",
-    "@vitest/coverage-v8": "4.1.11",
+    "@vitest/browser-playwright": "5.1.0",
+    "@vitest/coverage-v8": "5.1.0",
     "primevue": "4.5.5",
     "typescript": "^5.8.3",
-    "vite-plus": "0.3.3",
+    "vite-plus": "1.6.0",
     "vue-tsc": "^3.3.14"
   },
   "peerDependencies": {
@@ -298,11 +298,13 @@
     }
   },
   "overrides": {
-    "vite": "npm:@voidzero-dev/vite-plus-core@0.3.3",
-    "vitest": "4.1.11"
+    "vite": "npm:@voidzero-dev/vite-plus-core@1.6.0"
   },
   "engines": {
     "node": ">=24.11.0"
   },
-  "packageManager": "npm@11.17.0"
+  "packageManager": "npm@11.17.0",
+  "allowScripts": {
+    "fsevents": false
+  }
 }

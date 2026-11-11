@@ -1,7 +1,7 @@
 {
   "versions": {
     "@awesome.me/webawesome": "3.14.0",
-    "tailwindcss": "4.3.4",
+    "tailwindcss": "4.3.5",
     "primevue": "4.5.5",
     "@primeuix/themes": "2.0.3"
   },

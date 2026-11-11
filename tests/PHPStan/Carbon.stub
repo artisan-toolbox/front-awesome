@@ -1,0 +1,11 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Carbon;
+
+class Carbon
+{
+    /** @param-closure-this static $macro */
+    public static function macro(string $name, ?callable $macro): void {}
+}

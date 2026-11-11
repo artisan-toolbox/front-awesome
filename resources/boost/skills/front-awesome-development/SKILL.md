@@ -9,7 +9,9 @@ Front Awesome provides reusable Vue components and Laravel frontend integrations
 
 ## Install and use
 
-Start in an existing Laravel 13 application with PHP 8.5, Inertia 3, Vue 3.5, Tailwind 4, Vite, and Node.js 24.11 or later. Front Awesome's `1.x` branch is a development preview without a stable Composer release. Check the installed Composer version and its `package.json` exports before choosing an API. Older preview revisions may not include the Vite plugin or shared branding entries below.
+Use Laravel 13.36 or later within Laravel 13.x, PHP 8.5, Inertia 3, Vue 3.5, Tailwind 4, Vite, and Node.js 24.11 or later. Front Awesome's `1.x` branch is a development preview without a stable Composer release. Check the installed Composer version and its `package.json` exports before choosing an API. Older preview revisions may not include the Vite plugin or shared branding entries below.
+
+For applications on Laravel 13.0 through 13.35, update Laravel within 13.x before upgrading this source preview. It requires Illuminate Translation `^13.36` because earlier releases renumber numeric JSON translation keys.
 
 1. To opt into the `1.x` preview, run `composer require 'artisan-toolbox/front-awesome:^1.0@dev'` in the application root before installing frontend dependencies. Keep the stability exception scoped to this package. When a compatible stable release is available, use its documented stable constraint instead.
 2. Declare both frontend packages in the application's `package.json`. Mosaicast is a peer dependency of Front Awesome. Run `npm install --install-links ./vendor/artisan-toolbox/front-awesome ./vendor/artisan-toolbox/mosaicast` from the application root. Keep `install-links=true` in the application's `.npmrc` so `npm ci` uses the same mode.

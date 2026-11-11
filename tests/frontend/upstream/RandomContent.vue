@@ -30,7 +30,7 @@
                 <Button
                     data-upstream-index="10"
                     appearance="filled"
-                    onclick="document.getElementById('rc-overview').randomize();"
+                    onclick="document.getElementById('rc-overview').randomize()"
                     >Shuffle</Button
                 >
             </div>
@@ -50,7 +50,7 @@
                 <Button
                     data-upstream-index="4"
                     appearance="filled"
-                    onclick="document.getElementById('rc-providing').randomize();"
+                    onclick="document.getElementById('rc-providing').randomize()"
                     >Shuffle</Button
                 >
             </div>
@@ -83,7 +83,7 @@
                     <Button
                         data-upstream-index="12"
                         appearance="filled"
-                        onclick="document.getElementById('rc-items').randomize();"
+                        onclick="document.getElementById('rc-items').randomize()"
                         >Shuffle</Button
                     >
                 </div>
@@ -115,7 +115,7 @@
                     <Button
                         data-upstream-index="10"
                         appearance="filled"
-                        onclick="document.getElementById('rc-modes').randomize();"
+                        onclick="document.getElementById('rc-modes').randomize()"
                         >Shuffle</Button
                     >
                 </div>
@@ -153,7 +153,7 @@
                     <Button
                         data-upstream-index="9"
                         appearance="filled"
-                        onclick="document.getElementById('rc-animation').randomize();"
+                        onclick="document.getElementById('rc-animation').randomize()"
                         >Next</Button
                     >
                 </div>
@@ -221,7 +221,7 @@
                 <Button
                     data-upstream-index="8"
                     appearance="filled"
-                    onclick="document.getElementById('rc-layout').randomize();"
+                    onclick="document.getElementById('rc-layout').randomize()"
                     >Shuffle</Button
                 >
             </div>
@@ -244,7 +244,7 @@
                 <Button
                     data-upstream-index="2"
                     appearance="filled"
-                    onclick="document.getElementById('rc-inline').randomize();"
+                    onclick="document.getElementById('rc-inline').randomize()"
                     >Shuffle</Button
                 >
             </div>

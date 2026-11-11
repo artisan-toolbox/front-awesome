@@ -42,7 +42,7 @@ final class FrontAwesome implements Versionable, WithReadmeHead
             ))
             ->addBadge(Badge::make(
                 link: 'https://atb.dev.br/packages/front-awesome/',
-                imgSrc: 'https://img.shields.io/badge/Laravel-13-FF2D20?style=flat-square',
+                imgSrc: 'https://img.shields.io/badge/Laravel-%5E13.36-FF2D20?style=flat-square',
                 imgAlt: 'Laravel',
             ))
             ->addBadge(Badge::make(

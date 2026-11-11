@@ -4,3 +4,5 @@ parameters:
         - src
         - tests/Fixtures
     tmpDir: build/phpstan
+    stubFiles:
+        - tests/PHPStan/Carbon.stub

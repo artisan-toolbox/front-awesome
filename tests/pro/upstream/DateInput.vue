@@ -203,16 +203,18 @@
                         size="s"
                         appearance="filled"
                         variant="neutral"
-                        onclick="this.closest('wa-date-input').value = new Date()
-                            .toISOString()
-                            .slice(0, 10);"
+                        onclick="
+                            this.closest('wa-date-input').value = new Date()
+                                .toISOString()
+                                .slice(0, 10)
+                        "
                         >Today</Button
                     >
                     <Button
                         data-upstream-index="2"
                         size="s"
                         appearance="plain"
-                        onclick="this.closest('wa-date-input').value = '';"
+                        onclick="this.closest('wa-date-input').value = ''"
                         >Clear</Button
                     >
                 </div>

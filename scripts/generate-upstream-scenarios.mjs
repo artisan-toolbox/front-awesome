@@ -1,7 +1,7 @@
 import { mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { parseFragment } from 'parse5';
-import { format } from 'oxfmt';
+import { format } from 'vite-plus/fmt';
 
 const root = resolve(import.meta.dirname, '..');
 const pro = process.argv.includes('--pro');

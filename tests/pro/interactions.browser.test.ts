@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 import { expect, onTestFinished, test, vi } from 'vite-plus/test';
-import { page, userEvent } from '@vitest/browser/context';
+import { page, userEvent } from 'vite-plus/test/browser';
 import { createApp, h, nextTick, shallowReactive } from 'vue';
 import type { Component } from 'vue';
 import * as Pro from '@artisan-toolbox/front-awesome/components/WebAwesome/Pro';

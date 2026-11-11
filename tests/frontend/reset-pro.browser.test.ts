@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 import { beforeAll, expect, test } from 'vite-plus/test';
-import { userEvent } from '@vitest/browser/context';
+import { userEvent } from 'vite-plus/test/browser';
 import '#front-awesome-webawesome/styles/themes/default.css';
 import preflight from 'tailwindcss/preflight.css?raw';
 import coreReset from '../../resources/js/theme/core-host-reset.css?raw';

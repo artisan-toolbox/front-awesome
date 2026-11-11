@@ -158,19 +158,19 @@
                     <Button
                         data-upstream-index="6"
                         appearance="filled"
-                        onclick="document.getElementById('demo-playlist').goTo(0);"
+                        onclick="document.getElementById('demo-playlist').goTo(0)"
                         >First</Button
                     >
                     <Button
                         data-upstream-index="7"
                         appearance="filled"
-                        onclick="document.getElementById('demo-playlist').previous();"
+                        onclick="document.getElementById('demo-playlist').previous()"
                         >Previous</Button
                     >
                     <Button
                         data-upstream-index="8"
                         appearance="filled"
-                        onclick="document.getElementById('demo-playlist').next();"
+                        onclick="document.getElementById('demo-playlist').next()"
                         >Next</Button
                     >
                 </div>

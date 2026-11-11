@@ -1,5 +1,5 @@
 import { expect, onTestFinished, test, vi } from 'vite-plus/test';
-import { userEvent } from '@vitest/browser/context';
+import { userEvent } from 'vite-plus/test/browser';
 import { createApp, h, nextTick } from 'vue';
 import { Combobox } from '@artisan-toolbox/front-awesome/components/WebAwesome/Pro';
 import PopupExamples from '../frontend/upstream/Popup.vue';

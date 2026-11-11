@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
 import { isDeepStrictEqual } from 'node:util';
-import { format } from 'oxfmt';
+import { format } from 'vite-plus/fmt';
 import ts from 'typescript';
 import { compileScript, parse } from 'vue/compiler-sfc';
 import { webAwesomeModels } from './web-awesome-models.mjs';

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Require Illuminate Translation 13.36 or later within 13.x to preserve numeric JSON translation keys during export. Applications on Laravel 13.0 through 13.35 must update Laravel before upgrading this preview. Keep the prefer-lowest CI lane and the numeric-key regression test unchanged.
+- Describe Carbon's bound macro context to PHPStan when checking older Carbon releases that omit that annotation, preserving runtime behavior under the minimum dependency set.
+
+- Align Vite Plus and its Vite core alias at 1.6.0 with the bundled Vitest 5.1.0, matching browser and coverage adapters, and no legacy runner override. Restore test startup and remove the vulnerable Vitest 4 dependency chain.
+- Use Vite Plus's public formatter and browser test exports in generators and legacy browser tests. Explicitly deny unnecessary fsevents install scripts while preserving its packaged macOS watcher.
+
 - Preserve Carbon's macro closure-binding contract during automated refactoring and keep the preference model fixture free of an unused factory trait. Scope the corresponding Rector transformations so repeated fixes do not reintroduce PHPStan errors.
 
 - Reject PHP reserved type names in generated preference stores and preserve an explicitly empty locale configuration so validation cannot silently enable wildcard discovery.
