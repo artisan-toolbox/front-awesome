@@ -5,6 +5,7 @@ export type AppearancePreference = 'system' | 'light' | 'dark';
 
 interface AppearanceController {
     appearance: Readonly<Ref<AppearancePreference>>;
+    serverConfirmed?: boolean;
     setAppearance: (preference: AppearancePreference) => void;
     toggle: () => void;
 }

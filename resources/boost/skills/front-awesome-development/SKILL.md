@@ -1,6 +1,6 @@
 ---
 name: front-awesome-development
-description: Use Front Awesome Vue and Inertia form controls, two-way models, validation, layouts, icons, and theme integrations in Laravel applications.
+description: Use Front Awesome Vue and Inertia form controls, layouts, icons, Laravel-source translations, backend display and currency preferences, optional QZ printing, and theme integrations in Laravel applications.
 ---
 
 # Front Awesome development
@@ -36,6 +36,28 @@ In Laravel, use the `ArtisanToolbox\FrontAwesome\Facades\Toast` methods `brand($
 To change the default icons for toasts sent from Laravel, run `php artisan vendor:publish --tag=front-awesome-config` and edit `webawesome.toast.icons` in `config/front-awesome.php`. Set a variant to `null` to disable its default. An explicit toast icon takes priority. For toasts created in Vue, pass `icon` to `show()` when you want one.
 
 [Front Awesome documentation](https://atb.dev.br/docs/front-awesome/)
+
+## Persist appearance, language, timezone, and currency
+
+Backend preferences are an unreleased source-preview API. Confirm the installed exports include `createPreferences` and `Timezone`, and Artisan lists `make:preferences-store` and `install:user-preferences`. Start after the installation and localization setup below, with Laravel sessions and the application's Inertia middleware enabled.
+
+Append `ArtisanToolbox\FrontAwesome\Preferences\Http\Middleware\HandlePreferences::class` to the `web` middleware group in `bootstrap/app.php`. It resolves the active store, sets the request locale, and always shares `preferences`, including selectable `locales` and supported `timezones`, on Inertia responses. Render the request locale on `<html lang>` and put `@frontAwesomePreferences` before CSS in the root Blade head. The optional directive argument is a CSP nonce. Remove competing theme cookies and localStorage initialization from the application.
+
+Inside `createInertiaApp`'s `withApp(app, { page })`, create `const preferences = createPreferences(page.props.preferences)` and pass it to `app.use(createFrontAwesome({ preferences, localization }))`. Import `createPreferences` from the package root or `@artisan-toolbox/front-awesome/preferences`. For an application that already owns transport and toast setup, `app.use(preferences); app.use(localization);` is supported in that order. A custom `preferences.key` requires the corresponding initial `page.props` key.
+
+Import `Appearance`, `Language`, `Timezone`, and `Currency` from `@artisan-toolbox/front-awesome/components`. Direct `components/<Name>.vue` and `preferences/<Name>.vue` exports are available. These components add no markup. Appearance exposes `appearance`, `system()`, `light()`, `dark()`, and `toggle()`. Language exposes `locale`, `locales`, and `setLocale(locale)`. Timezone exposes `timezone`, `timezones`, and `setTimezone(timezone)`. All four expose `pending` and `error`; disable controls while pending and render errors accessibly. For example, `<Timezone v-slot="{ timezone, timezones, setTimezone, pending }"><select :value="timezone" :disabled="pending" @change="setTimezone($event.target.value)"><option v-for="zone in timezones" :key="zone" :value="zone">{{ zone }}</option></select></Timezone>` saves a selected zone. Supply a visible label in the application's complete form.
+
+Actions send serial, CSRF-protected Inertia PATCH requests and return to the current page with component state, scroll, query, and fragment preserved. The server validates exactly one preference before calling a store setter. Currency accepts a supported ISO 4217 code or null, with null as its default. Currency exposes `currency`, `currencies`, `setCurrency(currency)`, `pending`, and `error`. Only confirmed values update the document's appearance and HTML language, which drives Vue I18n and Web Awesome. `useLocalization().setLocale()` also persists when preferences are installed. A failed network response may follow a committed write; `usePreferences().refresh()` reconciles with the server. Cached/history visits reconcile the full server page, including translated PHP props, on supported Inertia 3.0 versions; explicit refresh reloads only the preference prop. Standalone localization and `appearance: true` retain browser-only behavior when preferences are absent.
+
+The default `SessionPreferenceStore` stores values in the current Laravel session. Missing values resolve to system appearance, quality-negotiated supported `Accept-Language` with `app.locale` fallback, and `app.timezone`. Regenerating a session ID retains preferences; invalidating the session clears them. For cross-tab session durability, configure Laravel session blocking on all participating routes with a supported driver and lock-capable cache. A lock on the PATCH route alone does not prevent an unblocked request saving stale session data.
+
+For account storage, run `php artisan install:user-preferences --model='App\Models\User'` from the application root. Review the generated nullable JSON migration before running `php artisan migrate`. The installer never migrates or edits the model. Add `Preferences\Contracts\HasPreferences` and `Preferences\Concerns\InteractsWithPreferences` to the authenticatable model, then register it with `FrontAwesome::setPreferenceStore(User::class)` in `AppServiceProvider::boot()`. For an alternate account guard such as auth:staff, set preferences.guard to staff so reads and writes resolve the same user. Guests still use the session; guest settings never overwrite account settings automatically. The trait merges one field using a fresh-row transaction, preserves unrelated JSON values, and hides the storage column from ordinary model serialization. Review production database behavior separately from SQLite coverage.
+
+`front-awesome.preferences.key` defaults to `preferences` and names both the JSON column and Inertia shared prop, even when model storage is not selected. Choose an unused portable identifier before generating the migration. `preferences.store` selects a concrete store or authenticatable model. Generate a custom eight-method Request-aware implementation with `php artisan make:preferences-store TenantPreferencesStore`, then register its fully qualified class with `FrontAwesome::setPreferenceStore(...)`. The custom contract also includes getCurrency(Request): ?string and setCurrency(Request, ?string): void. The default namespace is `App\Http\Preferences`. All getters and setters receive the current Request; nullable getters use standard defaults. Never retain a request or account in process-global state.
+
+Keep `app.timezone` fixed. The enabled-by-default `toPreferenceTimezone()` Carbon macro returns a converted copy without changing the instant or original object. Existing macros with that name are preserved; disable registration with `preferences.carbon_macro: false`. JavaScript's device zone may differ from the saved zone. `usePreferences().formatDate(date, options)` uses the confirmed locale and timezone; explicit options may override them. With localization installed after preferences, native Vue I18n `d(value, 'preference')` and `n(value, 'currency')` track confirmed timezone and currency. Null currency formats a decimal. Other configured named formats inherit missing timezone/currency properties, while explicit settings win. Unkeyed native d/n retain Vue I18n defaults. Browser ICU must support a chosen zone to format it.
+
+Reload the page after changing each selector and confirm persistence. See the grouped [Preferences guides](https://atb.dev.br/docs/front-awesome/preferences), [language setup](https://atb.dev.br/docs/front-awesome/preferences/language), and [reference](https://atb.dev.br/docs/front-awesome/preferences/reference).
 
 ## Web Awesome component imports
 
@@ -309,3 +331,88 @@ const selected = ref('2026-11-09');
 ```
 
 The calendar highlights November 9, 2026. Selecting another day updates the paragraph. If the application imports this wrapper without its licensed dependency, Front Awesome reports that the component requires Web Awesome Pro during the build and through Vite's development error reporting. The wrapper does not supply a license or silently substitute a Core element.
+
+
+## Translate browser UI from Laravel
+
+Localization is an optional unreleased source preview. Inspect the installed package exports for `./localization` and `components/Language.vue`, and confirm that `php artisan list` includes `front-awesome:export-translations`. Published previews do not guarantee these additions. Follow the [Laravel-source localization guide](https://atb.dev.br/docs/front-awesome/localization) for the complete procedure.
+
+Keep messages in Laravel PHP and JSON language files. The package always exports its own English, Spanish, and Brazilian Portuguese messages. In `config/front-awesome.php`, set `translations.include_application` to `true` to include eligible application messages for selected languages and the configured fallback. The default `translations.locales` value is `['*']`, which discovers eligible locale directories, JSON files, and namespace overrides. An explicit ordered list such as `['en', 'es']` offers only English and Spanish, in that order. It does not add to the built-in choices. Empty lists, mixed wildcard and locale lists, and partial globs are invalid. The wildcard must stand alone. Published Front Awesome overrides can add discovered languages even with application export disabled, while application text remains excluded globally. Application locale directories, JSON files, and other namespace overrides participate in discovery when application export is enabled. File and key filters are optional. Treat exported language files as public browser data. Optional `include_files` and `exclude_files` use lang-relative globs. `include_regex` and `exclude_regex` accept `path` and `file` lists of delimited PCRE expressions. `path` matches lang-relative paths and `file` matches basenames. Inclusion rules combine with OR, exclusions win, and application filters cannot remove mandatory package text.
+
+In the root Blade document, render `<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">`. In the existing Vite plugin, enable `frontAwesome({ webAwesome: 'core', translations: true })`, or select the installed licensed Pro edition. A custom executable or directory uses `translations: { php, artisan, cwd }`. Vite automatically exports before normal startup and builds.
+
+In the frontend entry, install the catalog through the existing Front Awesome plugin call:
+
+```js
+import { createFrontAwesome } from '@artisan-toolbox/front-awesome';
+import { createLocalization } from '@artisan-toolbox/front-awesome/localization';
+import catalog from './generated/front-awesome-translations.json';
+
+const localization = createLocalization(catalog, {
+    numberFormats: {
+        en: { money: { style: 'currency', currency: 'USD' } },
+        es: { money: { style: 'currency', currency: 'EUR' } },
+        'pt-BR': { money: { style: 'currency', currency: 'BRL' } },
+    },
+});
+app.use(createFrontAwesome({ localization }));
+```
+
+Use canonical browser tags such as `pt-BR` in Vue I18n `numberFormats` and `datetimeFormats`. The catalog and HTML controller own `locale`, `messages`, and `legacy`. The export fallback follows `APP_FALLBACK_LOCALE`, defaulting to `en` when unset; English remains the final package-text fallback. Add `/resources/js/generated/front-awesome-translations.*` to the consuming application's `.gitignore`. Before standalone `vue-tsc` on a clean checkout, run `php artisan front-awesome:export-translations`. Direct Artisan exports also require Node.js 24.11 or later and permission to start a subprocess on the asset host. They validate browser locale IDs with the shared Intl helper before changing either generated artifact, rejecting aliases such as iw/he that resolve to one locale. Configure `translations.node_binary` or pass `--node=/absolute/path/to/node`; Vite automatically supplies its own Node executable. PHP preference requests do not start Node. Its sibling generated declaration augments Vue I18n message keys. Named formats use Vue I18n's native schema augmentation.
+
+Inside Vue setup, use `useLocalization()` from `@artisan-toolbox/front-awesome/localization` for readonly `locale`, locale descriptors, `t`, `n`, `d`, and `setLocale`. For example, an exported `lang/en/app.php` value `'welcome' => 'Welcome, :name!'` renders as `Welcome, Ana!` with `t('app.welcome', { name: 'Ana' })`. Laravel `:name`, `:Name`, and `:NAME` replacements and exact, interval, and implicit choice syntax remain valid. Use `t('app.documents', { count: 2 })` for choices. Source messages use Laravel syntax rather than native Vue I18n interpolation. Replacements are browser scalar values.
+
+Compose controls with `Language` from `@artisan-toolbox/front-awesome/components`, or its direct `.vue` export. Its default slot receives `{ locale, locales, setLocale }`. The generated version 1 JSON `availableLocales` field supplies the ordered choices. The parser canonicalizes choices and rejects unknown or duplicate entries. Older version 1 catalogs without this optional field offer every catalog locale. Internal package catalogs always retain `en`, `es`, `pt_BR`, and the configured fallback even when hidden. For `['en', 'es']`, the selector omits Brazilian Portuguese while retaining its internal package data. `setLocale` accepts only selectable choices. Render one named button per descriptor, key it by `choice.locale`, and call `setLocale(choice.locale)`. The component adds no wrapper or style. HTML `lang` is the sole active-locale source, including direct changes and server-rendered languages hidden from the selector. Native Web Awesome follows that same HTML language. Canonical aliases such as `pt_BR` map to `pt-BR`. Standalone locale selection updates only the browser. Install the Preferences integration above for validated Inertia persistence and request locale selection.
+
+Package overrides use `php artisan vendor:publish --tag=front-awesome-lang` and `lang/vendor/front-awesome/{locale}/printing.php`. Native Web Awesome language imports follow the selected edition. Its `pt` catalog supplies native text for `pt-BR`, with European wording and some untranslated strings. Do not describe native controls as fully Brazilian Portuguese.
+
+Printing installed with both `printing` and `localization` translates package defaults, titles, errors, and live views. Explicit message overrides, supplied titles, printer names, and external literal errors remain literal. Settled `handle.finished` strings remain historical snapshots. A language change starts no connection, print job, preparation, submission, or retry. Standalone printing without localization keeps English defaults. See the [localization reference](https://atb.dev.br/docs/front-awesome/localization/reference) for the full contract.
+
+## Review and print documents
+
+The printing suite is an unreleased source preview under `@artisan-toolbox/front-awesome/printing`. Confirm that the Composer-installed Front Awesome exports `./printing` and that the QZ Tray frontend exports `renderPrintRequest` before using this API. The previously published QZ Tray 1.3.0 archive does not guarantee these new preview exports. Follow the [printing guide](https://atb.dev.br/docs/front-awesome/printing) for the current preview installation path.
+
+Printing is optional. In an application using the preview, install the compatible QZ Tray Composer package first, then install its frontend from `file:vendor/artisan-toolbox/qztray`. Configure QZ certificate/signing endpoints through the QZ Tray package, run the QZ Tray desktop application, and install a printer before submitting real documents. Keep credentials and signing keys on the server. Applications without printing do not need this optional frontend peer.
+
+Create one service for each Vue application and mount one drawer in its persistent layout:
+
+```ts
+import { createFrontAwesome } from '@artisan-toolbox/front-awesome';
+import { createPrinting, PrintDrawer } from '@artisan-toolbox/front-awesome/printing';
+
+const printing = createPrinting({
+    storageKey: 'my-application.printing',
+    previewOptions: { escpos: { widthDots: 576 } },
+});
+app.use(createFrontAwesome({ printing }));
+// Render <PrintDrawer /> in the persistent application layout.
+```
+
+Use `usePrinting()` inside Vue setup, or retain the service created above. The root package does not import the QZ runtime. `PrintDrawer` also accepts `:service="printing"` for explicit ownership. With explicit ownership, dispose the service when its application unmounts. Drawer dismissal preserves queued jobs and the QZ connection.
+
+For an existing response promise returning `{ invoice: string | string[] | null }`, queue a PDF without an await:
+
+```ts
+const handle = printing.pdfBase64(responsePromise, {
+    key: 'invoice',
+    title: 'Invoice',
+    options: { copies: 1 },
+});
+const result = await handle.finished;
+```
+
+The drawer opens while the response loads. It then previews every file/page, lets the reader choose an available printer and settings, and submits only after their action. A selected `null` skips that step. Missing keys, inherited keys, dotted traversal, `undefined`, empty files, and malformed collections fail with a friendly message. `key` selects only an own top-level property. Without `key`, the payload itself must be a document. Do not persist document data.
+
+The default workflow restores the last printer for each format. The operator reviews and clicks Print once for each document. Accepted submissions advance automatically, and successful completed jobs close without a final report. No document prints automatically. Set `autoAdvance: false` to pause after submission or `showSummary: true` to show a final report. Both options work on `createPrinting`, individual `job` calls, and format helpers. `handle.finished` always returns ordered results even when the report is hidden. Failed and unknown outcomes remain visible until reviewed.
+
+Use `pdf(payload, { flavor: 'file' })` for PDF URLs, `escpos(payload)` for Base64 ESC/POS, and `zpl(payload)` for plain ZPL. Set `flavor: 'plain'`, `'hex'`, or `'file'` explicitly when needed. Arrays preserve file order. ESC/POS can mix command strings and QZ image records. PDF `dataOptions`, including page ranges, remain format-specific. Unsupported PDF preview transformations fail explicitly rather than claiming a matching preview.
+
+For a shared response containing multiple document formats, call `job({ title, source: responsePromise, steps: [{ type: 'escpos', flavor: 'base64', key: 'receipt', title: 'Receipt' }, { type: 'pdf', flavor: 'base64', key: 'invoice', title: 'Invoice' }] })`. Jobs remain FIFO. Each step requires its own submission; no batching or automatic print occurs. Results preserve step order and report `submitted`, `skipped`, `cancelled`, `failed`, or `unknown` exactly once. `submitted` means QZ Tray accepted the request, not that paper physically printed.
+
+`handle.cancel()` and service disposal settle pending work. An active send cannot reliably be recalled and therefore settles as `unknown`. Inspect QZ Tray and the physical printer before requesting another copy. The suite never automatically retries an ambiguous submission.
+
+Configure `defaults` by format for printer and QZ options, `previewOptions` for renderer dimensions/density, and per-step `previewOptions` for overrides. Use localization for reactive package translations. Use `messages` on the service for literal overrides of visible interface and error text. The optional Drawer `messages` prop overrides presentation labels. Supply a `PrintBridge` with optional `prepare(document, previewOptions)`, plus `connect`, `getPrinters`, `render(document, previewOptions)`, and `print(request)` to integrate a different transport or simulate submissions. A simulated `print` must be clearly labeled in the application.
+
+The default bridge materializes file URLs and image files into a detached byte snapshot once before review. Custom bridges that omit `prepare` must preserve the same document between preview and submission.
+
+The Drawer exposes `preview`, `settings`, `settings-extra`, `summary`, and `footer` slots. Keep review and transport actions user-triggered. Raw requests show their source commands with a warning rather than pretending to render a page. Optional storage saves only printer/copy preferences by format, respects `storageKey`, and tolerates blocked or malformed browser storage. Set `storage: false` to disable it. The application still owns its branding and Web Awesome theme.

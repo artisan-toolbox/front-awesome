@@ -1,17 +1,34 @@
 export type * from './WebAwesome/componentProps';
 import { createMosaicast } from '@artisan-toolbox/mosaicast';
 import type { MosaicastPluginOptions } from '@artisan-toolbox/mosaicast';
-import type { Plugin } from 'vue';
+import type { App, Plugin } from 'vue';
 import { initializeFlashToast } from './WebAwesome/flashToast';
 import type { FlashToastOptions } from './WebAwesome/flashToast';
 import { toastKey, toastService } from './WebAwesome/toast';
 import type { ToastService } from './WebAwesome/toast';
-import { initializeAppearance } from './appearance';
+import { initializeAppearance } from './preferences/appearance';
+import type { PreferencesService } from './preferences/types';
+export { createPreferences, usePreferences } from './preferences';
+export type {
+    Preferences,
+    PreferencesBootstrap,
+    PreferencesService,
+    PreferenceErrors,
+    PreferenceField,
+} from './preferences/types';
+import type { LocalizationService } from './localization/types';
+export { useLocalization } from './localization/context';
+export type {
+    LaravelLocalizationCatalog,
+    LocalizationLocale,
+    LocalizationOptions,
+    LocalizationService,
+} from './localization/types';
 
 export type { FlashToastOptions, ToastIconOptions, ToastOptions } from './WebAwesome/flashToast';
 export { useToast } from './WebAwesome/toast';
 export type { ToastService } from './WebAwesome/toast';
-export type { AppearancePreference } from './appearance';
+export type { AppearancePreference } from './preferences/appearance';
 export type { ButtonGroupProps, ButtonProps } from './WebAwesome/buttonProps';
 export { useFormBridge } from './WebAwesome/useFormBridge';
 export type {
@@ -34,9 +51,19 @@ export type { TooltipProps } from './WebAwesome/tooltipProps';
 export type { PopoverProps } from './WebAwesome/popoverProps';
 export type { PageProps } from './WebAwesome/pageProps';
 
+export interface FrontAwesomeServices {
+    toast: ToastService;
+    localization?: LocalizationService;
+    preferences?: PreferencesService;
+}
+
+export interface FrontAwesomePrinting {
+    install(app: App): void;
+}
+
 declare module 'vue' {
     interface ComponentCustomProperties {
-        $frontAwesome: { toast: ToastService };
+        $frontAwesome: FrontAwesomeServices;
     }
 }
 
@@ -44,6 +71,9 @@ export interface FrontAwesomeOptions {
     mosaicast?: MosaicastPluginOptions;
     flashToast?: FlashToastOptions;
     appearance?: boolean;
+    printing?: FrontAwesomePrinting;
+    localization?: LocalizationService;
+    preferences?: PreferencesService;
 }
 
 // Mosaicast 1.1 keeps its Inertia listener for the document lifetime.
@@ -53,13 +83,22 @@ export function createFrontAwesome({
     mosaicast,
     flashToast,
     appearance,
+    printing,
+    localization,
+    preferences,
 }: FrontAwesomeOptions = {}): Plugin {
     return {
         install(app) {
             app.provide(toastKey, toastService);
-            app.config.globalProperties.$frontAwesome = { toast: toastService };
+            app.config.globalProperties.$frontAwesome = {
+                ...app.config.globalProperties.$frontAwesome,
+                toast: toastService,
+            };
+            if (preferences) preferences.install(app);
+            if (localization) localization.install(app);
+            if (printing) printing.install(app);
 
-            if (appearance) {
+            if (appearance && !preferences) {
                 initializeAppearance(app);
             }
 

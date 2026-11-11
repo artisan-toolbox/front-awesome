@@ -100,3 +100,50 @@ test('Input refreshes projected parent slot closures while preserving the native
     expect(Reflect.get(input, 'value')).toBe('Edited');
     expect(state.value).toBe('Edited');
 });
+
+test('namespaces conditional branch keys from independent native slots without replacing their controls', async () => {
+    const state = shallowReactive({ title: 'First', footer: 'Continue' });
+    const warnings: unknown[][] = [];
+    const originalWarn = console.warn;
+    console.warn = (...values: unknown[]) => {
+        warnings.push(values);
+    };
+    const container = document.createElement('div');
+    document.body.append(container);
+    const app = createApp({
+        render: () =>
+            h(
+                Card,
+                {},
+                {
+                    header: () => h('div', { key: 0 }, state.title),
+                    default: () =>
+                        h(
+                            'div',
+                            { key: 0 },
+                            h(Checkbox, {}, () => 'Keep checked state'),
+                        ),
+                    footer: () => h('div', { key: 0 }, state.footer),
+                },
+            ),
+    });
+    onTestFinished(() => {
+        console.warn = originalWarn;
+        app.unmount();
+        container.remove();
+    });
+    app.mount(container);
+    await Promise.all(['wa-card', 'wa-checkbox'].map((tag) => customElements.whenDefined(tag)));
+    await nextTick();
+    const checkbox = container.querySelector<HTMLElement>('wa-checkbox');
+    if (!checkbox) throw new Error('Expected a projected checkbox.');
+    checkbox.click();
+    state.title = 'Second';
+    state.footer = 'Finish';
+    await nextTick();
+    expect(container.querySelector('[slot="header"]')?.textContent).toBe('Second');
+    expect(container.querySelector('[slot="footer"]')?.textContent).toBe('Finish');
+    expect(container.querySelector('wa-checkbox')).toBe(checkbox);
+    expect(Reflect.get(checkbox, 'checked')).toBe(true);
+    expect(warnings.flat().join(' ')).not.toContain('Duplicate keys');
+});

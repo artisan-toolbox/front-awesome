@@ -6,10 +6,12 @@ use Rector\Config\RectorConfig;
 use Rector\Php74\Rector\Closure\ClosureToArrowFunctionRector;
 use Rector\Php81\Rector\Array_\ArrayToFirstClassCallableRector;
 use Rector\TypeDeclaration\Rector\Closure\AddClosureVoidReturnTypeWhereNoReturnRector;
+use RectorLaravel\Rector\Class_\AddHasFactoryToModelsRector;
 use RectorLaravel\Rector\ClassMethod\AddGenericReturnTypeToRelationsRector;
 use RectorLaravel\Rector\Empty_\EmptyToBlankAndFilledFuncRector;
 use RectorLaravel\Rector\FuncCall\RemoveDumpDataDeadCodeRector;
 use RectorLaravel\Rector\MethodCall\WhereToWhereLikeRector;
+use RectorLaravel\Rector\StaticCall\CarbonToDateFacadeRector;
 use RectorLaravel\Set\LaravelSetList;
 
 return RectorConfig::configure()
@@ -34,6 +36,10 @@ return RectorConfig::configure()
         RemoveDumpDataDeadCodeRector::class,
     ])
     ->withSkip([
+        // Carbon's macro API declares the closure's bound instance type.
+        CarbonToDateFacadeRector::class => [__DIR__.'/src/Preferences/CarbonPreferences.php'],
+        // This fixture uses query creation and has no model factory.
+        AddHasFactoryToModelsRector::class => [__DIR__.'/tests/Fixtures/PreferenceUser.php'],
         ArrayToFirstClassCallableRector::class,
         AddClosureVoidReturnTypeWhereNoReturnRector::class,
         AddGenericReturnTypeToRelationsRector::class,

@@ -2,6 +2,36 @@
 
 ## Unreleased
 
+- Preserve Carbon's macro closure-binding contract during automated refactoring and keep the preference model fixture free of an unused factory trait. Scope the corresponding Rector transformations so repeated fixes do not reintroduce PHPStan errors.
+
+- Reject PHP reserved type names in generated preference stores and preserve an explicitly empty locale configuration so validation cannot silently enable wildcard discovery.
+
+- Validate locale identifiers with the shared JavaScript Intl canonicalizer before replacing either translation artifact. Direct exports now require Node.js 24.11 or later on the asset host; configure translations.node_binary or --node, while Vite supplies its own executable automatically. PHP request handling remains independent of Node.
+
+- Reconcile cached and history visits through a full server response on supported Inertia 3.0 releases, including in-flight prefetch and replace navigation, so preferences and translated page props cannot revert to stale values.
+
+- Forward nested PDF requestInit options during print-document preparation, with top-level options taking precedence, so authenticated previews retain their request headers.
+
+- Add backend-owned appearance, locale, timezone, and nullable currency preferences with request-aware session, custom, and authenticated-model stores; validated Inertia updates; middleware sharing; a nonmutating Carbon timezone macro; reviewable migration and store generators; and renderless selectors under the preferences frontend module. Keep existing component exports and standalone browser behavior available.
+
+- Group backend features by module, including the translation export command under Localization/Console/Commands and preference routes under routes/preferences.php.
+
+- Discover selectable translation locales with the default wildcard or restrict them with an ordered allowlist. Export selector choices in availableLocales while retaining internal package and configured fallback catalogs. Limit application text to selected locales and the fallback when application export is enabled.
+
+- Use APP_FALLBACK_LOCALE as the translation export fallback, defaulting to English when the environment variable is unset.
+
+- Default printing to the last printer per format, one explicit print action per document, automatic advancement after accepted submission, and no final report. Opt into paused advancement or a summary per service or job. Keep failures visible and prevent repeated pointer or keyboard actions from applying to the promoted document.
+
+- Add optional Laravel-source Vue I18n localization with deterministic catalog and type export, Vite regeneration, a renderless Language selector, HTML-owned locale, edition-aware native translations, and reactive printing defaults. Include English, Spanish, and Brazilian Portuguese package messages while preserving explicit overrides and standalone English printing.
+
+- Exclude installed development dependencies and generated validation output from Composer source archives while retaining language resources, frontend runtime files, and consumer skills.
+
+- Compact the print review drawer on large screens, cap preview height, and show completed jobs in a narrower summary with grouped result rows.
+
+- Keep conditional Vue branch keys unique when projecting independent native slots and nested fragments, preserving native control identity during updates.
+
+- Add the opt-in printing source preview with app-scoped FIFO jobs, promised keyed documents, PDF/ESC/POS/ZPL helpers, configurable QZ previews, a responsive Web Awesome review drawer, per-format preferences, and explicit submission results. Keep QZ optional for applications that do not print. Settle cancellation and application disposal safely, and report uncertain submissions without automatic retries.
+
 - Infer non-text form bridge value types from its guards even when an emit callback ignores its argument, while preserving the legacy text overload.
 
 - Reject sparse value collections and incomplete model listener arrays before writing to a control or form. Preserve valid empty collections and existing dense-value behavior.

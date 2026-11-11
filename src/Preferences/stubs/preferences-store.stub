@@ -1,0 +1,53 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+use ArtisanToolbox\FrontAwesome\Preferences\Contracts\PreferencesStore;
+use ArtisanToolbox\FrontAwesome\Preferences\Stores\SessionPreferenceStore;
+use Illuminate\Http\Request;
+
+class {{ class }} implements PreferencesStore
+{
+    public function __construct(private readonly SessionPreferenceStore $session) {}
+
+    public function getAppearance(Request $request): ?string
+    {
+        return $this->session->getAppearance($request);
+    }
+
+    public function setAppearance(Request $request, string $appearance): void
+    {
+        $this->session->setAppearance($request, $appearance);
+    }
+
+    public function getLocale(Request $request): ?string
+    {
+        return $this->session->getLocale($request);
+    }
+
+    public function setLocale(Request $request, string $locale): void
+    {
+        $this->session->setLocale($request, $locale);
+    }
+
+    public function getTimezone(Request $request): ?string
+    {
+        return $this->session->getTimezone($request);
+    }
+
+    public function setTimezone(Request $request, string $timezone): void
+    {
+        $this->session->setTimezone($request, $timezone);
+    }
+    public function getCurrency(Request $request): ?string
+    {
+        return $this->session->getCurrency($request);
+    }
+
+    public function setCurrency(Request $request, ?string $currency): void
+    {
+        $this->session->setCurrency($request, $currency);
+    }
+}

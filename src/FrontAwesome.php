@@ -4,15 +4,25 @@ declare(strict_types=1);
 
 namespace ArtisanToolbox\FrontAwesome;
 
+use ArtisanToolbox\FrontAwesome\Preferences\PreferenceConfiguration;
 use ArtisanToolbox\Maintainer\Versionable\Contracts\Versionable;
 use ArtisanToolbox\Maintainer\Versionable\Contracts\WithReadmeHead;
 use ArtisanToolbox\Maintainer\Versionable\Readme\Badge;
 use ArtisanToolbox\Maintainer\Versionable\Readme\Head;
 
-/** @internal */
 final class FrontAwesome implements Versionable, WithReadmeHead
 {
     public const string VERSION = '1.0.0-alpha.1';
+
+    /**
+     * Select a custom request-aware store or an authenticatable model implementing HasPreferences.
+     *
+     * @param  class-string  $class
+     */
+    public static function setPreferenceStore(string $class): void
+    {
+        config(['front-awesome.preferences.store' => PreferenceConfiguration::storeClass($class)]);
+    }
 
     public function readmeHead(): Head
     {

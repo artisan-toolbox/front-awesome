@@ -37,7 +37,7 @@
     "./components/Input.vue": "./resources/js/components/WebAwesome/Input.vue",
     "./components/Icon.vue": "./resources/js/components/WebAwesome/Icon.vue",
     "./components/Page.vue": "./resources/js/components/WebAwesome/Page.vue",
-    "./components/Appearance.vue": "./resources/js/components/Appearance.vue",
+    "./components/Appearance.vue": "./resources/js/preferences/Appearance.vue",
     "./components/WebAwesome": "./resources/js/components/WebAwesome/index.ts",
     "./components/WebAwesome/Button.vue": "./resources/js/components/WebAwesome/Button.vue",
     "./components/WebAwesome/ButtonGroup.vue": "./resources/js/components/WebAwesome/ButtonGroup.vue",
@@ -223,7 +223,18 @@
     "./components/Video.vue": "./resources/js/components/WebAwesomePro/Video.vue",
     "./components/WebAwesome/Video.vue": "./resources/js/components/WebAwesomePro/Video.vue",
     "./components/VideoPlaylist.vue": "./resources/js/components/WebAwesomePro/VideoPlaylist.vue",
-    "./components/WebAwesome/VideoPlaylist.vue": "./resources/js/components/WebAwesomePro/VideoPlaylist.vue"
+    "./components/WebAwesome/VideoPlaylist.vue": "./resources/js/components/WebAwesomePro/VideoPlaylist.vue",
+    "./printing": "./resources/js/printing/index.ts",
+    "./printing/PrintDrawer.vue": "./resources/js/printing/PrintDrawer.vue",
+    "./localization": "./resources/js/localization/index.ts",
+    "./components/Language.vue": "./resources/js/preferences/Language.vue",
+    "./components/Timezone.vue": "./resources/js/preferences/Timezone.vue",
+    "./components/Currency.vue": "./resources/js/preferences/Currency.vue",
+    "./preferences": "./resources/js/preferences/index.ts",
+    "./preferences/Appearance.vue": "./resources/js/preferences/Appearance.vue",
+    "./preferences/Language.vue": "./resources/js/preferences/Language.vue",
+    "./preferences/Timezone.vue": "./resources/js/preferences/Timezone.vue",
+    "./preferences/Currency.vue": "./resources/js/preferences/Currency.vue"
   },
   "scripts": {
     "build": "vp build",
@@ -231,7 +242,7 @@
     "test": "vp test run --project unit",
     "test:browser": "vp test run --project chromium",
     "test:coverage": "vp test run --coverage",
-    "check": "vp check && npm run typecheck && npm run theme:check && npm run components:check && npm run examples:check",
+    "check": "vp check && npm run typecheck && npm run theme:check && npm run components:check && npm run examples:check && npm run translations:check",
     "check:fix": "vp check --fix",
     "typecheck": "vue-tsc --noEmit",
     "theme:generate": "node scripts/generate-theme.mjs",
@@ -247,14 +258,18 @@
     "examples:generate": "node scripts/generate-upstream-scenarios.mjs && node scripts/generate-upstream-scenarios.mjs --coverage",
     "examples:generate:pro": "node scripts/generate-upstream-scenarios.mjs --pro && node scripts/generate-upstream-scenarios.mjs --coverage",
     "examples:check": "node scripts/generate-upstream-scenarios.mjs --check && node scripts/generate-upstream-scenarios.mjs --coverage --check",
-    "examples:check:pro": "node scripts/generate-upstream-scenarios.mjs --pro --check && node scripts/generate-upstream-scenarios.mjs --coverage --check"
+    "examples:check:pro": "node scripts/generate-upstream-scenarios.mjs --pro --check && node scripts/generate-upstream-scenarios.mjs --coverage --check",
+    "translations:generate": "node scripts/generate-printing-messages.mjs && node scripts/generate-localization-casing.mjs",
+    "translations:check": "node scripts/generate-printing-messages.mjs --check && node scripts/generate-localization-casing.mjs --check"
   },
   "dependencies": {
     "@awesome.me/webawesome": "^3.14.0",
-    "@vueuse/core": "^14.0.0"
+    "@vueuse/core": "^14.0.0",
+    "vue-i18n": "^11.4.18"
   },
   "devDependencies": {
     "@artisan-toolbox/mosaicast": "file:vendor/artisan-toolbox/mosaicast",
+    "@artisan-toolbox/qztray": "file:vendor/artisan-toolbox/qztray",
     "@primeuix/themes": "2.0.3",
     "@tailwindcss/vite": "^4.3.4",
     "@types/node": "^24.13.3",
@@ -268,6 +283,7 @@
   },
   "peerDependencies": {
     "@artisan-toolbox/mosaicast": "^1.1.1",
+    "@artisan-toolbox/qztray": "^1.3.0",
     "@inertiajs/vue3": "^3.0.0",
     "@primeuix/themes": "*",
     "tailwindcss": "^4.0.0",
@@ -275,6 +291,9 @@
   },
   "peerDependenciesMeta": {
     "@primeuix/themes": {
+      "optional": true
+    },
+    "@artisan-toolbox/qztray": {
       "optional": true
     }
   },

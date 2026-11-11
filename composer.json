@@ -29,6 +29,7 @@
         "inertiajs/inertia-laravel": "^3.0"
     },
     "require-dev": {
+        "artisan-toolbox/qztray": "^1.3",
         "driftingly/rector-laravel": "^2.5",
         "larastan/larastan": "^3.9",
         "laravel/pao": "^1.0",
@@ -77,10 +78,10 @@
             "vendor/bin/pint --parallel --test"
         ],
         "analyse": [
-            "vendor/bin/phpstan analyse"
+            "vendor/bin/phpstan analyse --memory-limit=512M"
         ],
         "test:types": [
-            "vendor/bin/pest --type-coverage --min=100"
+            "vendor/bin/pest --type-coverage --min=100 --memory-limit=512M"
         ],
         "test:coverage": [
             "vendor/bin/pest --coverage"

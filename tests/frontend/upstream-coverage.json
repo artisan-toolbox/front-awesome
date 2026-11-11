@@ -296,6 +296,10 @@
           "title": "refreshes projected parent slots without remounting native child controls"
         },
         {
+          "file": "tests/frontend/native-slot-updates.browser.test.ts",
+          "title": "namespaces conditional branch keys from independent native slots without replacing their controls"
+        },
+        {
           "file": "tests/pro/models.browser.test.ts",
           "title": "DatePicker keeps its native slot and stable frame through validation using ${namedSlot ? 'Vue named slots' : 'native slot attributes'}"
         }
@@ -377,6 +381,10 @@
         {
           "file": "tests/frontend/native-slot-updates.browser.test.ts",
           "title": "refreshes projected parent slots without remounting native child controls"
+        },
+        {
+          "file": "tests/frontend/native-slot-updates.browser.test.ts",
+          "title": "namespaces conditional branch keys from independent native slots without replacing their controls"
         },
         {
           "file": "tests/frontend/reset.browser.test.ts",
@@ -512,6 +520,14 @@
         {
           "file": "tests/frontend/page.browser.test.ts",
           "title": "uses one navigation tree on desktop and mobile and retains native toggle and drawer methods"
+        },
+        {
+          "file": "tests/frontend/printing.browser.test.ts",
+          "title": "supports reconnect, preview retry, printer selection and invalid copy recovery through real controls"
+        },
+        {
+          "file": "tests/frontend/printing.browser.test.ts",
+          "title": "bounds large-screen review and groups completed documents in a narrower summary"
         },
         {
           "file": "tests/frontend/reset.browser.test.ts",
