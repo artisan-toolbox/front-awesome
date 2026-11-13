@@ -1,5 +1,28 @@
 # Changelog
 
+## [1.0.0-beta.1] - 2026-11-13
+
+### Maintenance
+
+- **Promote Front Awesome 1.x beta in documentation** (`ee822aa`)
+  Updates the project’s documentation and related metadata to promote Front Awesome 1.x from an “unreleased/source preview” state to an explicit beta.
+
+Key user-facing changes:
+- CHANGELOG/Unreleased messaging: Adds an Unreleased note clarifying that Front Awesome 1.x is now promoted to beta across the README, release badge, and the consumer skill. It instructs consumers to install using the package-scoped beta stability flag while keeping release version metadata managed by the Maintainer.
+- README branding and install guidance: Updates the GitHub releases badge label from “Release-in development” to a beta-themed badge (“Release-beta-yellow”). Updates Composer installation instructions to require the beta constraint explicitly (e.g., using `:^1.0@beta`) rather than leaving stability unpinned.
+- Beta compatibility messaging: Adjusts README language to clearly state that the 1.x API may change before the first stable release, setting user expectations around potential pre-stable compatibility risk.
+- Documentation updates for the 1.x track: Revises Front Awesome 1.x documentation to reflect the beta status, including the updated Composer command, beta framing around export/feature completeness, updated links (e.g., renaming a Popover doc link target), and adjusted wording for migration-related terminology (e.g., Theme→Appearance) without changing the described replacements.
+
+Library/version/test alignment:
+- package.json and library constants: Bumps the package version and `FrontAwesome::VERSION` from `1.0.0-alpha.2` to `1.0.0-beta.1` to align code-visible versioning with the new beta release.
+- Test updates: Updates unit test expectations for README head badge URLs to match the new beta badge styling.
+
+Why this matters / impact:
+- While the diff indicates no behavioral code/API changes beyond version/tag signaling, these updates directly affect how users install and interpret the 1.x release. Consumers must use the beta stability constraint to obtain the intended pre-stable version, and they are warned to expect possible API changes before the first stable release.
+
+Compatibility/migration needs:
+- No automated migrations are indicated; instead, users should ensure they install the beta via the documented Composer constraint and review the beta notes regarding potential API changes before adopting 1.x in production.
+
 ## [Unreleased]
 
 ### Changed
