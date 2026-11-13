@@ -9,11 +9,11 @@ Front Awesome provides reusable Vue components and Laravel frontend integrations
 
 ## Install and use
 
-Use Laravel 13.36 or later within Laravel 13.x, PHP 8.5, Inertia 3, Vue 3.5, Tailwind 4, Vite, and Node.js 24.11 or later. Front Awesome's `1.x` branch is a development preview without a stable Composer release. Check the installed Composer version and its `package.json` exports before choosing an API. Older preview revisions may not include the Vite plugin or shared branding entries below.
+Use Laravel 13.36 or later within Laravel 13.x, PHP 8.5, Inertia 3, Vue 3.5, Tailwind 4, Vite, and Node.js 24.11 or later. Front Awesome `1.x` is in beta. Its API can change before the first stable release. Check the installed Composer version and its `package.json` exports before choosing an API.
 
-For applications on Laravel 13.0 through 13.35, update Laravel within 13.x before upgrading this source preview. It requires Illuminate Translation `^13.36` because earlier releases renumber numeric JSON translation keys.
+For applications on Laravel 13.0 through 13.35, update Laravel within 13.x before upgrading Front Awesome. It requires Illuminate Translation `^13.36` because earlier releases renumber numeric JSON translation keys.
 
-1. To opt into the `1.x` preview, run `composer require 'artisan-toolbox/front-awesome:^1.0@dev'` in the application root before installing frontend dependencies. Keep the stability exception scoped to this package. When a compatible stable release is available, use its documented stable constraint instead.
+1. To install the `1.x` beta, run `composer require 'artisan-toolbox/front-awesome:^1.0@beta'` in the application root before installing frontend dependencies. Keep the stability exception scoped to this package. When a compatible stable release is available, use its documented stable constraint instead.
 2. Declare both frontend packages in the application's `package.json`. Mosaicast is a peer dependency of Front Awesome. Run `npm install --install-links ./vendor/artisan-toolbox/front-awesome ./vendor/artisan-toolbox/mosaicast` from the application root. Keep `install-links=true` in the application's `.npmrc` so `npm ci` uses the same mode.
 3. Add `frontAwesome()` from `@artisan-toolbox/front-awesome/vite` alongside `@vitejs/plugin-vue` in the application's Vite plugins. It recognizes `wa-` custom elements automatically and preserves existing custom element matchers and Vue compiler options.
 4. Import `@artisan-toolbox/front-awesome/styles.css` after Tailwind in the application's CSS entry. If the application needs the standard Web Awesome stylesheet, import `@artisan-toolbox/front-awesome/web-awesome.css` from the JavaScript entry.
@@ -41,7 +41,7 @@ To change the default icons for toasts sent from Laravel, run `php artisan vendo
 
 ## Persist appearance, language, timezone, and currency
 
-Backend preferences are an unreleased source-preview API. Confirm the installed exports include `createPreferences` and `Timezone`, and Artisan lists `make:preferences-store` and `install:user-preferences`. Start after the installation and localization setup below, with Laravel sessions and the application's Inertia middleware enabled.
+The beta includes backend preferences through `createPreferences`, `Timezone`, `make:preferences-store`, and `install:user-preferences`. Start after the installation and localization setup below, with Laravel sessions and the application's Inertia middleware enabled.
 
 Append `ArtisanToolbox\FrontAwesome\Preferences\Http\Middleware\HandlePreferences::class` to the `web` middleware group in `bootstrap/app.php`. It resolves the active store, sets the request locale, and always shares `preferences`, including selectable `locales` and supported `timezones`, on Inertia responses. Render the request locale on `<html lang>` and put `@frontAwesomePreferences` before CSS in the root Blade head. The optional directive argument is a CSP nonce. Remove competing theme cookies and localStorage initialization from the application.
 
@@ -63,11 +63,11 @@ Reload the page after changing each selector and confirm persistence. See the gr
 
 ## Web Awesome component imports
 
-The Web Awesome wrappers live under `components/WebAwesome`. The source preview includes wrappers for all 73 Web Awesome Core 3.14 components. Confirm the installed revision before use. Import components such as `Checkbox`, `Select`, `Option`, `Dialog`, `Card`, `Button`, `ButtonGroup`, `Input`, `Page`, and `Icon`, and their prop types from `@artisan-toolbox/front-awesome/components/WebAwesome`, or import an individual wrapper such as `@artisan-toolbox/front-awesome/components/WebAwesome/Input.vue`. Existing `components` named imports and direct `.vue` imports remain available. `Appearance` stays in `@artisan-toolbox/front-awesome/components` because it controls the application appearance.
+The Web Awesome wrappers live under `components/WebAwesome`. The beta includes wrappers for all 73 Web Awesome Core 3.14 components. Confirm the installed revision before use. Import components such as `Checkbox`, `Select`, `Option`, `Dialog`, `Card`, `Button`, `ButtonGroup`, `Input`, `Page`, and `Icon`, and their prop types from `@artisan-toolbox/front-awesome/components/WebAwesome`, or import an individual wrapper such as `@artisan-toolbox/front-awesome/components/WebAwesome/Input.vue`. Existing `components` named imports and direct `.vue` imports remain available. `Appearance` stays in `@artisan-toolbox/front-awesome/components` because it controls the application appearance.
 
 ## Page layouts
 
-Use the `Page` wrapper when arranging a full application layout. It is a source preview; confirm that the Composer-installed package exports `components/Page.vue` before use. The published `1.0.0-alpha.1` archive lacks this wrapper. Refresh the frontend copy after updating Composer.
+Use the `Page` wrapper when arranging a full application layout. The beta exports `components/Page.vue`. Refresh the frontend copy after updating Composer.
 
 After installation and Web Awesome style setup, add this to a Vue page:
 
@@ -99,7 +99,7 @@ Import `PageProps` from the root or either component barrel for upstream-derived
 
 ## Label content and show contextual help
 
-The updated `1.x` development preview exports unstyled `Tag` and `Tooltip` wrappers. Confirm these exports exist in the installed revision. Import both from `@artisan-toolbox/front-awesome/components/WebAwesome`. Each also has direct `components/WebAwesome/<Name>.vue` and `components/<Name>.vue` exports. Import `TagProps` and `TooltipProps` from the package root or either component barrel to type options.
+The `1.x` beta exports unstyled `Tag` and `Tooltip` wrappers. Confirm these exports exist in the installed revision. Import both from `@artisan-toolbox/front-awesome/components/WebAwesome`. Each also has direct `components/WebAwesome/<Name>.vue` and `components/<Name>.vue` exports. Import `TagProps` and `TooltipProps` from the package root or either component barrel to type options.
 
 After the installation above, render this in a Vue page:
 
@@ -132,7 +132,7 @@ Read the [Tag example](https://atb.dev.br/docs/front-awesome/web-awesome/compone
 
 ## Show interactive contextual content
 
-Use the source-preview `Popover` wrapper for contextual content that contains links or buttons. Confirm that the Composer-installed revision exports it. Import `Popover` and `Button` from `@artisan-toolbox/front-awesome/components/WebAwesome`. Direct `components/Popover.vue` and `components/WebAwesome/Popover.vue` imports also work. Import `PopoverProps` from the root or either component barrel.
+Use the `Popover` wrapper for contextual content that contains links or buttons. Confirm that the Composer-installed revision exports it. Import `Popover` and `Button` from `@artisan-toolbox/front-awesome/components/WebAwesome`. Direct `components/Popover.vue` and `components/WebAwesome/Popover.vue` imports also work. Import `PopoverProps` from the root or either component barrel.
 
 After the installation and stylesheet setup above, add this to a Vue page:
 
@@ -161,7 +161,7 @@ The default slot supports interactive content. Native `placement`, numeric `dist
 
 For imperative control, use the Vue instance's `$el` after `customElements.whenDefined('wa-popover')` and the native host's `updateComplete`. Call the native `show()` and `hide()` methods on that host. A canceled transition suppresses its after event, so do not await its native promise as though it must settle. Initially open panels follow the installed Web Awesome version's initial-open behavior. Use an ordinary trigger action when relying on normal focus and dismissal lifecycle behavior.
 
-Read the [Popover source preview](https://atb.dev.br/docs/front-awesome/web-awesome/components/helpers#popover) for the public native contract and examples.
+Read the [Popover guide](https://atb.dev.br/docs/front-awesome/web-awesome/components/helpers#popover) for the public native contract and examples.
 
 ## Display an icon
 
@@ -196,7 +196,7 @@ Use `@wa-load` and `@wa-error` to receive the original native events. These even
 
 After installation, enable the controller with `app.use(createFrontAwesome({ appearance: true }))` in the application's existing plugin setup. Import `Appearance` from `@artisan-toolbox/front-awesome/components` or use the direct `@artisan-toolbox/front-awesome/components/Appearance.vue` export. Import the `AppearancePreference` type from the package root or `components` entry when typing preferences.
 
-For the unreleased preview migration, replace `Theme` with `Appearance`, `components/Theme.vue` with `components/Appearance.vue`, `theme: true` with `appearance: true`, `ThemePreference` with `AppearancePreference`, and the `theme` slot value with `appearance`. Old-name aliases are not available.
+When migrating from earlier versions, replace `Theme` with `Appearance`, `components/Theme.vue` with `components/Appearance.vue`, `theme: true` with `appearance: true`, `ThemePreference` with `AppearancePreference`, and the `theme` slot value with `appearance`. Old-name aliases are not available.
 
 ```vue
 <template>
@@ -272,7 +272,7 @@ The published template includes complete commented ramps for neutral, success, w
 
 For optional PrimeVue 4 styled mode, install `primevue` and `@primeuix/themes`, import `frontAwesomePrimeVueTheme` from `@artisan-toolbox/front-awesome/primevue`, and pass it as PrimeVue's `theme` option. Keep its named CSS layer and `.wa-dark` selector. Removing this import removes the optional adapter.
 
-The updated development preview maps all 22 Aura physical color ramps to Tailwind and keeps Aura's component-specific shade choices. Surfaces use gray. Warning buttons, badges, and tags use orange, while warning messages and toasts use yellow. The template includes an orange ramp alongside yellow. Customize both to align their warning families. Recheck the rendered components, interaction states, and contrast in light and dark modes after changing palettes.
+The beta maps all 22 Aura physical color ramps to Tailwind and keeps Aura's component-specific shade choices. Surfaces use gray. Warning buttons, badges, and tags use orange, while warning messages and toasts use yellow. The template includes an orange ramp alongside yellow. Customize both to align their warning families. Recheck the rendered components, interaction states, and contrast in light and dark modes after changing palettes.
 
 Read the [shared theme guide](https://atb.dev.br/docs/front-awesome/shared-theme/), [branding reference](https://atb.dev.br/docs/front-awesome/branding/), and [wa-page guide](https://atb.dev.br/docs/front-awesome/web-awesome/components/layout#page) for mappings, shadow limitations, and responsive recipes. Existing `styles.css` and `web-awesome.css` remain available for application-owned theme setups.
 
@@ -280,7 +280,7 @@ Run the application's `npm run build` after changing branding, then check the re
 
 ## Use the complete Core catalog
 
-The new wrappers are source-preview APIs. They are not present in the published `1.0.0-alpha.1` archive. All Core wrappers share the `components/WebAwesome` and `components` barrels and both direct `.vue` export paths. Prop types such as `CheckboxProps` and `SelectProps` are available from the root and component barrels. The 17 Pro-only wrappers use the separate `@artisan-toolbox/front-awesome/components/WebAwesome/Pro` barrel. Their prop types are exported there, and their direct `components/<Name>.vue` and `components/WebAwesome/<Name>.vue` paths remain available. This separation keeps Core imports usable without a Pro installation.
+The beta includes all Core wrappers. All Core wrappers share the `components/WebAwesome` and `components` barrels and both direct `.vue` export paths. Prop types such as `CheckboxProps` and `SelectProps` are available from the root and component barrels. The 17 Pro-only wrappers use the separate `@artisan-toolbox/front-awesome/components/WebAwesome/Pro` barrel. Their prop types are exported there, and their direct `components/<Name>.vue` and `components/WebAwesome/<Name>.vue` paths remain available. This separation keeps Core imports usable without a Pro installation.
 
 After the installation and style setup above, place this in a Vue page:
 
@@ -337,7 +337,7 @@ The calendar highlights November 9, 2026. Selecting another day updates the para
 
 ## Translate browser UI from Laravel
 
-Localization is an optional unreleased source preview. Inspect the installed package exports for `./localization` and `components/Language.vue`, and confirm that `php artisan list` includes `front-awesome:export-translations`. Published previews do not guarantee these additions. Follow the [Laravel-source localization guide](https://atb.dev.br/docs/front-awesome/localization) for the complete procedure.
+Localization is optional. The beta exports `./localization`, `components/Language.vue`, and the `front-awesome:export-translations` command. Follow the [Laravel-source localization guide](https://atb.dev.br/docs/front-awesome/localization) for the complete procedure.
 
 Keep messages in Laravel PHP and JSON language files. The package always exports its own English, Spanish, and Brazilian Portuguese messages. In `config/front-awesome.php`, set `translations.include_application` to `true` to include eligible application messages for selected languages and the configured fallback. The default `translations.locales` value is `['*']`, which discovers eligible locale directories, JSON files, and namespace overrides. An explicit ordered list such as `['en', 'es']` offers only English and Spanish, in that order. It does not add to the built-in choices. Empty lists, mixed wildcard and locale lists, and partial globs are invalid. The wildcard must stand alone. Published Front Awesome overrides can add discovered languages even with application export disabled, while application text remains excluded globally. Application locale directories, JSON files, and other namespace overrides participate in discovery when application export is enabled. File and key filters are optional. Treat exported language files as public browser data. Optional `include_files` and `exclude_files` use lang-relative globs. `include_regex` and `exclude_regex` accept `path` and `file` lists of delimited PCRE expressions. `path` matches lang-relative paths and `file` matches basenames. Inclusion rules combine with OR, exclusions win, and application filters cannot remove mandatory package text.
 
@@ -374,9 +374,9 @@ Printing installed with both `printing` and `localization` translates package de
 
 ## Review and print documents
 
-The printing suite is an unreleased source preview under `@artisan-toolbox/front-awesome/printing`. Confirm that the Composer-installed Front Awesome exports `./printing` and that the QZ Tray frontend exports `renderPrintRequest` before using this API. The previously published QZ Tray 1.3.0 archive does not guarantee these new preview exports. Follow the [printing guide](https://atb.dev.br/docs/front-awesome/printing) for the current preview installation path.
+The beta includes the printing suite under `@artisan-toolbox/front-awesome/printing`. Use QZ Tray 1.4 or later within 1.x for its `renderPrintRequest` frontend export. Follow the [printing guide](https://atb.dev.br/docs/front-awesome/printing) for installation and setup.
 
-Printing is optional. In an application using the preview, install the compatible QZ Tray Composer package first, then install its frontend from `file:vendor/artisan-toolbox/qztray`. Configure QZ certificate/signing endpoints through the QZ Tray package, run the QZ Tray desktop application, and install a printer before submitting real documents. Keep credentials and signing keys on the server. Applications without printing do not need this optional frontend peer.
+Printing is optional. Install the compatible QZ Tray Composer package first, then install its frontend from `file:vendor/artisan-toolbox/qztray`. Configure QZ certificate/signing endpoints through the QZ Tray package, run the QZ Tray desktop application, and install a printer before submitting real documents. Keep credentials and signing keys on the server. Applications without printing do not need this optional frontend peer.
 
 Create one service for each Vue application and mount one drawer in its persistent layout:
 

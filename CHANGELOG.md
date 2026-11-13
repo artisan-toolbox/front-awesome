@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Promote Front Awesome 1.x to beta in the README, release badge, and consumer skill. Use a package-scoped beta stability flag for installation. Release version metadata remains managed by Maintainer.
+
 ## [1.0.0-alpha.2] - 2026-11-11
 
 ### Features

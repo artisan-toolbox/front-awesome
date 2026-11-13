@@ -32,7 +32,7 @@ final class FrontAwesome implements Versionable, WithReadmeHead
             ->withDescription('Reusable Vue components and frontend integrations for Laravel and Inertia applications.')
             ->addBadge(Badge::make(
                 link: 'https://github.com/artisan-toolbox/front-awesome/releases',
-                imgSrc: 'https://img.shields.io/badge/Release-in%20development-lightgrey?style=flat-square',
+                imgSrc: 'https://img.shields.io/badge/Release-beta-yellow?style=flat-square',
                 imgAlt: 'Release',
             ))
             ->addBadge(Badge::make(
