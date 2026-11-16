@@ -14,8 +14,13 @@ use LogicException;
 
 final readonly class UserPreferenceStore implements PreferencesStore
 {
+    private PreferencesStore $guest;
+
     /** @param class-string<Model&HasPreferences&Authenticatable> $model */
-    public function __construct(private string $model, private SessionPreferenceStore $session) {}
+    public function __construct(private string $model, PreferencesStore $session)
+    {
+        $this->guest = $session;
+    }
 
     private function user(Request $request): ?HasPreferences
     {
@@ -35,41 +40,41 @@ final readonly class UserPreferenceStore implements PreferencesStore
 
     public function getAppearance(Request $request): ?string
     {
-        return ($user = $this->user($request)) ? $user->getFrontAwesomePreference('appearance') : $this->session->getAppearance($request);
+        return ($user = $this->user($request)) ? $user->getFrontAwesomePreference('appearance') : $this->guest->getAppearance($request);
     }
 
     public function setAppearance(Request $request, string $appearance): void
     {
-        ($user = $this->user($request)) ? $user->setFrontAwesomePreference('appearance', $appearance) : $this->session->setAppearance($request, $appearance);
+        ($user = $this->user($request)) ? $user->setFrontAwesomePreference('appearance', $appearance) : $this->guest->setAppearance($request, $appearance);
     }
 
     public function getLocale(Request $request): ?string
     {
-        return ($user = $this->user($request)) ? $user->getFrontAwesomePreference('locale') : $this->session->getLocale($request);
+        return ($user = $this->user($request)) ? $user->getFrontAwesomePreference('locale') : $this->guest->getLocale($request);
     }
 
     public function setLocale(Request $request, string $locale): void
     {
-        ($user = $this->user($request)) ? $user->setFrontAwesomePreference('locale', $locale) : $this->session->setLocale($request, $locale);
+        ($user = $this->user($request)) ? $user->setFrontAwesomePreference('locale', $locale) : $this->guest->setLocale($request, $locale);
     }
 
     public function getTimezone(Request $request): ?string
     {
-        return ($user = $this->user($request)) ? $user->getFrontAwesomePreference('timezone') : $this->session->getTimezone($request);
+        return ($user = $this->user($request)) ? $user->getFrontAwesomePreference('timezone') : $this->guest->getTimezone($request);
     }
 
     public function setTimezone(Request $request, string $timezone): void
     {
-        ($user = $this->user($request)) ? $user->setFrontAwesomePreference('timezone', $timezone) : $this->session->setTimezone($request, $timezone);
+        ($user = $this->user($request)) ? $user->setFrontAwesomePreference('timezone', $timezone) : $this->guest->setTimezone($request, $timezone);
     }
 
     public function getCurrency(Request $request): ?string
     {
-        return ($user = $this->user($request)) ? $user->getFrontAwesomePreference('currency') : $this->session->getCurrency($request);
+        return ($user = $this->user($request)) ? $user->getFrontAwesomePreference('currency') : $this->guest->getCurrency($request);
     }
 
     public function setCurrency(Request $request, ?string $currency): void
     {
-        ($user = $this->user($request)) ? $user->setFrontAwesomePreference('currency', $currency) : $this->session->setCurrency($request, $currency);
+        ($user = $this->user($request)) ? $user->setFrontAwesomePreference('currency', $currency) : $this->guest->setCurrency($request, $currency);
     }
 }

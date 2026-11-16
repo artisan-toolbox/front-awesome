@@ -27,6 +27,8 @@ Compatibility/migration needs:
 
 ### Changed
 
+- Use persistent encrypted HttpOnly cookies by default for appearance, locale, timezone, and currency, including guests of an authenticated-model store. Session expiry no longer resets these choices. Configure `preferences.cookie_lifetime` in minutes (365 days by default). Each preference has its own cookie; clearing currency expires it. Existing active-session strings migrate on first read, with cookies taking priority. Explicit `SessionPreferenceStore` selections retain temporary session behavior; update published store configuration to opt into cookies. Account values remain isolated from guest cookies.
+
 - Promote Front Awesome 1.x to beta in the README, release badge, and consumer skill. Use a package-scoped beta stability flag for installation. Release version metadata remains managed by Maintainer.
 
 ## [1.0.0-alpha.2] - 2026-11-11

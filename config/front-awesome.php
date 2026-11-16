@@ -1,12 +1,13 @@
 <?php
 
 declare(strict_types=1);
-use ArtisanToolbox\FrontAwesome\Preferences\Stores\SessionPreferenceStore;
+use ArtisanToolbox\FrontAwesome\Preferences\Stores\CookiePreferenceStore;
 
 return [
     'preferences' => [
         'key' => 'preferences',
-        'store' => SessionPreferenceStore::class,
+        'store' => CookiePreferenceStore::class,
+        'cookie_lifetime' => 525600,
         'guard' => null,
         'carbon_macro' => true,
     ],

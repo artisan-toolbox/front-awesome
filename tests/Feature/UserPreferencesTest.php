@@ -5,6 +5,7 @@ declare(strict_types=1);
 use ArtisanToolbox\FrontAwesome\FrontAwesome;
 use ArtisanToolbox\FrontAwesome\Preferences\Contracts\PreferencesStore;
 use ArtisanToolbox\FrontAwesome\Preferences\Http\Middleware\HandlePreferences;
+use ArtisanToolbox\FrontAwesome\Preferences\Stores\CookiePreferenceStore;
 use ArtisanToolbox\FrontAwesome\Preferences\Stores\SessionPreferenceStore;
 use ArtisanToolbox\FrontAwesome\Preferences\Stores\UserPreferenceStore;
 use ArtisanToolbox\FrontAwesome\Tests\Fixtures\PreferenceUser;
@@ -35,10 +36,10 @@ beforeEach(function (): void {
     Route::middleware(['web', HandlePreferences::class])->get('/account-preferences', fn () => Inertia::render('Preferences'));
 });
 
-it('keeps session storage as the default even for a model implementing HasPreferences', function (): void {
+it('keeps cookie storage as the default even for a model implementing HasPreferences', function (): void {
     $user = PreferenceUser::query()->create(['name' => 'Reader', 'preferences' => json_encode(['appearance' => 'dark'])]);
     $this->actingAs($user)->withHeader('X-Inertia', 'true')->get('/account-preferences')->assertJsonPath('props.preferences.appearance', 'system');
-    expect(resolve(PreferencesStore::class))->toBeInstanceOf(SessionPreferenceStore::class);
+    expect(resolve(PreferencesStore::class))->toBeInstanceOf(CookiePreferenceStore::class);
 });
 
 it('resolves only the explicitly registered current authenticated model', function (): void {
@@ -75,12 +76,26 @@ it('uses a configured column and hides it from model serialization', function ()
 
 it('keeps guest preferences separate from authenticated account defaults', function (): void {
     FrontAwesome::setPreferenceStore(PreferenceUser::class);
-    $this->withHeaders(['X-Inertia' => 'true', 'X-Front-Awesome-Return' => '/account-preferences'])
+    $response = $this->withHeaders(['X-Inertia' => 'true', 'X-Front-Awesome-Return' => '/account-preferences'])
         ->patch('/front-awesome/preferences', ['appearance' => 'dark'])->assertStatus(303);
+    $cookie = $response->getCookie(config('session.cookie').'_front_awesome_preferences_appearance');
+    $this->withCookie($cookie->getName(), $cookie->getValue());
     $this->get('/account-preferences')->assertJsonPath('props.preferences.appearance', 'dark');
     $user = PreferenceUser::query()->create(['name' => 'Reader']);
     $this->actingAs($user)->get('/account-preferences')->assertJsonPath('props.preferences.appearance', 'system');
     expect($user->fresh()->getRawOriginal('preferences'))->toBeNull();
+});
+
+it('keeps account updates out of guest cookies and restores guest preferences after logout', function (): void {
+    FrontAwesome::setPreferenceStore(PreferenceUser::class);
+    $name = config('session.cookie').'_front_awesome_preferences_appearance';
+    $user = PreferenceUser::query()->create(['name' => 'Reader', 'preferences' => json_encode(['appearance' => 'light'])]);
+    $this->withCookie($name, 'dark')->actingAs($user)->withHeader('X-Front-Awesome-Return', '/account-preferences')
+        ->patch('/front-awesome/preferences', ['appearance' => 'system'])->assertStatus(303)->assertCookieMissing($name);
+    expect($user->fresh()->getFrontAwesomePreference('appearance'))->toBe('system');
+    auth()->guard()->forgetUser();
+    session()->invalidate();
+    $this->withHeader('X-Inertia', 'true')->get('/account-preferences')->assertJsonPath('props.preferences.appearance', 'dark');
 });
 
 it('resolves the actual user after an alternate auth guard selects it', function (): void {

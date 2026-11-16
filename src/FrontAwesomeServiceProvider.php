@@ -12,7 +12,7 @@ use ArtisanToolbox\FrontAwesome\Preferences\Contracts\PreferencesStore;
 use ArtisanToolbox\FrontAwesome\Preferences\Http\Middleware\HandlePreferences;
 use ArtisanToolbox\FrontAwesome\Preferences\InertiaPreferences;
 use ArtisanToolbox\FrontAwesome\Preferences\PreferenceConfiguration;
-use ArtisanToolbox\FrontAwesome\Preferences\Stores\SessionPreferenceStore;
+use ArtisanToolbox\FrontAwesome\Preferences\Stores\CookiePreferenceStore;
 use ArtisanToolbox\FrontAwesome\Preferences\Stores\UserPreferenceStore;
 use Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests;
 use Illuminate\Contracts\Foundation\Application;
@@ -42,7 +42,7 @@ final class FrontAwesomeServiceProvider extends ServiceProvider
                 return $app->make($class);
             }
 
-            return new UserPreferenceStore($class, $app->make(SessionPreferenceStore::class));
+            return new UserPreferenceStore($class, $app->make(CookiePreferenceStore::class));
         });
         $this->callAfterResolving(HttpKernel::class, function (HttpKernel $kernel): void {
             if ($kernel instanceof Kernel) {

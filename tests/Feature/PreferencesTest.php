@@ -42,10 +42,11 @@ it('resolves negotiated preferences and preserves application timezone and local
 });
 
 it('persists one preference through an Inertia same-page redirect', function (): void {
-    $this->withHeaders(['X-Inertia' => 'true', 'X-Front-Awesome-Return' => '/preference-fixture?q=one'])
+    $response = $this->withHeaders(['X-Inertia' => 'true', 'X-Front-Awesome-Return' => '/preference-fixture?q=one'])
         ->patch('/front-awesome/preferences', ['appearance' => 'dark'])->assertStatus(303)
         ->assertHeader('Location', '/preference-fixture?q=one');
-    $this->withHeaders(['X-Inertia' => 'true'])->get('/preference-fixture')->assertJsonPath('props.preferences.appearance', 'dark');
+    $cookie = $response->getCookie(config('session.cookie').'_front_awesome_preferences_appearance');
+    $this->withCookie($cookie->getName(), $cookie->getValue())->withHeaders(['X-Inertia' => 'true'])->get('/preference-fixture')->assertJsonPath('props.preferences.appearance', 'dark');
 });
 
 it('redirects invalid values without writing preferences', function (): void {
@@ -124,8 +125,10 @@ it('supports a configured property name without leaking foreign shares', functio
 });
 
 it('preserves fragments through successful and invalid Inertia redirects', function (): void {
-    $this->withHeaders(['X-Inertia' => 'true', 'X-Front-Awesome-Return' => '/preference-fixture'])
+    $response = $this->withHeaders(['X-Inertia' => 'true', 'X-Front-Awesome-Return' => '/preference-fixture'])
         ->patch('/front-awesome/preferences', ['timezone' => 'America/Sao_Paulo'])->assertStatus(303);
+    $cookie = $response->getCookie(config('session.cookie').'_front_awesome_preferences_timezone');
+    $this->withCookie($cookie->getName(), $cookie->getValue());
     $this->get('/preference-fixture')->assertJsonPath('preserveFragment', true)->assertJsonPath('props.preferences.timezone', 'America/Sao_Paulo');
     $this->patch('/front-awesome/preferences', ['timezone' => 'invalid'])->assertStatus(303);
     $this->get('/preference-fixture')->assertJsonPath('preserveFragment', true)->assertJsonPath('props.preferences.timezone', 'America/Sao_Paulo');
@@ -235,6 +238,7 @@ it('lets a specific allowed language override a wildcard exclusion', function ()
 });
 
 it('falls back from malformed saved values without rewriting the store', function (): void {
+    FrontAwesome::setPreferenceStore(SessionPreferenceStore::class);
     $saved = ['appearance' => 'blue', 'locale' => 'xx', 'timezone' => 'Mars/Olympus'];
     $this->withSession(['front-awesome.preferences' => $saved])->withHeader('X-Inertia', 'true')
         ->get('/preference-fixture')->assertJsonPath('props.preferences.appearance', 'system')
@@ -269,11 +273,13 @@ it('defaults currency to null and shares the authoritative ISO 4217 list', funct
 });
 
 it('persists and clears a nullable currency preference', function (): void {
-    $this->withHeaders(['X-Inertia' => 'true', 'X-Front-Awesome-Return' => '/preference-fixture'])
+    $response = $this->withHeaders(['X-Inertia' => 'true', 'X-Front-Awesome-Return' => '/preference-fixture'])
         ->patch('/front-awesome/preferences', ['currency' => 'BRL'])->assertStatus(303);
+    $cookie = $response->getCookie(config('session.cookie').'_front_awesome_preferences_currency');
+    $this->withCookie($cookie->getName(), $cookie->getValue());
     $this->get('/preference-fixture')->assertJsonPath('props.preferences.currency', 'BRL');
-    $this->patch('/front-awesome/preferences', ['currency' => null])->assertStatus(303);
-    $this->get('/preference-fixture')->assertJsonPath('props.preferences.currency', null);
+    $this->patch('/front-awesome/preferences', ['currency' => null])->assertStatus(303)->assertCookieExpired($cookie->getName());
+    $this->withCookie($cookie->getName(), '')->get('/preference-fixture')->assertJsonPath('props.preferences.currency', null);
 });
 
 it('rejects invalid currency inputs before calling the store', function (mixed $currency): void {
