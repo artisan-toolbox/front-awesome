@@ -27,6 +27,8 @@ Compatibility/migration needs:
 
 ### Fixed
 
+- Watch existing directories for translation inputs instead of registering missing files or children already covered by a watched ancestor. Refresh directory subscriptions on creation and removal so configuration publication, atomic replacement, and directory recreation regenerate the catalog, including when the Laravel working directory is outside the Vite root.
+
 - Restrict the source checkout's PHPStan development dependency to versions below 2.3.6 while Pest's type-coverage plugin 5.1.0 depends on the removed `AnalyserResult::getCollectedData()` method. Run type coverage without cached results so local runs also detect incompatible analyzer updates. Preserve the mandatory 100 percent type-coverage check and both CI dependency lanes. Production dependency constraints and preference behavior are unchanged.
 
 ### Changed

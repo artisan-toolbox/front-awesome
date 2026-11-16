@@ -1,5 +1,5 @@
 import { execFile } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { statSync } from 'node:fs';
 import { dirname, isAbsolute, resolve } from 'node:path';
 import { promisify } from 'node:util';
 
@@ -56,14 +56,27 @@ export function translationExport(options) {
     }
 
     function watchPaths() {
-        const paths = new Set(manifest.watchPaths);
+        const paths = new Set();
         for (const path of manifest.watchPaths) {
             let parent = path;
-            while (!existsSync(parent) && dirname(parent) !== parent) parent = dirname(parent);
+            while (
+                !statSync(parent, { throwIfNoEntry: false })?.isDirectory() &&
+                dirname(parent) !== parent
+            )
+                parent = dirname(parent);
             paths.add(parent);
         }
-        const added = [...paths].filter((path) => !watched.has(path));
-        for (const path of added) watched.add(path);
+        const added = [];
+        for (const path of [...paths].sort((first, second) => first.length - second.length)) {
+            const key = pathKey(path);
+            const covered = [...watched].some((directory) => {
+                const root = pathKey(directory);
+                return key === root || key.startsWith(root.endsWith('/') ? root : `${root}/`);
+            });
+            if (covered) continue;
+            watched.add(path);
+            added.push(path);
+        }
         if (added.length) server.watcher.add(added);
     }
 
@@ -89,6 +102,7 @@ export function translationExport(options) {
             return path === root || path.startsWith(`${root}/`) || root.startsWith(`${path}/`);
         });
         if (!affected || (!event.includes('Dir') && !/\.(php|json)$/.test(path))) return;
+        if (event.includes('Dir')) watchPaths();
         clearTimeout(timer);
         timer = setTimeout(() => {
             pending = true;
@@ -107,8 +121,8 @@ export function translationExport(options) {
         },
         watch(viteServer) {
             server = viteServer;
-            watchPaths();
             server.watcher.on('all', onChange);
+            watchPaths();
         },
         async close() {
             closed = true;

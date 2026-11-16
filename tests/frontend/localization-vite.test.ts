@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, readFile, realpath, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, realpath, rename, rm, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
@@ -174,6 +174,70 @@ test('watches missing lang creation, changes, deletion, config, errors and recov
         await close(server, root);
     }
 }, 30000);
+
+test.each([false, true])(
+    'watches configuration creation and directory replacement outside the Vite root (existing directory: %s)',
+    async (existingDirectory) => {
+        const root = await fixture();
+        const client = join(root, 'client');
+        const configuration = join(root, 'config');
+        let server: ViteDevServer | undefined;
+        try {
+            await mkdir(client);
+            await applicationMessage(root, 'Kept outside the Vite root');
+            if (existingDirectory) await mkdir(configuration);
+            server = await createServer({
+                root: client,
+                configFile: false,
+                logLevel: 'silent',
+                plugins: [frontAwesome({ translations: { php, artisan, cwd: root } })],
+                server: {
+                    middlewareMode: true,
+                    hmr: false,
+                    watch: { usePolling: true, interval: 25 },
+                },
+                optimizeDeps: { noDiscovery: true },
+            });
+            await expect
+                .poll(() => server?.watcher.getWatched()[join(root, 'lang/en')])
+                .toContain('app.php');
+            expect(await text(root)).toContain('Kept outside the Vite root');
+
+            if (!existingDirectory) await mkdir(configuration);
+            await writeFile(
+                join(configuration, 'front-awesome.php'),
+                "<?php return ['exclude_keys' => ['app.*']];",
+            );
+            await expect.poll(() => text(root), { timeout: 10000 }).not.toContain('app.greeting');
+
+            const replacement = join(configuration, 'front-awesome.php.tmp');
+            await writeFile(replacement, '<?php return [];');
+            await rename(replacement, join(configuration, 'front-awesome.php'));
+            await expect
+                .poll(() => text(root), { timeout: 10000 })
+                .toContain('Kept outside the Vite root');
+            await writeFile(
+                join(configuration, 'front-awesome.php'),
+                "<?php return ['exclude_keys' => ['app.*']];",
+            );
+            await expect.poll(() => text(root), { timeout: 10000 }).not.toContain('app.greeting');
+
+            await rm(configuration, { recursive: true });
+            await expect
+                .poll(() => text(root), { timeout: 10000 })
+                .toContain('Kept outside the Vite root');
+            await mkdir(configuration);
+            await writeFile(
+                join(configuration, 'front-awesome.php'),
+                "<?php return ['exclude_keys' => ['app.*']];",
+            );
+            await expect.poll(() => text(root), { timeout: 10000 }).not.toContain('app.greeting');
+        } finally {
+            await close(server, root);
+        }
+    },
+    30000,
+);
 
 test('selects literal native locale imports from the chosen installed edition without exporting Laravel', async () => {
     const root = await fixture();
