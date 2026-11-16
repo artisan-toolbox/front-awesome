@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.0.0-beta.2] - 2026-11-16
+
+### Features
+
+- **Default to persistent encrypted cookie store** (`5353972`)
+  Includes the changes introduced by commit 5353972: feat(preferences): default to persistent encrypted cookie store.
+
+### Fixes
+
+- **Refresh Vite translation watch roots for outside-root config changes** (`3d047b2`)
+  Updated the Vite translations watcher to correctly refresh directory subscriptions when translation-related input directories are created or removed. This ensures catalog regeneration keeps working for scenarios like configuration publication, atomic replacement, and directory recreation—particularly when the Laravel working directory (and thus watched paths) is outside the Vite root. The watcher now recalculates watch roots on relevant directory change events and avoids stale/overlapping watch paths by sorting candidate directories and only adding directories that are not already covered by previously watched prefixes.
+
+- **Constrain PHPStan dev dependency and disable Pest type cache** (`1c4e8c6`)
+  Adjusted the PHPStan/Pest toolchain compatibility by restricting the development PHPStan dependency to versions <2.3.6 (within the 2.2.x line) because Pest type-coverage plugin 5.1.0 depends on a removed PHPStan method (`AnalyserResult::getCollectedData()`). Also updated the `test:types` script to run Pest type coverage with `--no-cache`, ensuring local runs detect incompatible analyzer updates instead of relying on potentially stale cached type-coverage results. The mandatory 100% type-coverage requirement remains in place and CI dependency lanes are kept unchanged.
+
 ## [1.0.0-beta.1] - 2026-11-13
 
 ### Maintenance
