@@ -40,7 +40,7 @@
         "pestphp/pest-plugin-laravel": "^5.0",
         "pestphp/pest-plugin-type-coverage": "^5.0",
         "phpstan/extension-installer": "^1.4",
-        "phpstan/phpstan": "^2.2.8",
+        "phpstan/phpstan": "^2.2.8 <2.3.6",
         "rector/rector": "^2.6.2"
     },
     "autoload": {
@@ -82,7 +82,7 @@
             "vendor/bin/phpstan analyse --memory-limit=512M"
         ],
         "test:types": [
-            "vendor/bin/pest --type-coverage --min=100 --memory-limit=512M"
+            "vendor/bin/pest --type-coverage --min=100 --memory-limit=512M --no-cache"
         ],
         "test:coverage": [
             "vendor/bin/pest --coverage"

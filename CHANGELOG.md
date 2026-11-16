@@ -25,6 +25,10 @@ Compatibility/migration needs:
 
 ## [Unreleased]
 
+### Fixed
+
+- Restrict the source checkout's PHPStan development dependency to versions below 2.3.6 while Pest's type-coverage plugin 5.1.0 depends on the removed `AnalyserResult::getCollectedData()` method. Run type coverage without cached results so local runs also detect incompatible analyzer updates. Preserve the mandatory 100 percent type-coverage check and both CI dependency lanes. Production dependency constraints and preference behavior are unchanged.
+
 ### Changed
 
 - Use persistent encrypted HttpOnly cookies by default for appearance, locale, timezone, and currency, including guests of an authenticated-model store. Session expiry no longer resets these choices. Configure `preferences.cookie_lifetime` in minutes (365 days by default). Each preference has its own cookie; clearing currency expires it. Existing active-session strings migrate on first read, with cookies taking priority. Explicit `SessionPreferenceStore` selections retain temporary session behavior; update published store configuration to opt into cookies. Account values remain isolated from guest cookies.
