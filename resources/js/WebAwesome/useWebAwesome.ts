@@ -15,6 +15,7 @@ import {
 import { modelSnapshot, sameModelSnapshot, type ModelSnapshot } from './modelSnapshot';
 import type { WebAwesomeModelPort } from './useWebAwesomeModel';
 import { projectNativeSlot } from './nativeSlots';
+import { observeTextAutofill } from './observeTextAutofill';
 
 interface AttributeDefinition {
     attribute: string;
@@ -95,11 +96,14 @@ export function useWebAwesome(
     const owners = new Map<WebAwesomeModelPort, { element: Element; remove: () => void }>();
     const slots = useSlots();
     const element = useTemplateRef<HTMLElement>('element');
+    const autofill = new Map<WebAwesomeModelPort, ReturnType<typeof observeTextAutofill>>();
     const targets = new Map<string, BindingTarget>();
     const resetAttributes = new Map<string, AttributeDefinition>();
     const initialAttributes = new Map<string, unknown>();
     const propertyDestinations = new Set<string>();
     let modelWriters = new Map<string, (element: HTMLElement) => void>();
+    let pendingOwners = new Map<string, () => boolean>();
+    let appliedOwners = new Map<string, () => boolean>();
     let pendingSnapshots = new Map<string, ModelSnapshot>();
     let appliedSnapshots = new Map<string, ModelSnapshot>();
     let pendingProperties = new Map<string, unknown>();
@@ -107,6 +111,46 @@ export function useWebAwesome(
     let phase: 'pending' | 'ready' | 'unmounted' = 'pending';
 
     const isUnmounted = () => phase === 'unmounted';
+
+    for (const model of models) {
+        if (!model.autofill) continue;
+        autofill.set(
+            model,
+            observeTextAutofill({
+                nativeProperty: model.autofill === 'text' ? 'input' : undefined,
+                emptyValue: model.autofill === 'host' ? 'omit' : undefined,
+                captureOwner() {
+                    const root = element.value;
+                    const current = model.current();
+                    if (!root || !current) return;
+                    const captured = model.captureCommit();
+                    return {
+                        value: current.value,
+                        sameOwner: current.sameOwner,
+                        unchanged: current.unchanged,
+                        commit: () => recordCommit(model, captured(root)),
+                    };
+                },
+            }),
+        );
+    }
+
+    const autofillListeners: Record<string, (event: Event) => void> = {};
+    for (const model of autofill.keys()) {
+        for (const name of model.events) {
+            const listener = `on${name.replace(/(^|-)([a-z])/g, (_, _separator: string, letter: string) => letter.toUpperCase())}`;
+            autofillListeners[listener] = (event) => {
+                const root = element.value;
+                if (
+                    phase === 'ready' &&
+                    root &&
+                    event.currentTarget === root &&
+                    event.target === root
+                )
+                    commitModel(model, root, event);
+            };
+        }
+    }
 
     for (const attribute of definition.attributes) {
         const target: BindingTarget = { kind: 'attribute', definition: attribute };
@@ -213,12 +257,14 @@ export function useWebAwesome(
                 bindings[destination] = attributeValue(target.definition, supplied);
         }
         modelWriters = new Map();
+        pendingOwners = new Map();
         pendingSnapshots = new Map();
         for (const model of models) {
             const current = model.current();
             if (current) {
                 properties.set(model.property, current.value);
                 modelWriters.set(model.property, current.apply);
+                pendingOwners.set(model.property, current.sameOwner);
                 pendingSnapshots.set(model.property, current.snapshot);
             }
         }
@@ -253,7 +299,7 @@ export function useWebAwesome(
             bindings[destination] = attributeValue(attribute, initial);
         }
         pendingProperties = properties;
-        return bindings;
+        return mergeProps(autofillListeners, bindings);
     }
 
     function applyProperties() {
@@ -266,15 +312,21 @@ export function useWebAwesome(
         );
         for (const [property, value] of ordered) {
             const sameIdentity = Object.is(appliedProperties.get(property), value);
+            const ownerChanged = pendingOwners.has(property)
+                ? !appliedOwners.get(property)?.()
+                : appliedOwners.has(property);
             const snapshot = pendingSnapshots.get(property);
             const mutated =
                 appliedProperties.has(property) &&
                 sameIdentity &&
                 snapshot !== undefined &&
                 !sameModelSnapshot(appliedSnapshots.get(property), snapshot);
-            if (!appliedProperties.has(property) || !sameIdentity || mutated) {
+            if (!appliedProperties.has(property) || !sameIdentity || mutated || ownerChanged) {
                 if (modelWriters.has(property)) modelWriters.get(property)?.(root);
                 else Reflect.set(root, property, value);
+                for (const [model, observer] of autofill)
+                    if (model.property === property)
+                        observer.markApplied(Reflect.get(root, property));
                 if (mutated) {
                     const requestUpdate: unknown = Reflect.get(root, 'requestUpdate');
                     if (typeof requestUpdate === 'function') Reflect.apply(requestUpdate, root, []);
@@ -282,15 +334,21 @@ export function useWebAwesome(
             }
         }
         appliedProperties = new Map(pendingProperties);
+        appliedOwners = new Map(pendingOwners);
         appliedSnapshots = new Map(pendingSnapshots);
     }
 
-    function commitModel(model: WebAwesomeModelPort, root: HTMLElement, event?: Event) {
-        const committed = model.commit(root, event);
+    function recordCommit(model: WebAwesomeModelPort, committed: { value: unknown } | undefined) {
         if (committed) {
             appliedProperties.set(model.property, committed.value);
             appliedSnapshots.set(model.property, modelSnapshot(committed.value));
         }
+    }
+
+    function commitModel(model: WebAwesomeModelPort, root: HTMLElement, event?: Event) {
+        const observer = autofill.get(model);
+        if (observer) observer.commit(root);
+        else recordCommit(model, model.commit(root, event));
     }
 
     function bindOwners() {
@@ -329,6 +387,7 @@ export function useWebAwesome(
         if (!root || !definition.formAssociated || Reflect.get(root, 'form') !== event.target)
             return;
         const commits = models.map((model) => model.captureCommit());
+        for (const observer of autofill.values()) observer.reset(event);
         queueMicrotask(() => {
             if (phase === 'ready' && !event.defaultPrevented && element.value === root)
                 for (const commit of commits) commit(root);
@@ -353,6 +412,7 @@ export function useWebAwesome(
                     }
                 }
                 for (const name of model.events) {
+                    if (autofill.has(model)) continue;
                     const listener = (event: Event) => {
                         if (
                             phase === 'ready' &&
@@ -395,6 +455,8 @@ export function useWebAwesome(
             removers.push(() => observer.disconnect());
         }
         applyProperties();
+        for (const observer of autofill.values())
+            if (element.value) void observer.connect(element.value);
     });
     onUpdated(() => {
         bindOwners();
@@ -402,6 +464,7 @@ export function useWebAwesome(
     });
     onBeforeUnmount(() => {
         phase = 'unmounted';
+        for (const observer of autofill.values()) observer.stop();
         for (const remove of removers) remove();
         for (const owner of owners.values()) owner.remove();
     });

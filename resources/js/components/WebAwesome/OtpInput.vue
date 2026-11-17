@@ -31,7 +31,8 @@ const { bindings, slotContent, slotNodes, errors, invalid, element } = useWebAwe
             useWebAwesomeModel<string, WaOtpInput['value']>(props, {
                 name: 'modelValue',
                 property: 'value',
-                events: ['input'],
+                events: ['input', 'change', 'wa-complete'],
+                autofill: 'text',
                 form: true,
                 componentName: 'OtpInput',
                 acceptsWrite: modelDomains.string,

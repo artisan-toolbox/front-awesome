@@ -32,7 +32,8 @@ const { bindings, slotContent, slotNodes, errors, invalid, element } = useWebAwe
             useWebAwesomeModel<string | Date | null, WaKnownDate['value']>(props, {
                 name: 'modelValue',
                 property: 'value',
-                events: ['input'],
+                events: ['input', 'change'],
+                autofill: 'host',
                 form: true,
                 componentName: 'KnownDate',
                 acceptsWrite: modelDomains.date,

@@ -1,6 +1,6 @@
 ---
 name: front-awesome-development
-description: Use Front Awesome Vue and Inertia form controls, layouts, icons, Laravel-source translations, backend display and currency preferences, optional QZ printing, and theme integrations in Laravel applications.
+description: Use Front Awesome Vue and Inertia form controls, layouts, icons, Laravel-source translations, backend display and currency preferences, optional Dapter DataView, QZ printing, and theme integrations in Laravel applications.
 ---
 
 # Front Awesome development
@@ -49,7 +49,7 @@ Inside `createInertiaApp`'s `withApp(app, { page })`, create `const preferences 
 
 Import `Appearance`, `Language`, `Timezone`, and `Currency` from `@artisan-toolbox/front-awesome/components`. Direct `components/<Name>.vue` and `preferences/<Name>.vue` exports are available. These components add no markup. Appearance exposes `appearance`, `system()`, `light()`, `dark()`, and `toggle()`. Language exposes `locale`, `locales`, and `setLocale(locale)`. Timezone exposes `timezone`, `timezones`, and `setTimezone(timezone)`. All four expose `pending` and `error`; disable controls while pending and render errors accessibly. For example, `<Timezone v-slot="{ timezone, timezones, setTimezone, pending }"><select :value="timezone" :disabled="pending" @change="setTimezone($event.target.value)"><option v-for="zone in timezones" :key="zone" :value="zone">{{ zone }}</option></select></Timezone>` saves a selected zone. Supply a visible label in the application's complete form.
 
-Actions send serial, CSRF-protected Inertia PATCH requests and return to the current page with component state, scroll, query, and fragment preserved. The server validates exactly one preference before calling a store setter. Currency accepts a supported ISO 4217 code or null, with null as its default. Currency exposes `currency`, `currencies`, `setCurrency(currency)`, `pending`, and `error`. Only confirmed values update the document's appearance and HTML language, which drives Vue I18n and Web Awesome. `useLocalization().setLocale()` also persists when preferences are installed. A failed network response may follow a committed write; `usePreferences().refresh()` reconciles with the server. Cached/history visits reconcile the full server page, including translated PHP props, on supported Inertia 3.0 versions; explicit refresh reloads only the preference prop. Standalone localization and `appearance: true` retain browser-only behavior when preferences are absent.
+Actions send serial, CSRF-protected Inertia PATCH requests and return to the current page with component state, scroll, query, and fragment preserved. The server validates exactly one preference before calling a store setter. Currency accepts a supported ISO 4217 code or null, with null as its default. Currency exposes `currency`, `currencies`, `setCurrency(currency)`, `pending`, and `error`. Only confirmed values update the document's appearance and HTML language, which drives Vue I18n and Web Awesome. `useLocalization().setLocale()` also persists when preferences are installed. A failed network response may follow a committed write; `usePreferences().refresh()` reconciles with the server. Cached/history visits reconcile the full server page, including translated PHP props, on supported Inertia 3.0 versions; explicit refresh reloads only the preference prop. Reconciliation preserves the current query, fragment, and browser history entry. Standalone localization and `appearance: true` retain browser-only behavior when preferences are absent.
 
 The unreleased 1.x default `CookiePreferenceStore` saves each preference in a separate persistent cookie, independently of session expiry and login duration. Earlier betas default to `SessionPreferenceStore`; check that the installed source contains the cookie store before selecting it. Keep Laravel's `EncryptCookies` and `AddQueuedCookiesToResponse` web middleware enabled. Cookies are encrypted and signed, always HttpOnly, and inherit the cookie jar's path, domain, secure, and SameSite defaults from session configuration. `preferences.cookie_lifetime` is a positive integer number of minutes, defaulting to 525600 (365 days) after a write; reads do not renew it. Names use `{session.cookie}_front_awesome_{preferences.key}_{field}`. Keep application cookie names distinct within a shared scope. Null currency expires its cookie. Clearing site data, browser policies, or expiration removes saved choices.
 
@@ -240,6 +240,10 @@ const form = useForm({ users: [{ name: 'Ada' }] });
 
 Typing updates `search` or `form.users[0].name`. External edits, replaced nested data, and `form.reset()` update the rendered value. Text fields accept strings, null, and undefined. Empty displays use an empty string. `type="number"` still produces text. Model modifiers, including `.number` and `.trim`, are unsupported and throw an error. Do not combine `v-model` with an Inertia form or pass a competing native `value`.
 
+The unreleased source preview synchronizes Input, OtpInput, NumberInput, and Textarea for change-only autofill, Shadow DOM input, restored values, and silent native fills at the next render or ordinary form activation. Switching the bound Inertia form or field discards pending autofill from the previous binding, including when their values are equal. Later edits update the new binding. KnownDate, TimeInput, and Pro DateInput observe accepted public host values without coercing silently edited segments or changing Date setter types. Keep tag drafts and selection search text separate from committed rich values. Custom scripts must update bound Vue or Inertia state directly; `form.submit()` and validation-blocked `requestSubmit()` can bypass observation. Public Web Awesome writes need their normal render before native validation.
+
+For OTP, use OtpInput with a stable `id`, `name`, visible `label`, and `autocomplete="one-time-code"` inside a form. That autocomplete value is already the upstream default. Numeric mode uses one native text input with `inputmode="numeric"`, preserving codes such as `001234`; use `type="alphanumeric"` for letter-and-digit codes. For a plain Input, specify `type="text"`, `inputmode="numeric"`, `autocomplete="one-time-code"`, and your required length and pattern. Never use a numeric data model for OTP. The preview updates bound OTP state before `wa-complete` listeners; native autosubmit remains opt-in and cancelable. Use `username`, `current-password`, and `new-password` for their corresponding login or registration fields. Provider suggestions depend on their capabilities and settings; no extra vendor-specific attributes or automatic WebOTP request are required by these wrappers. Do not claim extension or SMS testing from synthetic events alone. See the [OTP example](https://atb.dev.br/docs/front-awesome/web-awesome/components/forms#otp-input).
+
 Use existing dotted object and array paths such as `users.0.name`. The wrapper rejects missing fields, object or numeric leaves, and Inertia helper or metadata paths. It never creates containers or clears server errors during typing.
 
 Inertia errors use the flat `form.errors[fieldName]` entry. Nonempty string messages, including all messages in a configured string array, replace the hint and put the whole input in its theme's danger colors. Error text is escaped. Clear errors through Inertia to restore the caller's hint and normal appearance. Server errors do not set native custom validity, so a corrected value can be submitted again. Keep required, pattern, and other native constraints as appropriate. Inertia applications that use string-array errors must configure their `InertiaConfig.errorValueType` accordingly.
@@ -424,3 +428,45 @@ Configure `defaults` by format for printer and QZ options, `previewOptions` for 
 The default bridge materializes file URLs and image files into a detached byte snapshot once before review. Custom bridges that omit `prepare` must preserve the same document between preview and submission.
 
 The Drawer exposes `preview`, `settings`, `settings-extra`, `summary`, and `footer` slots. Keep review and transport actions user-triggered. Raw requests show their source commands with a warning rather than pretending to render a page. Optional storage saves only printer/copy preferences by format, respects `storageKey`, and tolerates blocked or malformed browser storage. Set `storage: false` to disable it. The application still owns its branding and Web Awesome theme.
+
+## Present Dapter results with DataView
+
+Use the optional `@artisan-toolbox/front-awesome/data-view` entry when an application needs a table, grid, or list backed by an existing Dapter source. DataView is an unreleased source preview. Confirm that the installed Front Awesome checkout exports it. Install a compatible Dapter preview through Composer first, then add `"@artisan-toolbox/dapter": "file:vendor/artisan-toolbox/dapter"` and run npm install. Dapter is optional for the other Front Awesome entries.
+
+Start with the Front Awesome Vite and stylesheet setup above and a registered Dapter source named `Catalog` that returns rows such as `{ "id": 1, "name": "Notebook" }`. Complete [Dapter installation](https://atb.dev.br/docs/dapter/installation) before rendering the component.
+
+```vue
+<template>
+    <DataView :adapter="catalog" :views="views" row-key="id" caption="Products">
+        <template #cell-name="{ row }"><strong>{{ row.name }}</strong></template>
+        <template #grid-item="{ row }"><article>{{ row.name }}</article></template>
+    </DataView>
+</template>
+<script setup lang="ts">
+import { useDataAdapter } from '@artisan-toolbox/dapter';
+import { DataView, type DataViewViews } from '@artisan-toolbox/front-awesome/data-view';
+
+function decodeRow(value: unknown) {
+    if (!value || typeof value !== 'object' || !('id' in value) ||
+        typeof value.id !== 'number' || !('name' in value) || typeof value.name !== 'string') {
+        throw new Error('Invalid product');
+    }
+    return { id: value.id, name: value.name };
+}
+const catalog = useDataAdapter('Catalog', { decodeRow, protocol: 2, url: false });
+const views = {
+    table: { columns: [{ field: 'name', label: 'Name', orderBy: 'name' }], striped: true },
+    grid: {},
+} satisfies DataViewViews<typeof catalog.data[number]>;
+</script>
+```
+
+The initial table displays Notebook in bold. The Grid control changes presentation without a second read. `orderBy` must name an advertised Dapter field alias. Omitting it leaves a presentation-only column even when its property name matches an orderable field. Use an `id` and `accessor(row)` for computed columns. Use `{ kind: 'display', id: 'actions', label: 'Actions' }` and `#cell-actions` for action cells. Object values need an explicit cell slot.
+
+Declare layouts in display order. Grid and list each require `#grid-item` or `#list-item`. A single layout has no selector. Grid-only and list-only configurations need no columns. Row keys must be unique finite numbers or strings; pass a scalar property name or callback. Use `size="s"`, `"m"`, or `"l"`, table `striped` and `hover`, and column `align` of `start`, `center`, or `end`.
+
+Configure source, decoders, actions, URL state, live updates, polling, and infinite loading in `useDataAdapter`. Pass its exact handle as `adapter`. DataView rejects creator options and requires a keyed remount when replacing the handle. It has no `source` shorthand or top-level `columns` option. Borrow the same handle for sibling controls or another DataView.
+
+Use the exact typed handle in `toolbar`, `filters`, `actions`, `footer`, `pagination`, `loading`, `empty`, `error`, and `integration-error` slots. Every slot includes `adapter` and `view`; item slots also include `row` and `index`. Cell slots add `column` and `value`; `header-ID` slots add `column`. Custom toolbar and pagination slots replace the built-in controls. Built-in header ordering cycles advertised directions then clears; Shift adds ordering only when Dapter permits it. The accessible sort reflects accepted rows, while loading and the direction indicator describe requested updates.
+
+DataView preserves authorized rows on recoverable errors, displays integration errors separately, and leaves unknown counts unknown. Infinite rows and retries belong to Dapter. The preview does not generate filter forms, selection, editing, or export engines. Built-in labels are English; slots can replace controls and messages. See [DataView](https://atb.dev.br/docs/front-awesome/development/data-view) for focused examples and limitations.

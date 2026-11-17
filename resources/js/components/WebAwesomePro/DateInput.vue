@@ -55,7 +55,8 @@ const { bindings, slotContent, slotNodes, errors, invalid, element } = useWebAwe
             >(props, {
                 name: 'modelValue',
                 property: 'value',
-                events: ['input'],
+                events: ['input', 'change'],
+                autofill: 'host',
                 form: true,
                 componentName: 'DateInput',
                 acceptsWrite: modelDomains.dateInput,

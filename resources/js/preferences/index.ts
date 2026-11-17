@@ -248,6 +248,8 @@ export function createPreferences(input: unknown): PreferencesService {
             dispatch(() =>
                 router.reload({
                     ...(full ? {} : { only: [initial.key] }),
+                    replace: true,
+                    preserveUrl: true,
                     onStart() {
                         started = true;
                     },

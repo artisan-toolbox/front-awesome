@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+### Features
+
+- Add the optional DataView source preview with typed Dapter handles, declarative columns, cell slots, table, grid, and list layouts, capability-aware search and ordering, and source paging or infinite loading. Import it from `@artisan-toolbox/front-awesome/data-view`. Dapter remains optional for other Front Awesome imports.
+
+### Fixes
+
+- Discard pending autofill when a control switches to another Inertia field or form, even when both bindings have the same value. Reapply the new binding before observing further native edits.
+- Synchronize Input, OtpInput, NumberInput, and Textarea Vue and Inertia bindings with change-only and Shadow DOM autofill, browser restoration, and silent fills before ordinary form submission. Observe accepted host changes for KnownDate, TimeInput, and Pro DateInput without changing their Date setter contracts. Preserve OTP leading zeros, completion listener ordering, autosubmit cancellation, and native reset defaults.
+- Preserve the current URL and history entry when preferences refresh after Back, Forward, cached navigation, or an explicit refresh. Server query normalization no longer adds a duplicate entry or removes the fragment.
+
 ## [1.0.0-beta.2] - 2026-11-16
 
 ### Features

@@ -1,0 +1,25 @@
+<template>
+    <DataView :adapter="catalog" :views="{ table: { columns: [{ field: 'name', label: 'Name' }] } }" row-key="id" source="WrongOwner">
+        <template #cell-name="{ row, adapter }">
+            {{ row.missing }}
+            <button @click="adapter.fields?.status?.filters?.selected?.call({ value: 19 })">Invalid filter</button>
+            <button @click="adapter.actions?.http('rename', { id: 'invalid', name: 'Name' })">Invalid action</button>
+        </template>
+    </DataView>
+    <DataView :adapter="catalog" :views="{ grid: {} }" row-key="missing"><template #grid-item="{ row }">{{ row.missing }}</template></DataView>
+</template>
+<script setup lang="ts">
+import { useDataAdapter, defineActions, type AdapterDefinition, type ReadonlyDeep } from '@artisan-toolbox/dapter';
+import { DataView } from '@artisan-toolbox/front-awesome/data-view';
+function decodeRow(value: unknown) {
+    if (!value || typeof value !== 'object' || !('id' in value) || typeof value.id !== 'number' || !('name' in value) || typeof value.name !== 'string') throw new Error('Invalid row');
+    return { id: value.id, name: value.name };
+}
+function decodeDefinition(value: ReadonlyDeep<AdapterDefinition>) {
+    const selected = value.fields.status?.filters?.selected;
+    if (!selected || selected.multiple || selected.values.some(item => item !== 'active' && item !== 'archived')) throw new Error('Invalid filter');
+    return { ...value, fields: { status: { search: null, order: null, filters: { selected: { values: ['active', 'archived'], multiple: false } } } } } as const;
+}
+const actions = defineActions({ rename: { transports: ['http'], decodeInput: decodeRow } });
+const catalog = useDataAdapter('Catalog', { decodeRow, decodeDefinition, actionDefinitions: actions, protocol: 2 });
+</script>

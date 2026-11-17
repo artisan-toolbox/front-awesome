@@ -1,18 +1,26 @@
 import type { ComputedRef } from 'vue';
-import { modelSnapshot, type ModelSnapshot } from './modelSnapshot';
+import { modelSnapshot, sameModelSnapshot, type ModelSnapshot } from './modelSnapshot';
 import { useFormBridge } from './useFormBridge';
+import type { FormBridgeSource } from './useFormBridge';
 
 export interface WebAwesomeModelPort {
     readonly name: string;
     readonly property: string;
     readonly events: readonly string[];
     readonly form: boolean;
+    readonly autofill?: 'text' | 'host';
     readonly observeAttribute?: string;
     readonly ownerEvent?: { tag: string; name: string; itemKey: string };
     readonly errors: ComputedRef<readonly string[]>;
     readonly invalid: ComputedRef<boolean>;
     current: () =>
-        | { value: unknown; snapshot: ModelSnapshot; apply: (element: HTMLElement) => void }
+        | {
+              value: unknown;
+              snapshot: ModelSnapshot;
+              sameOwner: () => boolean;
+              unchanged: () => boolean;
+              apply: (element: HTMLElement) => void;
+          }
         | undefined;
     commit: (element: HTMLElement, event?: Event) => { value: unknown } | undefined;
     captureCommit: () => (element: HTMLElement, event?: Event) => { value: unknown } | undefined;
@@ -23,6 +31,7 @@ interface ModelOptions<W, R> {
     property: string;
     events: readonly string[];
     form: boolean;
+    autofill?: 'text' | 'host';
     componentName: string;
     acceptsWrite: (value: unknown) => value is W;
     acceptsRead: (value: unknown) => value is R;
@@ -53,23 +62,19 @@ export function useWebAwesomeModel<W, R>(
             options.property.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`),
         ],
     });
+    function sameOwner(captured: FormBridgeSource<W, R>) {
+        const current = bridge.source.value;
+        return captured.kind === 'model'
+            ? current.kind === 'model' && current.name === captured.name
+            : captured.kind === 'form' &&
+                  current.kind === 'form' &&
+                  current.form === captured.form &&
+                  current.path === captured.path;
+    }
     function captureCommit() {
         const captured = bridge.source.value;
         return (element: HTMLElement, event?: Event) => {
-            const source = bridge.source.value;
-            if (captured.kind === 'native' || source.kind !== captured.kind) return;
-            if (
-                captured.kind === 'model' &&
-                (source.kind !== 'model' || source.name !== captured.name)
-            )
-                return;
-            if (
-                captured.kind === 'form' &&
-                (source.kind !== 'form' ||
-                    source.form !== captured.form ||
-                    source.path !== captured.path)
-            )
-                return;
+            if (captured.kind === 'native' || !sameOwner(captured)) return;
             let value: unknown = Reflect.get(element, options.property);
             const detail: unknown = event && Reflect.get(event, 'detail');
             if (options.reader && detail !== null && typeof detail === 'object') {
@@ -95,6 +100,7 @@ export function useWebAwesomeModel<W, R>(
         property: options.property,
         events: options.events,
         form: options.form,
+        autofill: options.autofill,
         observeAttribute: options.observeAttribute,
         ownerEvent: options.ownerEvent,
         errors: bridge.errors,
@@ -103,9 +109,15 @@ export function useWebAwesomeModel<W, R>(
             const source = bridge.source.value;
             if (source.kind === 'native') return undefined;
             const value = source.current();
+            const snapshot = modelSnapshot(value);
             return {
                 value,
-                snapshot: modelSnapshot(value),
+                snapshot,
+                sameOwner: () => sameOwner(source),
+                unchanged: () =>
+                    sameOwner(source) &&
+                    Object.is(bridge.value.value, value) &&
+                    sameModelSnapshot(modelSnapshot(bridge.value.value), snapshot),
                 apply(element) {
                     if (!options.writer) {
                         Reflect.set(element, options.property, value);

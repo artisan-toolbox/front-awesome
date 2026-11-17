@@ -2,6 +2,7 @@ import { createInertiaApp } from '@inertiajs/vue3';
 import { defineComponent, h } from 'vue';
 import { createFrontAwesome } from '@artisan-toolbox/front-awesome';
 import Fixture from './Fixture.vue';
+import DataViewFixture from './DataViewFixture.vue';
 import './app.css';
 import '@artisan-toolbox/front-awesome/web-awesome.css';
 
@@ -19,7 +20,10 @@ void createInertiaApp({
             ],
         },
     },
-    resolve: () => defineComponent({ render: () => h(Fixture) }),
+    resolve: () =>
+        defineComponent({
+            render: () => (location.search.includes('data-view') ? h(DataViewFixture) : h(Fixture)),
+        }),
     withApp(app) {
         app.use(createFrontAwesome({ appearance: true }));
     },

@@ -246,6 +246,10 @@
           "title": "preserves boolean bindings before and after Web Awesome registers the button"
         },
         {
+          "file": "tests/frontend/data-view.browser.test.ts",
+          "title": "keeps declaration order and emits the effective fallback when layouts or the external model change"
+        },
+        {
           "file": "tests/frontend/popover.browser.test.ts",
           "title": "accepts the public Button trigger and preserves autofocus and native close links"
         },
@@ -660,6 +664,14 @@
       "renderedInExamples": 23,
       "actionTestReferences": [
         {
+          "file": "tests/frontend/autofill.browser.test.ts",
+          "title": "Textarea preserves Enter as text entry while reconciling an address fill"
+        },
+        {
+          "file": "tests/frontend/autofill.browser.test.ts",
+          "title": "Input preserves a synchronous Vue parent update before an already queued native render"
+        },
+        {
           "file": "tests/frontend/form-validation.browser.test.ts",
           "title": "preserves Input hint content for boolean failure and restores caller ARIA after messages"
         },
@@ -682,6 +694,18 @@
         {
           "file": "tests/frontend/input.browser.test.ts",
           "title": "preserves nullable owners and explicit custom validity independently from automatic errors"
+        },
+        {
+          "file": "tests/frontend/input.browser.test.ts",
+          "title": "does not duplicate model updates on committed typing or clear, and accepts later change-only fills"
+        },
+        {
+          "file": "tests/frontend/input.browser.test.ts",
+          "title": "reconciles an externally associated form and preserves the submitter"
+        },
+        {
+          "file": "tests/frontend/input.browser.test.ts",
+          "title": "reconciles silent credentials before native Enter submission"
         },
         {
           "file": "tests/frontend/native-slot-updates.browser.test.ts",
@@ -805,6 +829,10 @@
       "ownReferenceExamples": 22,
       "renderedInExamples": 22,
       "actionTestReferences": [
+        {
+          "file": "tests/frontend/autofill.browser.test.ts",
+          "title": "OtpInput commits the complete code before the caller handles wa-complete"
+        },
         {
           "file": "tests/frontend/upstream-interactions.browser.test.ts",
           "title": "completes OTP input and adds tags through native input and keyboard events"

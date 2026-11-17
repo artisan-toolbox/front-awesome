@@ -105,11 +105,12 @@ async function setup(replace: boolean) {
     const app = renderer.createApp({ render: () => null }).use(preferences);
     app.mount({});
     const client = http.getClient();
-    onTestFinished(() => {
+    onTestFinished(async () => {
         app.unmount();
         router.cancelAll();
         router.flushAll();
         http.setClient(client);
+        await new Promise<void>((resolve) => view.requestAnimationFrame(resolve));
         vi.unstubAllGlobals();
     });
     return { preferences, document, router, http, current: () => current };
@@ -179,4 +180,27 @@ test('leaves a canceled cached visit outside the next client-side navigation', a
     await expect.poll(() => current().url).toBe('/client');
     expect(preferences.locale.value).toBe('pt-BR');
     expect(request).toHaveBeenCalledTimes(1);
+});
+
+test('keeps the current URL and history entry when reconciling a restored page', async () => {
+    const { preferences, current, router, http, document } = await setup(false);
+    const restoredUrl = '/target?unrelated=retained&catalog=second#saved-position';
+    router.push({ url: restoredUrl, props: page(restoredUrl, 'pt-BR').props });
+    await expect.poll(() => current().url).toBe(restoredUrl);
+    const pushes = vi.spyOn(window.history, 'pushState');
+    const request = vi.fn(async (): Promise<HttpResponse> => ({
+        status: 200,
+        headers: { 'x-inertia': 'true' },
+        data: JSON.stringify(page('/target?catalog=second&unrelated=retained', 'pt-BR')),
+    }));
+    http.setClient({ request });
+    document.defaultView.dispatchEvent(Object.assign(new Event('pageshow'), { persisted: true }));
+    await expect.poll(() => request.mock.calls.length).toBe(1);
+    await expect.poll(() => preferences.pending.value).toBe(false);
+    expect(current().url).toBe(restoredUrl);
+    expect(window.location.pathname + window.location.search + window.location.hash).toBe(
+        restoredUrl,
+    );
+    expect(current().props.title).toBe('Bem-vindo');
+    expect(pushes).not.toHaveBeenCalled();
 });

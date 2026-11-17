@@ -47,9 +47,19 @@ export const webAwesomeModels = {
     Dialog: [open()],
     Drawer: [open()],
     Dropdown: [open()],
-    KnownDate: [value('value', 'date', 'string')],
-    NumberInput: [value('value', 'nullableString')],
-    OtpInput: [value('value', 'string')],
+    KnownDate: [{ ...value('value', 'date', 'string', ['input', 'change']), autofill: 'host' }],
+    NumberInput: [
+        {
+            ...value('value', 'nullableString', 'nullableString', ['input', 'change']),
+            autofill: 'text',
+        },
+    ],
+    OtpInput: [
+        {
+            ...value('value', 'string', 'string', ['input', 'change', 'wa-complete']),
+            autofill: 'text',
+        },
+    ],
     Pagination: [state('page', 'number', ['wa-page-change'])],
     Popover: [open()],
     RadioGroup: [value('value', 'radio')],
@@ -71,8 +81,16 @@ export const webAwesomeModels = {
         value('value', 'tags', 'strings', ['change']),
         state('inputValue', 'string', ['input']),
     ],
-    Textarea: [value('value', 'nullableString')],
-    TimeInput: [value('value', 'date', 'string'), open()],
+    Textarea: [
+        {
+            ...value('value', 'nullableString', 'nullableString', ['input', 'change']),
+            autofill: 'text',
+        },
+    ],
+    TimeInput: [
+        { ...value('value', 'date', 'string', ['input', 'change']), autofill: 'host' },
+        open(),
+    ],
     Tooltip: [open()],
     TreeItem: [
         state('expanded', 'boolean', ['wa-after-expand', 'wa-after-collapse']),
@@ -90,7 +108,10 @@ export const webAwesomeModels = {
         state('expandedKeys', 'keys', ['wa-row-expand', 'wa-row-collapse']),
         state('columnOrder', 'strings', ['wa-column-move']),
     ],
-    DateInput: [value('value', 'dateInput', 'string'), open()],
+    DateInput: [
+        { ...value('value', 'dateInput', 'string', ['input', 'change']), autofill: 'host' },
+        open(),
+    ],
     DatePicker: [
         value('value', 'datePicker', 'string'),
         state('view', 'dateView', ['wa-view-change']),

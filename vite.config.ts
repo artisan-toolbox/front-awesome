@@ -70,6 +70,7 @@ export default defineConfig({
                         'vue/server-renderer',
                         'vue',
                         '@inertiajs/vue3',
+                        '@inertiajs/core',
                         'lit',
                         'vite-plus/test',
                     ],

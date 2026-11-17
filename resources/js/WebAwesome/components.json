@@ -2493,8 +2493,9 @@
         "property": "value",
         "write": "date",
         "read": "string",
-        "events": ["input"],
-        "form": true
+        "events": ["input", "change"],
+        "form": true,
+        "autofill": "host"
       }
     ],
     "generated": true
@@ -2754,8 +2755,9 @@
         "property": "value",
         "write": "nullableString",
         "read": "nullableString",
-        "events": ["input"],
-        "form": true
+        "events": ["input", "change"],
+        "form": true,
+        "autofill": "text"
       }
     ],
     "generated": true
@@ -2949,8 +2951,9 @@
         "property": "value",
         "write": "string",
         "read": "string",
-        "events": ["input"],
-        "form": true
+        "events": ["input", "change", "wa-complete"],
+        "form": true,
+        "autofill": "text"
       }
     ],
     "generated": true
@@ -5285,8 +5288,9 @@
         "property": "value",
         "write": "nullableString",
         "read": "nullableString",
-        "events": ["input"],
-        "form": true
+        "events": ["input", "change"],
+        "form": true,
+        "autofill": "text"
       }
     ],
     "generated": true
@@ -5467,8 +5471,9 @@
         "property": "value",
         "write": "date",
         "read": "string",
-        "events": ["input"],
-        "form": true
+        "events": ["input", "change"],
+        "form": true,
+        "autofill": "host"
       },
       {
         "name": "open",

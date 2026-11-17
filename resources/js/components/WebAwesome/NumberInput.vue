@@ -32,7 +32,8 @@ const { bindings, slotContent, slotNodes, errors, invalid, element } = useWebAwe
             useWebAwesomeModel<string | null, WaNumberInput['value']>(props, {
                 name: 'modelValue',
                 property: 'value',
-                events: ['input'],
+                events: ['input', 'change'],
+                autofill: 'text',
                 form: true,
                 componentName: 'NumberInput',
                 acceptsWrite: modelDomains.nullableString,

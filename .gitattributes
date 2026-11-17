@@ -30,3 +30,4 @@
 /.audit export-ignore
 
 /.vitest-attachments export-ignore
+/.vitest export-ignore

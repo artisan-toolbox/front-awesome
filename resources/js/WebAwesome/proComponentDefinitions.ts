@@ -540,8 +540,9 @@ export const dateInputDefinition = {
             property: 'value',
             write: 'dateInput',
             read: 'string',
-            events: ['input'],
+            events: ['input', 'change'],
             form: true,
+            autofill: 'host',
         },
         {
             name: 'open',

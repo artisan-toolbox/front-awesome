@@ -1118,8 +1118,9 @@
         "property": "value",
         "write": "dateInput",
         "read": "string",
-        "events": ["input"],
-        "form": true
+        "events": ["input", "change"],
+        "form": true,
+        "autofill": "host"
       },
       {
         "name": "open",

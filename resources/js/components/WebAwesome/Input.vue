@@ -21,6 +21,7 @@
 <script setup lang="ts" generic="T extends object">
 import {
     mergeProps,
+    nextTick,
     onBeforeUnmount,
     onMounted,
     shallowRef,
@@ -28,13 +29,14 @@ import {
     useId,
     useSlots,
     useTemplateRef,
-    watchEffect,
+    watch,
 } from 'vue';
 import { projectNativeSlot } from '../../WebAwesome/nativeSlots';
 import type WaInput from '@awesome.me/webawesome/dist/components/input/input.js';
 import type { InputAttributes } from '../../WebAwesome/inputProps';
 import { inputBooleanAttributes } from '../../WebAwesome/inputProps';
 import { useFormBridge } from '../../WebAwesome/useFormBridge';
+import { observeTextAutofill } from '../../WebAwesome/observeTextAutofill';
 import type { FormBindingProps, FormBridgeValue } from '../../WebAwesome/useFormBridge';
 
 interface Attributes extends /* @vue-ignore */ InputAttributes {}
@@ -45,7 +47,7 @@ const props = defineProps<Props>();
 const emit = defineEmits<{ 'update:modelValue': [value: FormBridgeValue] }>();
 const attrs = useAttrs();
 const slots = useSlots();
-const { value, errors, invalid } = useFormBridge(props, {
+const { source, value, errors, invalid } = useFormBridge(props, {
     emitValue: (next) => emit('update:modelValue', next),
 });
 const messageId = `fa-input-error-${useId()}`;
@@ -60,6 +62,33 @@ function errorMessage() {
 const element = useTemplateRef<WaInput>('element');
 const registered = shallowRef(false);
 const initialValue = value.value;
+function captureOwner() {
+    const input = element.value;
+    const owner = source.value;
+    if (!input || owner.kind === 'native') return;
+    const ownerValue = value.value;
+    function sameOwner() {
+        const current = source.value;
+        return owner.kind === 'model'
+            ? current.kind === 'model' && current.name === owner.name
+            : owner.kind === 'form' &&
+                  current.kind === 'form' &&
+                  current.form === owner.form &&
+                  current.path === owner.path;
+    }
+    return {
+        value: ownerValue,
+        sameOwner,
+        unchanged: () => sameOwner() && Object.is(value.value, ownerValue),
+        commit() {
+            if (sameOwner()) value.value = input.value;
+        },
+    };
+}
+const autofill = observeTextAutofill({
+    nativeProperty: 'validationTarget',
+    captureOwner,
+});
 function resetValue() {
     if (Object.hasOwn(attrs, 'defaultValue')) return attrs.defaultValue;
     if (Object.hasOwn(attrs, 'default-value')) return attrs['default-value'];
@@ -112,11 +141,13 @@ function rootBindings() {
     delete bindings.autocorrect;
     delete bindings.spellcheck;
     if (errors.value.length) bindings.hint = '';
-    return mergeProps({ onInput: onInput }, bindings);
+    return mergeProps({ onInput: onInput, onChange: onInput }, bindings);
 }
 
 function onInput(event: Event) {
-    if (event.currentTarget === element.value && element.value) value.value = element.value.value;
+    const input = element.value;
+    if (!input || event.currentTarget !== input) return;
+    autofill.commit(input);
 }
 
 const slotNodes = () =>
@@ -133,20 +164,24 @@ function slotContent(props: { nodes?: ReturnType<typeof slotNodes> } = {}) {
 }
 slotContent.props = ['nodes'];
 
-watchEffect(() => {
+let appliedOwner: ReturnType<typeof captureOwner>;
+watch([registered, value, source], ([isRegistered, current]) => {
     const input = element.value;
-    if (!registered.value || !input) return;
-    const next = value.value === undefined ? '' : value.value;
+    if (!isRegistered || !input || appliedOwner?.unchanged()) return;
+    const next = current === undefined ? '' : current;
     input.value = next;
     if (next === null && input.value !== null) {
         input.value = '';
         input.value = null;
     }
+    autofill.markApplied(input.value);
+    appliedOwner = captureOwner();
 });
 
 function onReset(event: Event) {
     const input = element.value;
     if (!input || input.form !== event.target) return;
+    autofill.reset(event);
     queueMicrotask(() => {
         if (active && !event.defaultPrevented) value.value = input.value;
     });
@@ -156,11 +191,16 @@ onMounted(async () => {
     await import('#front-awesome-webawesome/components/input/input.js');
     if (!active || !element.value) return;
     registered.value = true;
-    element.value.ownerDocument.addEventListener('reset', onReset, true);
+    const input = element.value;
+    const ownerDocument = input.ownerDocument;
+    ownerDocument.addEventListener('reset', onReset, true);
+    await nextTick();
+    await autofill.connect(input);
 });
 
 onBeforeUnmount(() => {
     active = false;
+    autofill.stop();
     element.value?.ownerDocument.removeEventListener('reset', onReset, true);
 });
 </script>

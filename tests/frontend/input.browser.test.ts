@@ -1,5 +1,5 @@
 import { expect, onTestFinished, test, vi } from 'vite-plus/test';
-import { page } from 'vitest/browser';
+import { page, userEvent } from 'vitest/browser';
 import { createApp, h, nextTick, reactive } from 'vue';
 import type { Component } from 'vue';
 import type WaInput from '@awesome.me/webawesome/dist/components/input/input.js';
@@ -421,3 +421,351 @@ test('preserves nullable owners and explicit custom validity independently from 
     expect(input.validity.customError).toBe(false);
     expect(input.checkValidity()).toBe(true);
 });
+
+test.each(['email', 'password'] as const)(
+    'commits a change-only %s fill to the Inertia payload before caller listeners run',
+    async (type) => {
+        const form = useForm({ credential: '' });
+        const filled = type === 'email' ? 'reader@example.com' : 'example-password';
+        const changes: Event[] = [];
+        const observed: string[] = [];
+        let submitted = '';
+        const { container, input } = mount({
+            render: () =>
+                h(
+                    'form',
+                    {
+                        onSubmit: (event: Event) => {
+                            event.preventDefault();
+                            submitted = form.data().credential;
+                        },
+                    },
+                    [
+                        h(Input<{ credential: string }>, {
+                            form,
+                            field: 'credential',
+                            type,
+                            name: 'credential',
+                            autocomplete: type === 'email' ? 'username' : 'current-password',
+                            onChange: (event: Event) => {
+                                changes.push(event);
+                                observed.push(form.credential);
+                            },
+                        }),
+                    ],
+                ),
+        });
+        await ready(input);
+        const native = input.shadowRoot?.querySelector('input');
+        if (!native) throw new Error('Expected the native input.');
+        native.value = filled;
+        native.dispatchEvent(new Event('change', { bubbles: true }));
+        expect(input.value).toBe(filled);
+        expect(form.credential).toBe(filled);
+        expect(observed).toEqual([filled]);
+        expect(changes).toHaveLength(1);
+        container.querySelector('form')?.requestSubmit();
+        expect(submitted).toBe(filled);
+        await ready(input);
+        form.reset();
+        await ready(input);
+        expect(input.value).toBe('');
+        expect(input.defaultValue).toBe('');
+    },
+);
+
+test('commits change-only fills to v-model and preserves the original host event', async () => {
+    const state = reactive({ value: '', revision: 0 });
+    const callerEvents: Event[] = [];
+    const hostEvents: Event[] = [];
+    const observed: string[] = [];
+    const { input } = mount({
+        render: () =>
+            h(
+                Input,
+                {
+                    modelValue: state.value,
+                    'onUpdate:modelValue': (next: string | null | undefined) =>
+                        (state.value = next ?? ''),
+                    'data-revision': state.revision,
+                    onChange: (event: Event) => {
+                        callerEvents.push(event);
+                        observed.push(state.value);
+                    },
+                },
+                { end: () => h('input', { 'aria-label': 'Slotted control' }) },
+            ),
+    });
+    await ready(input);
+    input.addEventListener('change', (event) => hostEvents.push(event));
+    const native = input.shadowRoot?.querySelector('input');
+    if (!native) throw new Error('Expected the native input.');
+    native.value = 'Filled name';
+    native.dispatchEvent(new Event('change', { bubbles: true }));
+    expect(state.value).toBe('Filled name');
+    expect(observed).toEqual(['Filled name']);
+    expect(callerEvents).toHaveLength(1);
+    expect(callerEvents[0]).toBe(hostEvents[0]);
+    state.revision++;
+    await ready(input);
+    expect(input.value).toBe('Filled name');
+    state.value = 'External update';
+    await ready(input);
+    expect(native.value).toBe('External update');
+    const slotted = input.querySelector('input');
+    if (!slotted) throw new Error('Expected the slotted control.');
+    slotted.value = 'Unrelated value';
+    slotted.dispatchEvent(new Event('change', { bubbles: true }));
+    expect(state.value).toBe('External update');
+});
+
+test('does not duplicate model updates on committed typing or clear, and accepts later change-only fills', async () => {
+    const state = reactive({ value: 'Original' });
+    const updates: (string | null | undefined)[] = [];
+    const { input } = mount({
+        render: () =>
+            h(Input, {
+                modelValue: state.value,
+                'onUpdate:modelValue': (next: string | null | undefined) => {
+                    updates.push(next);
+                    state.value = next ?? '';
+                },
+                label: 'Autofill name',
+                'data-testid': 'autofill-name',
+                withClear: true,
+            }),
+    });
+    await ready(input);
+    await page.getByTestId('autofill-name').getByRole('textbox').fill('Typed');
+    const native = input.shadowRoot?.querySelector('input');
+    if (!native) throw new Error('Expected the native input.');
+    native.blur();
+    await ready(input);
+    expect(updates).toEqual(['Typed']);
+    const clear = input.shadowRoot?.querySelector<HTMLButtonElement>('[part="clear-button"]');
+    if (!clear) throw new Error('Expected the clear button.');
+    clear.click();
+    await ready(input);
+    expect(updates).toEqual(['Typed', '']);
+    state.value = 'External update';
+    await ready(input);
+    native.value = 'Typed';
+    native.dispatchEvent(new Event('change', { bubbles: true }));
+    expect(state.value).toBe('Typed');
+    expect(updates).toEqual(['Typed', '', 'Typed']);
+});
+
+test.each(['noncomposed-input', 'autocomplete', 'restore', 'host-value', 'silent-native'] as const)(
+    'includes a %s fill in the submitted Inertia payload',
+    async (mode) => {
+        const form = useForm({ credential: '' });
+        let submitted = '';
+        const { container, input } = mount({
+            render: () =>
+                h(
+                    'form',
+                    {
+                        onSubmit: (event: Event) => {
+                            event.preventDefault();
+                            submitted = form.data().credential;
+                        },
+                    },
+                    [
+                        h(Input<{ credential: string }>, {
+                            form,
+                            field: 'credential',
+                            type: 'password',
+                            name: 'credential',
+                        }),
+                        h('button', { type: 'submit' }, 'Submit autofill'),
+                    ],
+                ),
+        });
+        await ready(input);
+        const native = input.shadowRoot?.querySelector('input');
+        if (!native) throw new Error('Expected the native input.');
+        if (mode === 'autocomplete' || mode === 'restore') {
+            input.formStateRestoreCallback('filled-password', mode);
+        } else if (mode === 'host-value') {
+            input.value = 'filled-password';
+        } else {
+            native.value = 'filled-password';
+            if (mode === 'noncomposed-input')
+                native.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        container.querySelector('button')?.click();
+        expect(submitted).toBe('filled-password');
+    },
+);
+
+test.each(['noncomposed-input', 'autocomplete', 'restore', 'host-value', 'silent-native'] as const)(
+    'retains a %s fill through an unrelated native render',
+    async (mode) => {
+        const form = useForm({ credential: '' });
+        const state = reactive({ label: 'Password' });
+        const { input } = mount({
+            render: () =>
+                h(Input<{ credential: string }>, {
+                    form,
+                    field: 'credential',
+                    type: 'password',
+                    label: state.label,
+                }),
+        });
+        await ready(input);
+        const native = input.shadowRoot?.querySelector('input');
+        if (!native) throw new Error('Expected the native input.');
+        if (mode === 'autocomplete' || mode === 'restore') {
+            input.formStateRestoreCallback('filled-password', mode);
+        } else if (mode === 'host-value') {
+            input.value = 'filled-password';
+        } else {
+            native.value = 'filled-password';
+            if (mode === 'noncomposed-input')
+                native.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        state.label = 'Updated password label';
+        await ready(input);
+        await expect.poll(() => form.credential).toBe('filled-password');
+        expect(native.value).toBe('filled-password');
+        form.credential = 'Application update';
+        await ready(input);
+        expect(input.value).toBe('Application update');
+        expect(native.value).toBe('Application update');
+    },
+);
+
+test('reconciles a silent native fill before required validation and native FormData submission', async () => {
+    const form = useForm({ credential: '' });
+    const submitted: unknown[] = [];
+    const { container, input } = mount({
+        render: () =>
+            h(
+                'form',
+                {
+                    onSubmit: (event: Event) => {
+                        event.preventDefault();
+                        const nativeForm = container.querySelector('form');
+                        if (!nativeForm) throw new Error('Expected the form.');
+                        submitted.push([
+                            form.data().credential,
+                            new FormData(nativeForm).get('credential'),
+                        ]);
+                    },
+                },
+                [
+                    h(Input<{ credential: string }>, {
+                        form,
+                        field: 'credential',
+                        name: 'credential',
+                        required: true,
+                    }),
+                    h('button', { type: 'submit' }, 'Submit silent fill'),
+                ],
+            ),
+    });
+    await ready(input);
+    expect(input.checkValidity()).toBe(false);
+    const native = input.shadowRoot?.querySelector('input');
+    if (!native) throw new Error('Expected the native input.');
+    native.value = 'filled-password';
+    container.querySelector('button')?.click();
+    expect(submitted).toEqual([['filled-password', 'filled-password']]);
+});
+
+test('reconciles an externally associated form and preserves the submitter', async () => {
+    const state = reactive({ value: '' });
+    const submissions: (string | undefined)[][] = [];
+    const { container, input } = mount({
+        render: () => [
+            h('form', {
+                id: 'autofill-external',
+                onSubmit: (event: SubmitEvent) => {
+                    event.preventDefault();
+                    submissions.push([
+                        state.value,
+                        event.submitter?.getAttribute('name') ?? undefined,
+                    ]);
+                },
+            }),
+            h(Input, {
+                modelValue: state.value,
+                'onUpdate:modelValue': (next: string | null | undefined) =>
+                    (state.value = next ?? ''),
+                form: 'autofill-external',
+                required: true,
+            }),
+            h('button', { form: 'autofill-external', type: 'submit', name: 'sign-in' }, 'Sign in'),
+        ],
+    });
+    await ready(input);
+    const native = input.shadowRoot?.querySelector('input');
+    if (!native) throw new Error('Expected the native input.');
+    native.value = 'filled-password';
+    container.querySelector('button')?.click();
+    expect(submissions).toEqual([['filled-password', 'sign-in']]);
+});
+
+test('reconciles silent credentials before native Enter submission', async () => {
+    const form = useForm({ credential: '' });
+    const submissions: string[] = [];
+    const { input } = mount({
+        render: () =>
+            h(
+                'form',
+                {
+                    onSubmit: (event: Event) => {
+                        event.preventDefault();
+                        submissions.push(form.data().credential);
+                    },
+                },
+                [
+                    h(Input<{ credential: string }>, {
+                        form,
+                        field: 'credential',
+                        required: true,
+                        label: 'Enter credential',
+                        'data-testid': 'enter-credential',
+                    }),
+                ],
+            ),
+    });
+    await ready(input);
+    const native = input.shadowRoot?.querySelector('input');
+    if (!native) throw new Error('Expected the native input.');
+    native.value = 'filled-password';
+    input.focus();
+    await userEvent.keyboard('{Enter}');
+    await expect.poll(() => submissions).toEqual(['filled-password']);
+});
+
+test.each(['inertia', 'model'] as const)(
+    'keeps a newer %s owner update ahead of queued autofill observation',
+    async (owner) => {
+        const form = useForm({ credential: 'Initial' });
+        const state = reactive({ value: 'Initial' });
+        const { input } = mount({
+            render: () =>
+                owner === 'inertia'
+                    ? h(Input<{ credential: string }>, { form, field: 'credential' })
+                    : h(Input, {
+                          modelValue: state.value,
+                          'onUpdate:modelValue': (next: string | null | undefined) =>
+                              (state.value = next ?? ''),
+                      }),
+        });
+        await ready(input);
+        const native = input.shadowRoot?.querySelector('input');
+        if (!native) throw new Error('Expected the native input.');
+        native.value = 'Autofilled';
+        input.label = 'Trigger an unrelated render';
+        queueMicrotask(() => {
+            form.credential = 'New application value';
+            state.value = 'New application value';
+        });
+        await ready(input);
+        expect(owner === 'inertia' ? form.credential : state.value).toBe('New application value');
+        expect(input.value).toBe('New application value');
+        expect(native.value).toBe('New application value');
+    },
+);
