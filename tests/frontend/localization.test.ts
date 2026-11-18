@@ -161,11 +161,14 @@ test('matches the installed Laravel plural selector for every supported locale f
 });
 
 test('matches Laravel conditions, source order, fallback segments, decimals and whitespace', () => {
+    const pluralConditionWhitespace =
+        oracle([{ kind: 'choice', line: ' {1} One|Other', count: 1, locale: 'en' }])[0] === 'One';
     const lines = [
         '{0} None|{1} One|[2,*] :count items',
         '[*,0] Low|[0,2] Middle|[1,*] High',
         '{-1} Negative one|{-0.5} Fraction|[0.5,1.5] Range|Rest',
         ' {1} Not a leading condition|Other',
+        '\t{ 1 } One|[ 2,* ] Many',
         '{1}  One  |[2,*] Many',
         '{0}\u00a0literal\u00a0| Other ',
         'only',
@@ -182,8 +185,36 @@ test('matches Laravel conditions, source order, fallback segments, decimals and 
             })),
         ),
     );
-    expect(cases.map(({ line, count, locale }) => chooseMessage(line, count, locale))).toEqual(
-        oracle(cases),
+    expect(
+        cases.map(({ line, count, locale }) =>
+            chooseMessage(line, count, locale, pluralConditionWhitespace),
+        ),
+    ).toEqual(oracle(cases));
+});
+
+test.each([undefined, false, true])(
+    'preserves the exported Laravel plural whitespace behavior: %s',
+    (pluralConditionWhitespace) => {
+        const localization = createLocalization({
+            ...catalog,
+            pluralConditionWhitespace,
+            locales: {
+                en: {
+                    ...catalog.locales.en,
+                    messages: { choice: ' { 1 } One|[ 2,* ] Many' },
+                },
+            },
+        });
+        expect(localization.t('choice', 1)).toBe(pluralConditionWhitespace ? 'One' : ' { 1 } One');
+        expect(localization.t('choice', 2)).toBe(
+            pluralConditionWhitespace ? 'Many' : '[ 2,* ] Many',
+        );
+    },
+);
+
+test('rejects invalid plural whitespace metadata', () => {
+    expect(() => createLocalization({ ...catalog, pluralConditionWhitespace: 'true' })).toThrow(
+        'pluralConditionWhitespace',
     );
 });
 

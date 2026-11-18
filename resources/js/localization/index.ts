@@ -49,7 +49,7 @@ export function createLocalization(
             Object.fromEntries(
                 Object.entries(entry.messages).map(([key, line]) => [
                     key,
-                    laravelMessage(line, entry.sourceLocale),
+                    laravelMessage(line, entry.sourceLocale, catalog.pluralConditionWhitespace),
                 ]),
             ),
         ]),

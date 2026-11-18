@@ -2,10 +2,18 @@ import type { MessageContext } from 'vue-i18n';
 import { pluralIndex } from './pluralRules';
 import { titlecase } from './titlecase';
 
-export function chooseMessage(line: string, count: number, sourceLocale: string): string {
+export function chooseMessage(
+    line: string,
+    count: number,
+    sourceLocale: string,
+    pluralConditionWhitespace = false,
+): string {
     const segments = line.split('|');
+    const conditionPattern = pluralConditionWhitespace
+        ? /^[ \t\n\r\v\f]*[{[][ \t\n\r\v\f]*([-?\d|*,.]*)[ \t\n\r\v\f]*[}\]](.*)/s
+        : /^[{[]([-?\d|*,.]*)[}\]](.*)/s;
     for (const segment of segments) {
-        const condition = /^[{[]([-?\d|*,.]*)[}\]](.*)/s.exec(segment);
+        const condition = conditionPattern.exec(segment);
         if (!condition) continue;
         const [, range, text] = condition;
         if (range.includes(',')) {
@@ -20,7 +28,10 @@ export function chooseMessage(line: string, count: number, sourceLocale: string)
         if (range.trim() !== '' && Number(range) === count)
             return text.replace(/^[ \t\n\r\0\v]+|[ \t\n\r\0\v]+$/g, '');
     }
-    const stripped = segments.map((segment) => segment.replace(/^[{[][-?\d|*,.]*[}\]]/, ''));
+    const stripPattern = pluralConditionWhitespace
+        ? /^[ \t\n\r\v\f]*[{[][ \t\n\r\v\f]*[-?\d|*,.]*[ \t\n\r\v\f]*[}\]]/
+        : /^[{[][-?\d|*,.]*[}\]]/;
+    const stripped = segments.map((segment) => segment.replace(stripPattern, ''));
     return stripped[pluralIndex(sourceLocale, count)] ?? stripped[0];
 }
 
@@ -51,7 +62,11 @@ export function replaceMessage(line: string, values: Record<string, unknown>): s
     return line.replace(new RegExp(pattern, 'g'), (token) => replacements.get(token) ?? token);
 }
 
-export function laravelMessage(line: string, sourceLocale: string) {
+export function laravelMessage(
+    line: string,
+    sourceLocale: string,
+    pluralConditionWhitespace = false,
+) {
     return (context: MessageContext<string>): string => {
         const count = context.named('count') ?? context.named('n');
         const values = { ...context.values };
@@ -60,7 +75,9 @@ export function laravelMessage(line: string, sourceLocale: string) {
             if (scalar(value)) values[name] = value;
         }
         return replaceMessage(
-            typeof count === 'number' ? chooseMessage(line, count, sourceLocale) : line,
+            typeof count === 'number'
+                ? chooseMessage(line, count, sourceLocale, pluralConditionWhitespace)
+                : line,
             values,
         );
     };

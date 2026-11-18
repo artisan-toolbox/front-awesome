@@ -6,6 +6,7 @@ use ArtisanToolbox\FrontAwesome\FrontAwesomeServiceProvider;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Translation\MessageSelector;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
 
@@ -80,6 +81,9 @@ it('exports complete mandatory catalogs and exact schemas without application da
     translationFixture('en/app.php', "<?php return ['secret' => 'Only server'];");
     [$manifest, $catalog] = exportedTranslations();
     expect($catalog['version'])->toBe(1);
+    expect($catalog['pluralConditionWhitespace'])->toBe(
+        (new MessageSelector)->choose(' {1} One|Other', 1, 'en') === 'One',
+    );
     expect($catalog['fallbackLocale'])->toBe('en');
     expect($catalog['availableLocales'])->toBe(['en', 'es', 'pt-BR']);
     expect(array_keys($catalog['locales']))->toBe(['en', 'es', 'pt-BR']);

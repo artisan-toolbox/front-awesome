@@ -24,6 +24,13 @@ export function validateCatalog(value: unknown): asserts value is LaravelLocaliz
         throw new TypeError(
             'Front Awesome localization fallbackLocale must name an exported locale.',
         );
+    if (
+        value.pluralConditionWhitespace !== undefined &&
+        typeof value.pluralConditionWhitespace !== 'boolean'
+    )
+        throw new TypeError(
+            'Front Awesome localization pluralConditionWhitespace must be a boolean.',
+        );
     for (const [locale, entry] of Object.entries(value.locales)) {
         if (
             !canonicalLocale(locale) ||
@@ -83,5 +90,11 @@ export function parseCatalog(
         }
         availableLocales.push(locale);
     }
-    return { version: 1, fallbackLocale, availableLocales, locales };
+    return {
+        version: 1,
+        fallbackLocale,
+        availableLocales,
+        pluralConditionWhitespace: value.pluralConditionWhitespace ?? false,
+        locales,
+    };
 }

@@ -23,6 +23,7 @@
     ],
     "require": {
         "php": "^8.5",
+        "artisan-toolbox/dapter": "^1.0.0-alpha.1",
         "artisan-toolbox/maintainer": "^1.10.0",
         "artisan-toolbox/mosaicast": "^1.1.1",
         "artisan-toolbox/qztray": "^1.4",
@@ -31,7 +32,6 @@
         "inertiajs/inertia-laravel": "^3.0"
     },
     "require-dev": {
-        "artisan-toolbox/dapter": "1.x-dev@dev",
         "driftingly/rector-laravel": "^2.5",
         "larastan/larastan": "^3.9",
         "laravel/pao": "^1.0",
@@ -116,8 +116,5 @@
         }
     },
     "minimum-stability": "stable",
-    "prefer-stable": true,
-    "suggest": {
-        "artisan-toolbox/dapter": "Required only for the optional DataView preview."
-    }
+    "prefer-stable": true
 }

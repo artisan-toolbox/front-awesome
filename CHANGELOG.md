@@ -8,6 +8,7 @@
 
 ### Fixes
 
+- Match the installed Laravel plural selector's handling of whitespace around exact and interval conditions. Export its behavior with the browser catalog while preserving older catalogs and Laravel versions.
 - Discard pending autofill when a control switches to another Inertia field or form, even when both bindings have the same value. Reapply the new binding before observing further native edits.
 - Synchronize Input, OtpInput, NumberInput, and Textarea Vue and Inertia bindings with change-only and Shadow DOM autofill, browser restoration, and silent fills before ordinary form submission. Observe accepted host changes for KnownDate, TimeInput, and Pro DateInput without changing their Date setter contracts. Preserve OTP leading zeros, completion listener ordering, autosubmit cancellation, and native reset defaults.
 - Preserve the current URL and history entry when preferences refresh after Back, Forward, cached navigation, or an explicit refresh. Server query normalization no longer adds a duplicate entry or removes the fragment.

@@ -9,6 +9,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Translation\FileLoader;
+use Illuminate\Translation\MessageSelector;
 use InvalidArgumentException;
 use Symfony\Component\Process\Process;
 
@@ -69,7 +70,13 @@ final class TranslationExporter
             }
         }
 
-        $catalog = ['version' => 1, 'fallbackLocale' => $fallback, 'availableLocales' => $available, 'locales' => []];
+        $catalog = [
+            'version' => 1,
+            'fallbackLocale' => $fallback,
+            'availableLocales' => $available,
+            'pluralConditionWhitespace' => (new MessageSelector)->choose(' {1} One|Other', 1, 'en') === 'One',
+            'locales' => [],
+        ];
         $schema = [];
         foreach ($locales as $locale => $source) {
             $messages = [];

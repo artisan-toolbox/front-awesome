@@ -5,6 +5,7 @@ export interface LaravelLocalizationCatalog {
     version: 1;
     fallbackLocale: string;
     availableLocales?: readonly string[];
+    pluralConditionWhitespace?: boolean;
     locales: Record<
         string,
         {
