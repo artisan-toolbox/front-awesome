@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.0.0-beta.3] - 2026-11-18
+
+### Features
+
+- **Export/apply Laravel plural whitespace behavior for improved catalog compatibility** (`eb87709`)
+  Changed the localization export and browser catalog application logic to align with Laravel plural selector whitespace handling, and ensured this behavior is applied during exports/imports. This corrects mismatches where differing whitespace around plural conditions could lead to incorrect plural selection or catalog behavior—while still maintaining compatibility with older catalogs and older Laravel versions. User impact: pluralized strings resolve more reliably and consistently across supported Laravel versions, reducing edge-case localization bugs. Compatibility/migration: catalog metadata may now be exported with different whitespace acceptance rules; projects should regenerate their translation catalog/build assets after updating Laravel (as reflected in the documentation updates). No code API change is implied beyond the export/apply behavior.
+
+- **Add optional Dapter-backed DataView preview source support** (`92bea93`)
+  Introduced an optional DataView preview capability backed by typed Dapter handles. The feature adds support for declarative columns plus cell slots, and supports multiple layouts (table/grid/list). It is capability-aware for searching and ordering, and supports source paging or infinite loading. A key design goal is that Dapter remains optional for other Front Awesome imports, but when using the new DataView exports, consumers may need a compatible `@artisan-toolbox/dapter` alpha dependency. User impact: enables richer “source preview” experiences for DataView, including more accurate typing and better runtime behavior for previewing query results. Compatibility/migration: this is a breaking-marked change (`feat(... )!`), largely due to new export surfaces and the introduction of an optional Dapter-backed integration path. If consumers use the new `@artisan-toolbox/front-awesome/data-view` exports, they should install/align `artisan-toolbox/dapter` (version `^1.0.0-alpha.1`) and update any typecheck/build steps to include DataView type validation.
+
+### Fixes
+
+- **Run vue-tsc via Node and preserve real errors for data view types** (`3a1a08d`)
+  Updated the typechecking workflow for DataView to run `vue-tsc` through Node (instead of relying on a direct invocation) and to preserve the underlying compiler/process-launch errors. This matters because previously some Vue typecheck failures could be obscured or differently surfaced, especially across environments (notably Windows vs Unix). User impact is indirect but important: developers get accurate, actionable typecheck failures when DataView-related typing changes occur. Compatibility impact is limited to the developer experience; there is no runtime/API change and no migration required for end users.
+
 ## Unreleased
 
 ### Features
