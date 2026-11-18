@@ -24,11 +24,17 @@ try {
         }),
     );
     const result = spawnSync(
-        resolve(root, 'node_modules/.bin/vue-tsc'),
-        ['--noEmit', '-p', resolve(directory, 'tsconfig.json')],
+        process.execPath,
+        [
+            resolve(root, 'node_modules/vue-tsc/bin/vue-tsc.js'),
+            '--noEmit',
+            '-p',
+            resolve(directory, 'tsconfig.json'),
+        ],
         { cwd: root, encoding: 'utf8' },
     );
-    const diagnostics = result.stdout + result.stderr;
+    if (result.error) throw result.error;
+    const diagnostics = (result.stdout ?? '') + (result.stderr ?? '');
     const checks = [
         /Type 'string' is not assignable to type '(undefined|never)'/,
         /Property 'missing' does not exist/,
