@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { copyFile, mkdir, mkdtemp, readdir, rm, symlink } from 'node:fs/promises';
+import { copyFile, mkdir, mkdtemp, readdir, rm, symlink, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { expect, test } from 'vite-plus/test';
 
@@ -8,6 +8,7 @@ const root = resolve(import.meta.dirname, '../..');
 async function createCheckerFixture() {
     const directory = await mkdtemp(resolve(root, 'node_modules/.data-view checker-'));
     await mkdir(resolve(directory, 'scripts'));
+    await symlink(resolve(root, 'vendor'), resolve(directory, 'vendor'), 'junction');
     await mkdir(resolve(directory, 'tests/frontend/data-view-types'), { recursive: true });
     await mkdir(resolve(directory, 'node_modules'));
     await copyFile(
@@ -62,3 +63,24 @@ test('reports a missing compiler and removes temporary Vue fixtures after failur
         await rm(directory, { recursive: true, force: true });
     }
 }, 30_000);
+
+test('rejects a stale Dapter file dependency before compiling the Vue fixture', async () => {
+    const directory = await createCheckerFixture();
+    try {
+        const copy = resolve(directory, 'old npm copy');
+        await mkdir(resolve(copy, 'resources/js'), { recursive: true });
+        await writeFile(resolve(copy, 'resources/js/protocol-v2.ts'), 'export {};');
+        const result = spawnSync(
+            process.execPath,
+            [resolve(directory, 'scripts/check-data-view-types.mjs'), copy],
+            { cwd: root, encoding: 'utf8', timeout: 10_000 },
+        );
+        expect(result.error).toBeUndefined();
+        expect(result.status).toBe(1);
+        expect(result.stderr).toContain('protocol-v2.ts');
+        expect(result.stderr).toContain('npm install --install-links');
+        expect(await readdir(resolve(directory, 'node_modules'))).toEqual([]);
+    } finally {
+        await rm(directory, { recursive: true, force: true });
+    }
+});

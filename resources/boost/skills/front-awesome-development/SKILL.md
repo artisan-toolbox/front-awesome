@@ -13,7 +13,7 @@ Use Laravel 13.36 or later within Laravel 13.x, PHP 8.5, Inertia 3, Vue 3.5, Tai
 
 For applications on Laravel 13.0 through 13.35, update Laravel within 13.x before upgrading Front Awesome. It requires Illuminate Translation `^13.36` because earlier releases renumber numeric JSON translation keys.
 
-1. To install the `1.x` beta, run `composer require 'artisan-toolbox/front-awesome:^1.0@beta'` in the application root before installing frontend dependencies. Keep the stability exception scoped to this package. When a compatible stable release is available, use its documented stable constraint instead.
+1. To install the `1.x` beta, run `composer require 'artisan-toolbox/front-awesome:^1.0@beta' 'artisan-toolbox/dapter:^1.0@alpha'` in the application root before installing frontend dependencies. Both prereleases need an explicit root requirement on a default-stable Composer host. Keep these stability exceptions scoped to the two packages. Dapter's JavaScript package is needed only for DataView. When compatible stable releases are available, use their documented stable constraints instead.
 2. Declare both frontend packages in the application's `package.json`. Mosaicast is a peer dependency of Front Awesome. Run `npm install --install-links ./vendor/artisan-toolbox/front-awesome ./vendor/artisan-toolbox/mosaicast` from the application root. Keep `install-links=true` in the application's `.npmrc` so `npm ci` uses the same mode.
 3. Add `frontAwesome()` from `@artisan-toolbox/front-awesome/vite` alongside `@vitejs/plugin-vue` in the application's Vite plugins. It recognizes `wa-` custom elements automatically and preserves existing custom element matchers and Vue compiler options.
 4. Import `@artisan-toolbox/front-awesome/styles.css` after Tailwind in the application's CSS entry. If the application needs the standard Web Awesome stylesheet, import `@artisan-toolbox/front-awesome/web-awesome.css` from the JavaScript entry.
@@ -340,7 +340,6 @@ const selected = ref('2026-11-09');
 
 The calendar highlights November 9, 2026. Selecting another day updates the paragraph. If the application imports this wrapper without its licensed dependency, Front Awesome reports that the component requires Web Awesome Pro during the build and through Vite's development error reporting. The wrapper does not supply a license or silently substitute a Core element.
 
-
 ## Translate browser UI from Laravel
 
 Localization is optional. The beta exports `./localization`, `components/Language.vue`, and the `front-awesome:export-translations` command. Follow the [Laravel-source localization guide](https://atb.dev.br/docs/front-awesome/localization) for the complete procedure.
@@ -433,7 +432,7 @@ The Drawer exposes `preview`, `settings`, `settings-extra`, `summary`, and `foot
 
 ## Present Dapter results with DataView
 
-Use the optional `@artisan-toolbox/front-awesome/data-view` entry when an application needs a table, grid, or list backed by an existing Dapter source. DataView is an unreleased source preview. Confirm that the installed Front Awesome checkout exports it. Install a compatible Dapter preview through Composer first, then add `"@artisan-toolbox/dapter": "file:vendor/artisan-toolbox/dapter"` and run npm install. Dapter is optional for the other Front Awesome entries.
+Use the optional `@artisan-toolbox/front-awesome/data-view` entry when an application needs a table, grid, or list backed by an existing Dapter source. Front Awesome 1.0.0-beta.3 includes the three-layout renderer. Install Dapter 1.0.0-alpha.1 through Composer first, then add `"@artisan-toolbox/dapter": "file:vendor/artisan-toolbox/dapter"` and run npm install. Dapter is optional for the other Front Awesome entries.
 
 Start with the Front Awesome Vite and stylesheet setup above and a registered Dapter source named `Catalog` that returns rows such as `{ "id": 1, "name": "Notebook" }`. Complete [Dapter installation](https://atb.dev.br/docs/dapter/installation) before rendering the component.
 
@@ -469,6 +468,16 @@ Declare layouts in display order. Grid and list each require `#grid-item` or `#l
 
 Configure source, decoders, actions, URL state, live updates, polling, and infinite loading in `useDataAdapter`. Pass its exact handle as `adapter`. DataView rejects creator options and requires a keyed remount when replacing the handle. It has no `source` shorthand or top-level `columns` option. Borrow the same handle for sibling controls or another DataView.
 
-Use the exact typed handle in `toolbar`, `filters`, `actions`, `footer`, `pagination`, `loading`, `empty`, `error`, and `integration-error` slots. Every slot includes `adapter` and `view`; item slots also include `row` and `index`. Cell slots add `column` and `value`; `header-ID` slots add `column`. Custom toolbar and pagination slots replace the built-in controls. Built-in header ordering cycles advertised directions then clears; Shift adds ordering only when Dapter permits it. The accessible sort reflects accepted rows, while loading and the direction indicator describe requested updates.
+The local Front Awesome preview adds the criteria editor, selection, grouping, localized controls, and richer paging feedback described below. Check the installed Front Awesome source before using these additions.
 
-DataView preserves authorized rows on recoverable errors, displays integration errors separately, and leaves unknown counts unknown. Infinite rows and retries belong to Dapter. The preview does not generate filter forms, selection, editing, or export engines. Built-in labels are English; slots can replace controls and messages. See [DataView](https://atb.dev.br/docs/front-awesome/development/data-view) for focused examples and limitations.
+Use the default toolbar for global search, field searches with their permitted operators, all/any search matching, and finite field or global filters. Filter options preserve the value and type advertised by the source. Open **Ordering** to replace, add, update, or remove a field term. Select a named preset when the offset source offers one. **Reset to source defaults** restores the initial query and paging. A custom `#toolbar` replaces those controls. A custom `#filters` adds content after the toolbar.
+
+To select records, add `selection="multiple"` and `v-model:selected-keys="selectedKeys"`, where `selectedKeys` is a ref containing an array of the row-key type. A bound model supplies the effective keys. Handle an update by assigning the keys your application accepts. Single selection uses the same model with `selection="single"`. Without a model the component stores its selection locally. All slots get the exact `adapter`, active `view`, and `selection` or null. Use `selection.keys` and `selection.rows` in accepted row order. `has(key)`, `set(key, selected)`, and `clear()` change only presentation. Multiple mode adds `setAllLoaded(selected)`, `allLoaded`, and `someLoaded`. Item and cell slots receive `row`, `index`, `rowKey`, and `selected`. Cell slots also receive `column` and `value`.
+
+For a joined source, provide a unique occurrence key for each result. The component calls a key function with `(row, index)`. A key derived from the position can identify a different row after sorting. For example, group a category column with `{ field: 'category', label: 'Category', groupBy: true }`, or use a scalar accessor for a complex display value. One data column can span consecutive equal values in the table. Grid and list retain each occurrence.
+
+Keep prefilled keys scoped to the current owner or tenant. The component prunes keys that leave the accepted result and withdraws them across observable authority loss. A newly mounted instance treats its supplied model as fresh preselection. For a write, read the current selection and action capability when the user submits, map the row to the advertised target operand, and supply the application's validated input. Use the Dapter outcome to report confirmation or uncertainty.
+
+Use the optional localization service with the exported Laravel `front-awesome::data-view` messages. Without that service the controls use English. Return a label from `controlLabel(subject)` for a field, filter, typed option, or selectable row. Return `undefined` to use the standard label.
+
+The `#pagination`, `#loading`, `#empty`, `#error`, and `#integration-error` slots replace their own regions. Use `#actions` and `#footer` for application-specific controls. Dapter owns URL restoration, live and polling configuration, and infinite loading. DataView reports available counts, offers a cursor restart when needed, and exposes explicit retry on a paused infinite window. [DataView guides](https://atb.dev.br/docs/front-awesome/data-view)

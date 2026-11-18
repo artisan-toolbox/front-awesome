@@ -1,4 +1,4 @@
-import type { DataAdapterProps } from '@artisan-toolbox/dapter';
+import type { DataAdapterProps, Scalar } from '@artisan-toolbox/dapter';
 
 export type DataViewHandle = NonNullable<DataAdapterProps['adapter']>;
 export type DataViewLayout = 'table' | 'grid' | 'list';
@@ -15,6 +15,7 @@ export type DataViewColumn<Row> = ColumnPresentation &
               readonly accessor?: never;
               readonly kind?: 'data';
               readonly orderBy?: string;
+              readonly groupBy?: true | ((row: Row) => Scalar);
           }
         | {
               readonly id: string;
@@ -22,6 +23,7 @@ export type DataViewColumn<Row> = ColumnPresentation &
               readonly field?: never;
               readonly kind?: 'data';
               readonly orderBy?: string;
+              readonly groupBy?: true | ((row: Row) => Scalar);
           }
         | {
               readonly kind: 'display';
@@ -29,6 +31,7 @@ export type DataViewColumn<Row> = ColumnPresentation &
               readonly field?: never;
               readonly accessor?: never;
               readonly orderBy?: never;
+              readonly groupBy?: never;
           }
     );
 type LayoutOptions<Row> = {
@@ -44,21 +47,58 @@ type LayoutOptions<Row> = {
 export type DataViewViews<Row> = {
     [Layout in DataViewLayout]: Pick<LayoutOptions<Row>, Layout> & Partial<LayoutOptions<Row>>;
 }[DataViewLayout];
-export type DataViewRowKey<Row> =
+export type OccurrenceKey = string | number;
+export type DataViewRowKey<Row, Indexed extends boolean = false> =
+    | { [Key in keyof Row]-?: Row[Key] extends OccurrenceKey ? Key : never }[keyof Row]
+    | ((row: Row, ...index: Indexed extends true ? [index: number] : []) => OccurrenceKey);
+export type ResultKey<Row, K> = K extends (...args: never[]) => infer Value
+    ? Extract<Value, OccurrenceKey>
+    : K extends keyof Row
+      ? Extract<Row[K], OccurrenceKey>
+      : never;
+
+export type DataViewLabelSubject<Row, Key extends OccurrenceKey = OccurrenceKey> =
+    | { kind: 'field'; field: string }
+    | { kind: 'filter'; field: string | null; filter: string }
+    | { kind: 'option'; field: string | null; filter: string; value: Scalar }
+    | { kind: 'row'; row: Row; key: Key; index: number };
+export type DataViewSelection<Row, Key extends OccurrenceKey = OccurrenceKey> = {
+    readonly keys: readonly Key[];
+    readonly rows: readonly Row[];
+    has(key: Key): boolean;
+    set(key: Key, selected: boolean): void;
+    clear(): void;
+} & (
+    | { readonly mode: 'single' }
     | {
-          [Key in keyof Row]-?: Row[Key] extends string | number ? Key : never;
-      }[keyof Row]
-    | ((row: Row) => string | number);
-export type DataViewScope<H extends DataViewHandle> = { adapter: H; view: DataViewLayout };
-export type DataViewItemScope<H extends DataViewHandle> = DataViewScope<H> & {
-    row: H['data'][number];
-    index: number;
+          readonly mode: 'multiple';
+          readonly allLoaded: boolean;
+          readonly someLoaded: boolean;
+          setAllLoaded(selected: boolean): void;
+      }
+);
+
+type SlotScope<H extends DataViewHandle> = { adapter: H; view: DataViewLayout };
+type Item<H extends DataViewHandle> = { row: H['data'][number]; index: number };
+type Cell<H extends DataViewHandle> = { column: DataViewColumn<H['data'][number]>; value: unknown };
+type SelectionScope<H extends DataViewHandle, K extends OccurrenceKey> = {
+    selection: DataViewSelection<H['data'][number], K> | null;
 };
-export type DataViewCellScope<H extends DataViewHandle> = DataViewItemScope<H> & {
-    column: DataViewColumn<H['data'][number]>;
-    value: unknown;
-};
-export type DataViewSlots<H extends DataViewHandle> = {
+type SelectedItem<K> = { rowKey: K; selected: boolean };
+export type DataViewScope<
+    H extends DataViewHandle,
+    K extends OccurrenceKey = never,
+> = SlotScope<H> & ([K] extends [never] ? unknown : SelectionScope<H, K>);
+export type DataViewItemScope<
+    H extends DataViewHandle,
+    K extends OccurrenceKey = never,
+> = DataViewScope<H, K> & Item<H> & ([K] extends [never] ? unknown : SelectedItem<K>);
+export type DataViewCellScope<
+    H extends DataViewHandle,
+    K extends OccurrenceKey = never,
+> = DataViewItemScope<H, K> & Cell<H>;
+
+type Slots<H extends DataViewHandle, Scope, ItemScope> = {
     [
         Name in
             | 'toolbar'
@@ -70,13 +110,23 @@ export type DataViewSlots<H extends DataViewHandle> = {
             | 'empty'
             | 'error'
             | 'integration-error'
-    ]?: (scope: DataViewScope<H>) => unknown;
+    ]?: (scope: Scope) => unknown;
 } & {
-    [Name in 'grid-item' | 'list-item']?: (scope: DataViewItemScope<H>) => unknown;
+    [Name in 'grid-item' | 'list-item']?: (scope: ItemScope) => unknown;
 } & {
-    [Name in `cell-${string}`]?: (scope: DataViewCellScope<H>) => unknown;
+    [Name in `cell-${string}`]?: (scope: ItemScope & Cell<H>) => unknown;
 } & {
-    [Name in `header-${string}`]?: (
-        scope: DataViewScope<H> & { column: DataViewColumn<H['data'][number]> },
-    ) => unknown;
+    [Name in `header-${string}`]?: (scope: Scope & Pick<Cell<H>, 'column'>) => unknown;
 };
+export type DataViewSlots<H extends DataViewHandle, K extends OccurrenceKey = never> = Slots<
+    H,
+    DataViewScope<H, K>,
+    DataViewItemScope<H, K>
+>;
+type CurrentScope<H extends DataViewHandle, K extends OccurrenceKey> = SlotScope<H> &
+    SelectionScope<H, K>;
+export type CurrentSlots<H extends DataViewHandle, K extends OccurrenceKey> = Slots<
+    H,
+    CurrentScope<H, K>,
+    CurrentScope<H, K> & Item<H> & SelectedItem<K>
+>;

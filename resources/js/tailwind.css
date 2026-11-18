@@ -5,6 +5,7 @@
 @import './theme/core-host-reset.css';
 @import './theme/pro-host-reset.css';
 @source './components';
+@source './data-view';
 
 @custom-variant dark (&:where(.dark, .dark *));
 

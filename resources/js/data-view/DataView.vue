@@ -1,196 +1,281 @@
 <template>
     <section
         v-bind="$attrs"
-        class="data-view"
+        class="data-view min-w-0"
         :data-size="size ?? 'm'"
-        :aria-label="label ?? 'Results'"
-        :aria-busy="state.adapter.paging.loading"
+        :aria-label="label ?? t('results')"
     >
-        <slot name="toolbar" :adapter="state.adapter" :view="activeView">
-            <DataViewToolbar :adapter="state.adapter" :size="size ?? 'm'" />
+        <slot name="toolbar" v-bind="scope">
+            <DataViewToolbar
+                :key="editorGeneration"
+                :adapter="state.adapter"
+                :size="size ?? 'm'"
+                :control-label="controlText"
+            />
         </slot>
-        <slot name="filters" :adapter="state.adapter" :view="activeView" />
-        <slot name="actions" :adapter="state.adapter" :view="activeView" />
+        <slot name="filters" v-bind="scope" />
+        <slot name="actions" v-bind="scope" />
         <div
             v-if="availableViews.length > 1"
             class="data-view-layouts"
             role="group"
-            aria-label="Results layout"
+            :aria-label="t('layout')"
         >
-            <Button
+            <button
                 v-for="layout in availableViews"
                 :key="layout"
-                :size="size ?? 'm'"
-                :appearance="activeView === layout ? 'filled' : 'outlined'"
+                type="button"
                 :aria-pressed="activeView === layout"
                 @click="selectView(layout)"
-                >{{ views[layout]?.label ?? layoutLabels[layout] }}</Button
             >
+                {{ views[layout]?.label ?? t(layout) }}
+            </button>
         </div>
         <div v-if="state.adapter.integrationError" role="alert">
-            <slot name="integration-error" :adapter="state.adapter" :view="activeView"
+            <slot name="integration-error" v-bind="scope"
                 ><Callout variant="warning">{{
                     state.adapter.integrationError.message
                 }}</Callout></slot
             >
         </div>
         <div v-if="state.adapter.error" role="alert">
-            <slot name="error" :adapter="state.adapter" :view="activeView">
-                <Callout variant="danger"
-                    >{{ state.adapter.error.message }}
+            <slot name="error" v-bind="scope">
+                <Callout variant="danger">
+                    {{ state.adapter.error.message }}
                     <Button
-                        v-if="state.adapter.error.code === 'cursor_expired'"
+                        v-if="
+                            !state.adapter.infinite &&
+                            ['invalid_cursor', 'cursor_expired'].includes(state.adapter.error.code)
+                        "
                         :size="size ?? 'm'"
+                        :disabled="state.adapter.paging.loading"
                         @click="state.adapter.paging.goToFirst()"
-                        >Restart from first page</Button
+                        >{{ t('restart') }}</Button
                     >
                 </Callout>
             </slot>
         </div>
-        <div v-if="state.adapter.status === 'loading'" role="status">
-            <slot name="loading" :adapter="state.adapter" :view="activeView"
-                ><Spinner />
-                {{ state.adapter.data.length ? 'Updating results…' : 'Loading results…' }}</slot
+        <div v-if="state.adapter.status === 'loading'" class="data-view-status" role="status">
+            <slot name="loading" v-bind="scope"
+                ><Spinner />{{ t(state.adapter.ready ? 'updating' : 'loading') }}</slot
             >
         </div>
-        <p v-else-if="state.adapter.status === 'idle'" role="status">Waiting for results.</p>
+        <p v-else-if="state.adapter.status === 'idle'" class="data-view-status" role="status">
+            {{ t('idle') }}
+        </p>
         <div
-            v-else-if="state.adapter.status === 'success' && state.adapter.data.length === 0"
+            v-else-if="state.adapter.status === 'success' && !items.length"
+            class="data-view-status"
             role="status"
         >
-            <slot name="empty" :adapter="state.adapter" :view="activeView">No results.</slot>
+            <slot name="empty" v-bind="scope">{{ t('empty') }}</slot>
         </div>
-        <div v-if="activeView === 'table'" class="data-view-scroll">
-            <table
-                class="data-view-table"
-                :class="{
-                    'data-view-striped': views.table?.striped,
-                    'data-view-hover': views.table?.hover,
-                }"
-            >
-                <caption>
-                    {{ caption ?? label ?? 'Results' }}
-                </caption>
-                <thead>
-                    <tr>
-                        <th
-                            v-for="column in columns"
-                            :key="columnId(column)"
-                            scope="col"
-                            :data-align="column.align ?? 'start'"
-                            :aria-sort="acceptedSort(column)"
-                        >
-                            <slot
-                                :name="`header-${columnId(column)}`"
-                                :adapter="state.adapter"
-                                :view="activeView"
-                                :column="column"
-                            >
-                                <Button
-                                    v-if="orderCapability(column)"
-                                    appearance="plain"
-                                    :size="size ?? 'm'"
-                                    :title="
-                                        state.adapter.global?.multi_order
-                                            ? 'Sort column. Hold Shift to add to the current order.'
-                                            : 'Sort column'
-                                    "
-                                    @click="orderColumn(column, $event)"
-                                    >{{ column.label
-                                    }}<span v-if="orderCapability(column)?.current">
-                                        {{
-                                            orderCapability(column)?.current?.direction === 'asc'
-                                                ? '↑'
-                                                : '↓'
-                                        }}
-                                        {{
-                                            state.adapter.global?.multi_order
-                                                ? orderCapability(column)?.current?.priority
-                                                : ''
-                                        }}</span
-                                    ><span
-                                        v-if="
-                                            orderCapability(column)?.current &&
-                                            state.adapter.status === 'loading'
-                                        "
-                                    >
-                                        (pending)</span
-                                    ></Button
-                                >
-                                <template v-else>{{ column.label }}</template>
-                            </slot>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(row, index) in state.adapter.data" :key="identity(row)">
-                        <td
-                            v-for="column in columns"
-                            :key="columnId(column)"
-                            :data-align="column.align ?? 'start'"
-                        >
-                            <slot
-                                :name="`cell-${columnId(column)}`"
-                                :adapter="state.adapter"
-                                :view="activeView"
-                                :row="row"
-                                :index="index"
-                                :column="column"
-                                :value="valueOf(column, row)"
-                                >{{ displayValue(valueOf(column, row)) }}</slot
-                            >
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <ul
-            v-else
-            :class="activeView === 'grid' ? 'data-view-grid' : 'data-view-list'"
-            :aria-label="caption ?? label ?? 'Results'"
+
+        <div
+            v-if="selectionState"
+            class="data-view-selection"
+            role="group"
+            :aria-label="t('selection')"
         >
-            <li
-                v-for="(row, index) in state.adapter.data"
-                :key="identity(row)"
-                class="data-view-item"
-            >
-                <slot
-                    :name="activeView === 'grid' ? 'grid-item' : 'list-item'"
-                    :adapter="state.adapter"
-                    :view="activeView"
-                    :row="row"
-                    :index="index"
+            <label v-if="selectionState.mode === 'multiple'">
+                <input
+                    type="checkbox"
+                    form=""
+                    :checked="selectionState.allLoaded"
+                    :indeterminate.prop="selectionState.someLoaded"
+                    :disabled="!items.length"
+                    @change="changeAll($event)"
                 />
-            </li>
-        </ul>
-        <slot name="pagination" :adapter="state.adapter" :view="activeView"
-            ><DataViewPager :adapter="state.adapter" :size="size ?? 'm'"
+                {{ t('selectAll') }}
+            </label>
+            <span>{{ t('selected', {}, selectionState.keys.length) }}</span>
+            <Button
+                :size="size ?? 'm'"
+                appearance="plain"
+                :disabled="!selectionState.keys.length"
+                @click="selectionState.clear()"
+                >{{ t('clearSelection') }}</Button
+            >
+        </div>
+        <div class="data-view-results min-w-0" :aria-busy="state.adapter.paging.loading">
+            <div v-if="activeView === 'table'" class="data-view-scroll overflow-x-auto">
+                <table
+                    class="data-view-table"
+                    :class="{
+                        'data-view-striped': views.table?.striped,
+                        'data-view-hover': views.table?.hover,
+                    }"
+                >
+                    <caption>
+                        {{ caption ?? label ?? t('results') }}
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th v-if="selectionState" scope="col">{{ t('selection') }}</th>
+                            <th
+                                v-for="head in headers"
+                                :key="head.id"
+                                scope="col"
+                                :data-align="head.column.align ?? 'start'"
+                                :aria-sort="head.ariaSort"
+                            >
+                                <slot
+                                    :name="`header-${head.id}`"
+                                    v-bind="scope"
+                                    :column="head.column"
+                                >
+                                    <Button
+                                        v-if="head.order"
+                                        appearance="plain"
+                                        :size="size ?? 'm'"
+                                        :title="t(head.order.canAdd ? 'sortShift' : 'sortHeader')"
+                                        @click="clickHeader(head.column, $event)"
+                                    >
+                                        {{ head.column.label
+                                        }}<span v-if="head.order.current">
+                                            {{ head.order.current.direction === 'asc' ? '↑' : '↓' }}
+                                            {{
+                                                state.adapter.global?.multi_order
+                                                    ? head.order.current.priority
+                                                    : ''
+                                            }}</span
+                                        ><span v-if="head.order.pending">
+                                            ({{ t('pending') }})</span
+                                        >
+                                    </Button>
+                                    <template v-else>{{ head.column.label }}</template>
+                                </slot>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody v-for="run in groups" :key="run.key">
+                        <tr
+                            v-for="(item, position) in run.rows"
+                            :key="item.key"
+                            :data-even="item.index % 2 === 1 || undefined"
+                            :data-selected="selectionState?.has(item.key) || undefined"
+                        >
+                            <td v-if="selectionState">
+                                <input
+                                    :type="selectionState.mode === 'single' ? 'radio' : 'checkbox'"
+                                    form=""
+                                    :name="selectionState.mode === 'single' ? radioName : undefined"
+                                    :aria-label="rowLabel(item)"
+                                    :checked="selectionState.has(item.key)"
+                                    @change="changeRow(item.key, $event)"
+                                />
+                            </td>
+                            <template v-for="column in columns" :key="columnId(column)">
+                                <component
+                                    :is="column === grouped ? 'th' : 'td'"
+                                    v-if="column !== grouped || position === 0"
+                                    :scope="column === grouped ? 'rowgroup' : undefined"
+                                    :rowspan="column === grouped ? run.rows.length : undefined"
+                                    :data-align="column.align ?? 'start'"
+                                >
+                                    <slot
+                                        :name="`cell-${columnId(column)}`"
+                                        v-bind="itemScope(item)"
+                                        :column="column"
+                                        :value="valueOf(column, item.row)"
+                                        >{{ displayValue(valueOf(column, item.row)) }}</slot
+                                    >
+                                </component>
+                            </template>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <ul
+                v-else
+                :class="activeView === 'grid' ? 'data-view-grid' : 'data-view-list'"
+                :aria-label="caption ?? label ?? t('results')"
+            >
+                <li
+                    v-for="item in items"
+                    :key="item.key"
+                    class="data-view-item"
+                    :data-selected="selectionState?.has(item.key) || undefined"
+                >
+                    <input
+                        v-if="selectionState"
+                        :type="selectionState.mode === 'single' ? 'radio' : 'checkbox'"
+                        form=""
+                        :name="selectionState.mode === 'single' ? radioName : undefined"
+                        :aria-label="rowLabel(item)"
+                        :checked="selectionState.has(item.key)"
+                        @change="changeRow(item.key, $event)"
+                    />
+                    <slot
+                        :name="activeView === 'grid' ? 'grid-item' : 'list-item'"
+                        v-bind="itemScope(item)"
+                    />
+                </li>
+            </ul>
+        </div>
+        <p v-if="sortFeedback.message.value" role="alert">{{ sortFeedback.message.value }}</p>
+        <slot name="pagination" v-bind="scope"
+            ><DataViewPager :key="authority" :adapter="state.adapter" :size="size ?? 'm'"
         /></slot>
-        <slot name="footer" :adapter="state.adapter" :view="activeView" />
+        <slot name="footer" v-bind="scope" />
     </section>
 </template>
-<script setup lang="ts" generic="H extends NonNullable<DataAdapterProps['adapter']>">
-import { computed, onBeforeUpdate, shallowRef, watchEffect } from 'vue';
+<script
+    setup
+    lang="ts"
+    generic="
+        H extends NonNullable<DataAdapterProps['adapter']>,
+        K extends DataViewRowKey<NoInfer<H>['data'][number], true> = DataViewRowKey<
+            NoInfer<H>['data'][number],
+            true
+        >
+    "
+>
+import { computed, onBeforeUpdate, shallowRef, watch, watchEffect } from 'vue';
 import { useDataAdapter, type DataAdapterProps } from '@artisan-toolbox/dapter';
 import Button from '../components/WebAwesome/Button.vue';
 import Spinner from '../components/WebAwesome/Spinner.vue';
 import Callout from '../components/WebAwesome/Callout.vue';
 import DataViewToolbar from './DataViewToolbar.vue';
 import DataViewPager from './DataViewPager.vue';
-import { columnId, columnValue, displayValue, ownerOptions, rowIdentity } from './presentation';
+import {
+    columnId,
+    columnValue,
+    displayValue,
+    ownerOptions,
+    occurrences,
+    groupingColumn,
+    groupRows,
+    type Occurrence,
+} from './presentation';
 import type {
     DataViewColumn,
     DataViewLayout,
     DataViewRowKey,
     DataViewSize,
-    DataViewSlots,
+    CurrentSlots,
+    ResultKey,
+    DataViewLabelSubject,
     DataViewViews,
 } from './types';
+import { orderModel } from './OrderModel';
+import { useControlFeedback, type ControlLabel } from './controlFeedback';
+import { useDataViewText } from './messages';
+import { useRowSelection } from './selection';
+import { useDocumentId } from './documentId';
+
+type Row = H['data'][number];
+type Key = ResultKey<Row, K>;
 defineOptions({ inheritAttrs: false });
 const props = defineProps<{
     adapter: H;
     views: DataViewViews<NoInfer<H>['data'][number]>;
-    rowKey: DataViewRowKey<NoInfer<H>['data'][number]>;
+    rowKey: K;
+    selection?: 'single' | 'multiple';
+    selectedKeys?: ReadonlyArray<NoInfer<Key>>;
+    controlLabel?: (
+        subject: DataViewLabelSubject<NoInfer<H>['data'][number], NoInfer<Key>>,
+    ) => string | undefined;
     view?: DataViewLayout;
     size?: DataViewSize;
     label?: string;
@@ -209,10 +294,26 @@ const props = defineProps<{
     scrollContainer?: never;
     infinite?: never;
 }>();
-const slots = defineSlots<DataViewSlots<H>>();
-const emit = defineEmits<{ 'update:view': [value: DataViewLayout] }>();
+const slots = defineSlots<CurrentSlots<H, Key>>();
+const emit = defineEmits<{
+    'update:view': [value: DataViewLayout];
+    'update:selectedKeys': [value: Key[]];
+}>();
 const state = { adapter: useDataAdapter<H>(props.adapter) };
-const layoutLabels = { table: 'Table', grid: 'Grid', list: 'List' };
+const t = useDataViewText();
+const editorGeneration = shallowRef(0);
+watch(
+    () => !!state.adapter.definition,
+    (available) => {
+        if (!available) editorGeneration.value++;
+    },
+    { flush: 'sync' },
+);
+const radioName = useDocumentId();
+const table = computed(() => {
+    const columns = props.views?.table?.columns ?? [];
+    return { columns, grouped: groupingColumn(columns) };
+});
 const availableViews = computed(() => {
     if (!props.views || typeof props.views !== 'object' || Array.isArray(props.views))
         throw new Error('DataView requires a views object.');
@@ -221,7 +322,7 @@ const availableViews = computed(() => {
         if ((key === 'table' || key === 'grid' || key === 'list') && props.views[key] === undefined)
             continue;
         if (key === 'table' && props.views.table) {
-            if (!props.views.table.columns.length)
+            if (!table.value.columns.length)
                 throw new Error('DataView table requires at least one column.');
             available.push(key);
         } else if ((key === 'grid' || key === 'list') && props.views[key]) {
@@ -258,55 +359,120 @@ watchEffect(() => {
     if (props.view !== undefined && props.view !== activeView.value)
         emit('update:view', activeView.value);
 });
-const columns = computed(() => props.views.table?.columns ?? []);
-watchEffect(() => {
-    const ids = columns.value.map(columnId);
-    if (new Set(ids).size !== ids.length) throw new Error('DataView column ids must be unique.');
-    const keys = state.adapter.data.map((row) => rowIdentity<H['data'][number]>(row, props.rowKey));
-    if (new Set(keys).size !== keys.length) throw new Error('DataView row keys must be unique.');
-});
-function identity(row: H['data'][number]) {
-    return rowIdentity<H['data'][number]>(row, props.rowKey);
+const columns = computed(() => table.value.columns);
+const grouped = computed(() => table.value.grouped);
+const data = computed<readonly Row[]>(() => state.adapter.data);
+const items = computed(() => occurrences<Row, K>(data.value, props.rowKey));
+const groups = computed(() => groupRows(items.value, grouped.value));
+const { authority, selection: selectionState } = useRowSelection<Row, Key>(
+    state.adapter,
+    items,
+    props,
+    (keys) => emit('update:selectedKeys', keys),
+);
+const scope = computed(() => ({
+    adapter: state.adapter,
+    view: activeView.value,
+    selection: selectionState.value,
+}));
+function itemScope(item: Occurrence<Row, Key>) {
+    return {
+        ...scope.value,
+        row: item.row,
+        index: item.index,
+        rowKey: item.key,
+        selected: selectionState.value?.has(item.key) ?? false,
+    };
 }
-function valueOf(column: DataViewColumn<H['data'][number]>, row: H['data'][number]) {
-    return columnValue<H['data'][number]>(column, row);
+function changeAll(event: Event) {
+    const input = event.currentTarget;
+    const selection = selectionState.value;
+    if (!(input instanceof HTMLInputElement) || selection?.mode !== 'multiple') return;
+    selection.setAllLoaded(input.checked);
+    const current = selectionState.value;
+    if (current?.mode === 'multiple') {
+        input.checked = current.allLoaded;
+        input.indeterminate = current.someLoaded;
+    }
+}
+function changeRow(key: Key, event: Event) {
+    const input = event.currentTarget;
+    const selection = selectionState.value;
+    if (!(input instanceof HTMLInputElement) || !selection) return;
+    selection.set(key, input.checked);
+    input.checked = selection.has(key);
+    if (input.type === 'radio' && !input.checked) {
+        // Activating a native radio also unchecks its sibling before change fires.
+        const retained = input
+            .closest('.data-view-results')
+            ?.querySelector<HTMLInputElement>(`[data-selected] input[name="${radioName.value}"]`);
+        if (retained) retained.checked = true;
+    }
+}
+function valueOf(column: DataViewColumn<Row>, row: Row) {
+    return columnValue<Row>(column, row);
+}
+const controlText: ControlLabel = (subject) => {
+    const formatted = props.controlLabel?.(subject);
+    if (formatted !== undefined) return formatted;
+    if (subject.kind === 'field') return subject.field;
+    if (subject.kind === 'filter')
+        return subject.field === null
+            ? subject.filter
+            : `${controlText({ kind: 'field', field: subject.field })} · ${subject.filter}`;
+    return typeof subject.value === 'string'
+        ? JSON.stringify(subject.value)
+        : String(subject.value);
+};
+function rowLabel(item: Occurrence<Row, Key>) {
+    const row =
+        props.controlLabel?.({ kind: 'row', row: item.row, key: item.key, index: item.index }) ??
+        t('row', { key: typeof item.key === 'string' ? JSON.stringify(item.key) : item.key });
+    return t('selectRow', { row });
 }
 function selectView(layout: DataViewLayout) {
     selectedView.value = layout;
     emit('update:view', layout);
 }
-function orderCapability(column: DataViewColumn<H['data'][number]>) {
-    return column.orderBy ? state.adapter.fields?.[column.orderBy]?.order : null;
-}
-function orderColumn(column: DataViewColumn<H['data'][number]>, event: MouseEvent) {
-    const capability = orderCapability(column);
-    if (!capability) return;
-    const directions = capability.available.directions;
-    const currentIndex = capability.current ? directions.indexOf(capability.current.direction) : -1;
-    const direction = directions[currentIndex + 1];
-    const sortType = capability.current?.sortType ?? capability.available.sortTypes[0];
-    if (!direction) void capability.clear();
-    else if (sortType)
-        void capability.call({
-            direction,
-            sortType,
-            multiSort: event.shiftKey && state.adapter.global?.multi_order === true,
-        });
-}
-function acceptedSort(
-    column: DataViewColumn<H['data'][number]>,
-): 'ascending' | 'descending' | undefined {
-    const accepted = state.adapter.accepted;
-    if (!column.orderBy || !accepted || !('order' in accepted) || accepted.order.kind !== 'terms')
-        return undefined;
-    const primary = accepted.order.terms.find((term) => !term.role);
-    if (primary?.field !== column.orderBy) return undefined;
-    return primary.direction === 'asc' ? 'ascending' : 'descending';
+const headers = computed(() => {
+    let hasPrimary = false;
+    return columns.value.map((column) => {
+        const order = orderModel(state.adapter, column.orderBy);
+        let ariaSort: 'ascending' | 'descending' | undefined;
+        if (!hasPrimary && order?.acceptedPriority === 1 && order.accepted) {
+            hasPrimary = true;
+            ariaSort = order.accepted.direction === 'asc' ? 'ascending' : 'descending';
+        }
+        return { column, id: columnId(column), order, ariaSort };
+    });
+});
+const sortFeedback = useControlFeedback(
+    () => state.adapter,
+    () =>
+        JSON.stringify([
+            authority.value,
+            activeView.value,
+            headers.value.map((h) => [
+                h.id,
+                h.order?.sortTypes,
+                h.order?.directions,
+                h.order?.current,
+            ]),
+        ]),
+);
+function clickHeader(column: DataViewColumn<Row>, event: MouseEvent) {
+    const order = orderModel(state.adapter, column.orderBy);
+    if (order)
+        void sortFeedback.run(
+            () => order.cycle(event.shiftKey) ?? Promise.resolve({ status: 'superseded' }),
+        );
 }
 </script>
 <style scoped>
 .data-view {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    min-width: 0;
     gap: var(--wa-space-m);
     color: var(--wa-color-text-normal);
 }
@@ -315,7 +481,51 @@ function acceptedSort(
     flex-wrap: wrap;
     gap: var(--wa-space-xs);
 }
+.data-view-selection,
+.data-view-selection label,
+.data-view-status {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--wa-space-s);
+    margin: 0;
+}
+.data-view-layouts button {
+    cursor: pointer;
+    max-inline-size: 100%;
+    min-inline-size: 0;
+    white-space: normal;
+    font: inherit;
+    color: inherit;
+    padding: var(--wa-space-xs) var(--wa-space-m);
+    background: var(--wa-color-surface-default);
+    border: var(--wa-border-width-s) solid var(--wa-color-surface-border);
+    border-radius: var(--wa-border-radius-pill);
+    overflow-wrap: anywhere;
+}
+.data-view-layouts button[aria-pressed='true'] {
+    color: var(--wa-color-brand-on-normal);
+    background: var(--wa-color-brand-fill-normal);
+    border-color: var(--wa-color-brand-border-normal);
+}
+.data-view-layouts button:focus-visible {
+    outline: var(--wa-focus-ring);
+    outline-offset: var(--wa-focus-ring-offset);
+}
+.data-view [type='checkbox'],
+.data-view [type='radio'] {
+    accent-color: var(--wa-color-brand-fill-loud);
+    inline-size: 1.1em;
+    block-size: 1.1em;
+}
+.data-view-item {
+    overflow-wrap: anywhere;
+}
+.data-view [data-selected] {
+    box-shadow: inset 0 0 0 var(--wa-border-width-s) var(--wa-color-brand-border-normal);
+}
 .data-view-scroll {
+    min-width: 0;
     overflow-x: auto;
 }
 .data-view-table {
@@ -349,7 +559,7 @@ function acceptedSort(
 .data-view[data-size='l'] td {
     padding: var(--wa-space-l);
 }
-.data-view-striped tbody tr:nth-child(even) {
+.data-view-striped tbody tr[data-even] {
     background: var(--wa-color-surface-lowered);
 }
 .data-view-hover tbody tr:hover {

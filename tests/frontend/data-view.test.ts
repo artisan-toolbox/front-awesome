@@ -2,6 +2,9 @@ import { readFile } from 'node:fs/promises';
 import { compileScript, parse } from '@vue/compiler-sfc';
 import { expect, test } from 'vite-plus/test';
 import {
+    groupingColumn,
+    groupRows,
+    occurrences,
     columnId,
     columnValue,
     displayValue,
@@ -114,4 +117,47 @@ test('reports invalid JavaScript layout and ownership inputs at the presentation
             },
         }),
     ).rejects.toThrow('column ids must be unique');
+});
+
+test('validates the grouping column and groups scalar boundaries by value and type', () => {
+    const rows = [null, '', false, 0, '0', '0', 0].map((group, id) => ({ group, id }));
+    const items = occurrences(rows, 'id');
+    const column = { field: 'group', label: 'Group', groupBy: true } as const;
+    expect(groupRows(items, column).map((run) => run.rows.length)).toEqual([1, 1, 1, 1, 2, 1]);
+    expect(() => groupRows(items, { ...column, groupBy: () => Infinity })).toThrow('finite scalar');
+    expect(() => groupingColumn([column, { ...column, id: 'other' }])).toThrow('one grouped');
+    expect(() =>
+        groupingColumn([
+            Object.assign({ kind: 'display', id: 'actions', label: 'Actions' } as const, {
+                groupBy: true,
+            }) as unknown as DataViewColumn<unknown>,
+        ]),
+    ).toThrow('data column');
+    expect(() => occurrences(rows, () => 'duplicate')).toThrow('unique');
+});
+
+test('ships the same English fallback and complete Spanish and Portuguese Laravel catalogs', async () => {
+    const { execFileSync } = await import('node:child_process');
+    const { english } = await import('../../resources/js/data-view/messages');
+    for (const language of ['en', 'es', 'pt_BR']) {
+        const translated = JSON.parse(
+            execFileSync(
+                process.env.PHP_BINARY ?? 'php',
+                [
+                    '-r',
+                    'echo json_encode(require $argv[1], JSON_THROW_ON_ERROR);',
+                    `lang/${language}/data-view.php`,
+                ],
+                { encoding: 'utf8' },
+            ),
+        ) as Record<string, string>;
+        expect(Object.keys(translated).sort()).toEqual(Object.keys(english).sort());
+        if (language === 'en') expect(translated).toEqual(english);
+        for (const [key, line] of Object.entries(translated)) {
+            expect(line.trim()).not.toBe('');
+            expect(line.match(/:\w+/g)?.sort()).toEqual(
+                english[key as keyof typeof english].match(/:\w+/g)?.sort(),
+            );
+        }
+    }
 });

@@ -5,6 +5,8 @@ export type {
     DataViewLayout,
     DataViewSize,
     DataViewRowKey,
+    DataViewLabelSubject,
+    DataViewSelection,
     DataViewScope,
     DataViewItemScope,
     DataViewCellScope,

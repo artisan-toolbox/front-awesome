@@ -246,10 +246,6 @@
           "title": "preserves boolean bindings before and after Web Awesome registers the button"
         },
         {
-          "file": "tests/frontend/data-view.browser.test.ts",
-          "title": "keeps declaration order and emits the effective fallback when layouts or the external model change"
-        },
-        {
           "file": "tests/frontend/popover.browser.test.ts",
           "title": "accepts the public Button trigger and preserves autofocus and native close links"
         },

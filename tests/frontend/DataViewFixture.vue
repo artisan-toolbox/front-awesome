@@ -7,13 +7,20 @@
     <DataView
         :adapter="catalog"
         :views="layouts"
-        row-key="id"
+        :key="revision"
+        :row-key="identify"
+        :selection="selectionMode"
+        :selected-keys="model"
+        :control-label="(subject) => (subject.kind === 'row' ? subject.row.name : undefined)"
+        @update:selected-keys="updateSelection"
         v-model:view="view"
         label="Catalog"
         caption="Products"
         :size="size"
         data-testid="catalog"
     >
+        <template v-if="customToolbar" #toolbar><span>Custom toolbar</span></template>
+        <template v-if="customFilters" #filters><span>Custom filters</span></template>
         <template #cell-name="{ row, adapter, value }"
             ><strong>{{ row.name.toUpperCase() }}</strong
             ><span v-if="adapter !== catalog">Wrong handle</span
@@ -30,11 +37,16 @@
             </article></template
         >
         <template #list-item="{ row }">{{ row.name }} list</template>
-        <template #footer="{ adapter, view: active }"
+        <template #footer="{ adapter, view: active, selection: chosen }"
             ><output data-testid="view-state"
                 >{{ active }} {{ adapter.status }}
                 {{ adapter === catalog ? 'same handle' : 'wrong handle' }}</output
-            ></template
+            ><output v-if="selection" data-testid="selection-state"
+                >{{ JSON.stringify(chosen?.keys) }}
+                {{ chosen?.rows.map((row) => row.name).join(',') }}</output
+            ><button v-if="captureScope" type="button" @click="saved = chosen">
+                Capture selection
+            </button></template
         >
     </DataView>
     <DataView
@@ -42,6 +54,7 @@
         :adapter="catalog"
         :views="{ list: {} }"
         row-key="id"
+        :selection="selectionMode"
         label="Shared catalog"
     >
         <template #list-item="{ row }">Shared {{ row.name }}</template>
@@ -55,23 +68,50 @@ import {
     type DataViewViews,
     type DataViewLayout,
     type DataViewSize,
+    type DataViewSelection,
 } from '@artisan-toolbox/front-awesome/data-view';
 import { decodeRow } from './data-view-fixtures';
 const props = defineProps<{
     infinite?: boolean;
+    historyId?: string;
     shared?: boolean;
     size?: DataViewSize;
     gridOnly?: boolean;
     layoutChanges?: boolean;
+    selection?: 'single' | 'multiple';
+    prefill?: readonly (string | number)[];
+    ignoreSelection?: boolean;
+    grouped?: boolean;
+    joined?: boolean;
+    customToolbar?: boolean;
+    customFilters?: boolean;
+    captureScope?: boolean;
 }>();
 const catalog = useDataAdapter('Catalog', {
     decodeRow,
     protocol: 2,
     paging: 'source',
     infinite: props.infinite ?? false,
-    url: false,
+    url: props.historyId !== undefined,
+    id: props.historyId,
     searchDebounce: 0,
 });
+const saved = shallowRef<DataViewSelection<ReturnType<typeof decodeRow>, string | number> | null>(
+    null,
+);
+const revision = shallowRef(0);
+const selectionMode = shallowRef(props.selection);
+const model = shallowRef(props.prefill);
+const emissions: (string | number)[][] = [];
+let keyCalls = 0;
+function identify(row: ReturnType<typeof decodeRow>, index: number) {
+    keyCalls++;
+    return props.joined ? (index === 0 ? row.id : String(index)) : row.id;
+}
+function updateSelection(keys: (string | number)[]) {
+    emissions.push(keys);
+    if (props.prefill !== undefined && !props.ignoreSelection) model.value = keys;
+}
 const view = shallowRef<DataViewLayout>('table');
 const layouts = shallowRef<DataViewViews<(typeof catalog.data)[number]>>(
     props.gridOnly
@@ -80,7 +120,12 @@ const layouts = shallowRef<DataViewViews<(typeof catalog.data)[number]>>(
               table: {
                   columns: [
                       { field: 'id', label: 'ID', align: 'end' },
-                      { field: 'name', label: 'Name', orderBy: 'title' },
+                      {
+                          field: 'name',
+                          label: 'Name',
+                          orderBy: 'title',
+                          groupBy: props.grouped ? (row) => row.name[0] : undefined,
+                      },
                       { id: 'computed', label: 'Computed', accessor: (row) => `Product ${row.id}` },
                       { kind: 'display', id: 'actions', label: 'Actions' },
                   ],
@@ -91,5 +136,15 @@ const layouts = shallowRef<DataViewViews<(typeof catalog.data)[number]>>(
               list: {},
           },
 );
-defineExpose({ catalog, layouts, view });
+defineExpose({
+    catalog,
+    layouts,
+    view,
+    model,
+    emissions,
+    revision,
+    selectionMode,
+    saved,
+    keyCalls: () => keyCalls,
+});
 </script>

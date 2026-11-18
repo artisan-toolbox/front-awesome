@@ -7,6 +7,13 @@
         </template>
     </DataView>
     <DataView :adapter="catalog" :views="{ grid: {} }" row-key="missing"><template #grid-item="{ row }">{{ row.missing }}</template></DataView>
+    <DataView :adapter="catalog" :views="{table:{columns:[{field:'id',label:'ID'}]}}" row-key="id" :selected-keys="['invalid-key']" />
+    <DataView :adapter="catalog" :views="invalidGroup" row-key="id" />
+    <DataView :adapter="catalog" :views="{grid:{}}" :row-key="indexKey">
+        <template #grid-item="{selection,rowKey}"><button @click="selection?.set(123,true)">{{ rowKey.toFixed() }}</button></template>
+    </DataView>
+    <DataView :adapter="catalog" :views="{grid:{}}" row-key="id" selection="invalid-mode" />
+    <DataView :adapter="catalog" :views="{grid:{}}" row-key="id" :control-label="subject => subject.kind === 'row' ? subject.key.toUpperCase() : undefined" />
 </template>
 <script setup lang="ts">
 import { useDataAdapter, defineActions, type AdapterDefinition, type ReadonlyDeep } from '@artisan-toolbox/dapter';
@@ -22,4 +29,6 @@ function decodeDefinition(value: ReadonlyDeep<AdapterDefinition>) {
 }
 const actions = defineActions({ rename: { transports: ['http'], decodeInput: decodeRow } });
 const catalog = useDataAdapter('Catalog', { decodeRow, decodeDefinition, actionDefinitions: actions, protocol: 2 });
+const invalidGroup = {table:{columns:[{kind:'display',id:'tools',label:'Tools',groupBy:true}]}} as const;
+const indexKey = (row:typeof catalog.data[number], index:number) => row.name+index;
 </script>

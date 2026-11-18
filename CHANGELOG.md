@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Corrected the installation command to explicitly allow the required Dapter alpha on applications using Composer's default stability policy.
+- DataView now presents the field and global search, match operators, finite filters, field order terms, and offset presets advertised by a borrowed Dapter handle. Search fields retain focus during infinite reads and can be used inside application forms. Numeric searches reject drafts that would change value in JSON. Pagination distinguishes loaded, matching, and total counts and offers explicit cursor and saved-state recovery.
+- Added optional single or multiple occurrence selection, indexed row-key callbacks, contiguous grouped table cells, and typed selection in slots. Use `controlLabel` for application labels and the Laravel localization catalog for translated controls. Existing three-prop usage and layout, toolbar, filters, and pagination slots remain supported.
+
 ## [1.0.0-beta.3] - 2026-11-18
 
 ### Features
