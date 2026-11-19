@@ -105,6 +105,18 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - name: Configure the browser container home
+        shell: bash
+        run: |
+          home="$(getent passwd "$(id -u)" | cut -d: -f6)"
+          if [[ ! -d "$home" || ! -O "$home" ]]; then
+            echo "::error::The browser container user must own its home directory."
+            exit 1
+          fi
+          export HOME="$home"
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git -C "$GITHUB_WORKSPACE" rev-parse --verify HEAD
+          printf 'HOME=%s\n' "$HOME" >> "$GITHUB_ENV"
       - uses: ./.github/actions/setup
         with:
           coverage: ${{ needs.plan.outputs.coverage == 'true' && 'xdebug' || 'none' }}
