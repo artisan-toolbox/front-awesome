@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.0.0-beta.6] - 2026-11-19
+
+### Fixes
+
+- **Keep exporting after polling stops in Vite translations** (`5536fb6`)
+  Updates the Vite translation export logic so translation exporting continues appropriately even after the polling lifecycle ends. This matters because Vite watcher/polling behavior can stop delivering updates in certain timing scenarios; without this fix, translation inputs that change shortly around the polling stop may not trigger re-exports. User impact: more reliable runtime translation updates in watch/poll modes, reducing cases where translations appear stale. Compatibility/migration: no public API or config key changes are indicated; this is an internal behavior correction for translation export scheduling/detection.
+
+- **Composer CI caching uses Playwright home and trusts workspace** (`ebb9efc`)
+  Adjusts the CI setup to locate Composer’s cache directory using the Playwright home directory and to trust the workspace before running Composer-related steps. This improves CI stability in environments where Composer cache paths differ from expectations and where Git safety/trust settings can prevent Composer from executing operations or reading repository context securely. User impact: fewer CI failures related to Composer caching and workspace trust. Compatibility/migration: no changes to application runtime; only CI environment behavior is affected.
+
+### Continuous Integration
+
+- **Add CI plan selector and cache Composer/npm dependencies** (`44b78dc`)
+  Introduces CI planning and dependency caching improvements by adding a CI plan selector (implemented via new scripts) and enabling caching for Composer and npm dependencies. The intent is to speed up and streamline tests by deciding which job subset should run based on the event type and changed files, while reusing Composer/npm artifacts across workflow runs. User impact: faster CI runs and more targeted testing; potential compatibility effect if contributors relied on previously always-running jobs. Compatibility/migration: workflow behavior changes are CI-only; no production API changes are implied, but contributors should expect jobs like coverage/compatibility/browser checks to be gated depending on the planned CI flags.
+
 ## Unreleased
 
 - Use the Playwright container user's home so Firefox can start, and trust the mounted Git checkout before Composer runs.
