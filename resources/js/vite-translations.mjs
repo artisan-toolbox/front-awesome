@@ -1,5 +1,5 @@
 import { execFile } from 'node:child_process';
-import { statSync } from 'node:fs';
+import { readFileSync, statSync } from 'node:fs';
 import { dirname, isAbsolute, resolve } from 'node:path';
 import { promisify } from 'node:util';
 
@@ -11,10 +11,12 @@ export function translationExport(options) {
     let manifest;
     let server;
     let timer;
-    let pending = false;
+    let scheduledReload = false;
+    let pendingExport;
     let running;
     let closed = false;
     let active;
+    let lastExportFailed = false;
     const watched = new Set();
 
     async function exportCatalog() {
@@ -81,13 +83,23 @@ export function translationExport(options) {
     }
 
     async function drain() {
-        while (pending && !closed) {
-            pending = false;
+        while (pendingExport && !closed) {
+            const reload = pendingExport.reload || lastExportFailed;
+            pendingExport = undefined;
             try {
+                const output = manifest.output;
+                const before = reload ? undefined : readCatalog(output);
                 await exportCatalog();
-                if (!closed) server.ws.send({ type: 'full-reload' });
+                if (
+                    !closed &&
+                    (reload || output !== manifest.output || before !== readCatalog(output))
+                ) {
+                    server.ws.send({ type: 'full-reload' });
+                }
+                lastExportFailed = false;
             } catch (error) {
                 if (closed) return;
+                lastExportFailed = true;
                 const message = `Front Awesome translation export failed. ${error.message}${error.stdout ? `\n${error.stdout}` : ''}`;
                 server.config.logger.error(message);
                 server.ws.send({ type: 'error', err: { message, stack: error.stack ?? '' } });
@@ -103,9 +115,15 @@ export function translationExport(options) {
         });
         if (!affected || (!event.includes('Dir') && !/\.(php|json)$/.test(path))) return;
         if (event.includes('Dir')) watchPaths();
+        scheduleExport(true);
+    }
+
+    function scheduleExport(reload = false) {
+        scheduledReload ||= reload;
         clearTimeout(timer);
         timer = setTimeout(() => {
-            pending = true;
+            pendingExport = { reload: scheduledReload || pendingExport?.reload === true };
+            scheduledReload = false;
             if (!running) {
                 running = drain().finally(() => {
                     running = undefined;
@@ -136,22 +154,35 @@ export function translationExport(options) {
             await exportCatalog();
         },
         watch(viteServer) {
+            if (viteServer.config.server.watch === null) return;
             server = viteServer;
             server.watcher.on('all', onChange);
             server.watcher.on('raw', onRawChange);
+            server.watcher.once('ready', scheduleExport);
             watchPaths();
+            // Vite may have finished its initial scan before this hook.
+            scheduleExport();
         },
         async close() {
             closed = true;
-            pending = false;
+            pendingExport = undefined;
             clearTimeout(timer);
             server?.watcher.off('all', onChange);
             server?.watcher.off('raw', onRawChange);
+            server?.watcher.off('ready', scheduleExport);
             active?.controller.abort();
             await active?.finished;
             await running;
         },
     };
+}
+
+function readCatalog(path) {
+    try {
+        return readFileSync(path, 'utf8');
+    } catch (error) {
+        if (error.code !== 'ENOENT') throw error;
+    }
 }
 
 function pathKey(path) {

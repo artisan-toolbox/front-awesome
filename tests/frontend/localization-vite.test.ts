@@ -167,6 +167,10 @@ test('watches missing lang creation, changes, deletion, config, errors and recov
             .poll(() => send.mock.calls, { timeout: 10000 })
             .toContainEqual([expect.objectContaining({ type: 'error' })]);
         expect(await text(root)).toContain('First change');
+        send.mockClear();
+        await applicationMessage(root, 'First change');
+        await expect.poll(() => send.mock.calls).toContainEqual([{ type: 'full-reload' }]);
+        expect(await text(root)).toContain('First change');
         await applicationMessage(root, 'Recovered');
         await expect.poll(() => text(root), { timeout: 10000 }).toContain('Recovered');
         await mkdir(join(root, 'config'));
@@ -179,6 +183,33 @@ test('watches missing lang creation, changes, deletion, config, errors and recov
         await expect.poll(() => text(root), { timeout: 10000 }).toContain('Recovered');
         await rm(join(root, 'lang/en/app.php'));
         await expect.poll(() => text(root), { timeout: 10000 }).not.toContain('app.greeting');
+    } finally {
+        await close(server, root);
+    }
+}, 30000);
+
+test('exports language files created while Vite starts watching', async () => {
+    const root = await fixture();
+    let server: ViteDevServer | undefined;
+    try {
+        server = await createServer({
+            root,
+            configFile: false,
+            logLevel: 'silent',
+            plugins: [
+                frontAwesome({ translations: { php, artisan } }),
+                {
+                    name: 'publish-language-files-at-startup',
+                    async configResolved() {
+                        await applicationMessage(root, 'Created during startup');
+                    },
+                },
+            ],
+            server: { middlewareMode: true, hmr: false, watch: { usePolling: true, interval: 25 } },
+            optimizeDeps: { noDiscovery: true },
+        });
+
+        await expect.poll(() => text(root), { timeout: 10000 }).toContain('Created during startup');
     } finally {
         await close(server, root);
     }

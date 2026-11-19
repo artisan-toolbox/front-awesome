@@ -17,6 +17,10 @@
 
 ## Unreleased
 
+- Regenerate the translation catalog when language files are created inside the Vite root during development server startup.
+
+- Require Pest Type Coverage 5.0.2 or later so `composer test:types` runs without writing a type coverage cache in the lowest-dependency CI job.
+
 - Use beta stability flags for Front Awesome and Dapter in the README installation command.
 
 - Configure the default color for bare `v-scrollbar` with `createFrontAwesome({ scrollbar: { defaultVariant: 'brand' } })`. The DataView table, print preview, and permission editor adopt the configured variant.
