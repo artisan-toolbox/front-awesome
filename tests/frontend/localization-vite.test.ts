@@ -1,4 +1,13 @@
-import { mkdir, mkdtemp, readFile, realpath, rename, rm, writeFile } from 'node:fs/promises';
+import {
+    mkdir,
+    mkdtemp,
+    readFile,
+    realpath,
+    rename,
+    rm,
+    utimes,
+    writeFile,
+} from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
@@ -238,6 +247,42 @@ test.each([false, true])(
     },
     30000,
 );
+
+test('updates the catalog when a replacement config preserves its modification time', async () => {
+    const root = await fixture();
+    const configuration = join(root, 'config');
+    const config = join(configuration, 'front-awesome.php');
+    const replacement = join(configuration, 'front-awesome.php.tmp');
+    const modified = new Date('2026-01-01T00:00:00Z');
+    const accessed = new Date('2026-01-02T00:00:00Z');
+    let server: ViteDevServer | undefined;
+    try {
+        await applicationMessage(root, 'Initially included');
+        await mkdir(configuration);
+        await writeFile(config, '<?php return [];');
+        await utimes(config, accessed, modified);
+        await writeFile(replacement, "<?php return ['exclude_keys' => ['app.*']];");
+        await utimes(replacement, accessed, modified);
+        server = await createServer({
+            root,
+            configFile: false,
+            logLevel: 'silent',
+            plugins: [frontAwesome({ translations: { php, artisan } })],
+            server: { middlewareMode: true, hmr: false, watch: { usePolling: true, interval: 25 } },
+            optimizeDeps: { noDiscovery: true },
+        });
+        await expect
+            .poll(() => server?.watcher.getWatched()[configuration])
+            .toContain('front-awesome.php');
+        expect(await text(root)).toContain('Initially included');
+
+        await rename(replacement, config);
+
+        await expect.poll(() => text(root), { timeout: 10000 }).not.toContain('app.greeting');
+    } finally {
+        await close(server, root);
+    }
+}, 30000);
 
 test('selects literal native locale imports from the chosen installed edition without exporting Laravel', async () => {
     const root = await fixture();

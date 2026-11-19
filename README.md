@@ -5,7 +5,8 @@
 </div>
 
 <p id="maintainer-badges" align="center">
-<a href="https://github.com/artisan-toolbox/front-awesome/releases"><img src="https://img.shields.io/badge/Release-beta-yellow?style=flat-square" alt="Release"></a>
+<a href="https://github.com/artisan-toolbox/front-awesome/releases"><img src="https://img.shields.io/badge/version-1.0.0--beta.3-blue?style=flat-square" alt="version"></a>
+<a href="https://packagist.org/packages/artisan-toolbox/front-awesome"><img src="https://img.shields.io/badge/Packagist-F28D1A?style=flat-square&amp;logo=packagist&amp;logoColor=white" alt="Packagist"></a>
 <a href="https://atb.dev.br/packages/front-awesome/"><img src="https://img.shields.io/badge/PHP-%5E8.5-777BB4?style=flat-square" alt="PHP"></a>
 <a href="https://atb.dev.br/packages/front-awesome/"><img src="https://img.shields.io/badge/Laravel-%5E13.36-FF2D20?style=flat-square" alt="Laravel"></a>
 <a href="https://atb.dev.br/packages/front-awesome/"><img src="https://img.shields.io/badge/Node.js-%3E%3D24.11.0-339933?style=flat-square" alt="Node.js"></a>
@@ -20,16 +21,16 @@
 
 ## Installation
 
-From a Laravel application with Inertia and Vue, run Composer before npm.
+Check the [installation requirements](https://atb.dev.br/packages/front-awesome/installation/). From a Laravel application with Inertia and Vue, run Composer before npm.
 
 Declare `@artisan-toolbox/mosaicast` in your application's `package.json` to satisfy Front Awesome's JavaScript peer dependency. The npm command below adds both frontend packages from Composer's vendor directory.
 
 ```bash
-composer require 'artisan-toolbox/front-awesome:^1.0@beta' 'artisan-toolbox/dapter:^1.0.0-beta.1'
+composer require 'artisan-toolbox/front-awesome:@beta' 'artisan-toolbox/dapter:@beta'
 npm install --install-links ./vendor/artisan-toolbox/front-awesome ./vendor/artisan-toolbox/mosaicast
 ```
 
-Front Awesome `1.x` is in beta. Its API can change before the first stable release. It targets PHP 8.5, Laravel 13.36 or later within Laravel 13.x, Vue 3.5, Inertia 3, Tailwind CSS 4, and Node.js 24.11 or later.
+Front Awesome is in beta, and its API can change before the first stable release.
 
 ## Usage
 

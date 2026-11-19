@@ -30,10 +30,11 @@ final class FrontAwesome implements Versionable, WithReadmeHead
             ->withLogo(src: 'logo/front-awesome-icon.svg', alt: '', width: 88)
             ->withTitle('Front Awesome')
             ->withDescription('Reusable Vue components and frontend integrations for Laravel and Inertia applications.')
+            ->addBadge(Badge::releaseVersion('https://github.com/artisan-toolbox/front-awesome/releases'))
             ->addBadge(Badge::make(
-                link: 'https://github.com/artisan-toolbox/front-awesome/releases',
-                imgSrc: 'https://img.shields.io/badge/Release-beta-yellow?style=flat-square',
-                imgAlt: 'Release',
+                link: 'https://packagist.org/packages/artisan-toolbox/front-awesome',
+                imgSrc: 'https://img.shields.io/badge/Packagist-F28D1A?style=flat-square&logo=packagist&logoColor=white',
+                imgAlt: 'Packagist',
             ))
             ->addBadge(Badge::make(
                 link: 'https://atb.dev.br/packages/front-awesome/',

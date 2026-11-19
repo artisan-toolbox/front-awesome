@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Use beta stability flags for Front Awesome and Dapter in the README installation command.
+
 - Configure the default color for bare `v-scrollbar` with `createFrontAwesome({ scrollbar: { defaultVariant: 'brand' } })`. The DataView table, print preview, and permission editor adopt the configured variant.
 
 - Add `v-scrollbar` with five theme modifiers and optional OverlayScrollbars options. The original HTML element owns scrolling, and the browser scrollbar remains available during server rendering and in forced colors.
@@ -46,6 +48,7 @@
 
 ### Fixes
 
+- Regenerate the Vite translation catalog when the polling watcher detects a changed file even if its modification time stays the same.
 - Run the DataView negative Vue type checker through Node on Windows and Unix. Preserve compiler and process-launch errors instead of masking them with an invalid diagnostic write.
 - Match the installed Laravel plural selector's handling of whitespace around exact and interval conditions. Export its behavior with the browser catalog while preserving older catalogs and Laravel versions.
 - Discard pending autofill when a control switches to another Inertia field or form, even when both bindings have the same value. Reapply the new binding before observing further native edits.

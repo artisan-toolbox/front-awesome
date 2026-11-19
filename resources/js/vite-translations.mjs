@@ -114,6 +114,22 @@ export function translationExport(options) {
         }, 75);
     }
 
+    function onRawChange(event, file, details) {
+        if (event !== 'change') return;
+        const { curr, prev } = details ?? {};
+        if (!curr?.isFile() || !prev?.isFile()) return;
+
+        // Polling can report a replacement or edit even when the normalized watcher skips it.
+        if (
+            curr.size !== prev.size ||
+            curr.mtimeMs !== prev.mtimeMs ||
+            curr.ctimeMs !== prev.ctimeMs ||
+            curr.ino !== prev.ino
+        ) {
+            onChange(event, file);
+        }
+    }
+
     return {
         async start(root) {
             cwd = resolve(settings.cwd ?? root);
@@ -122,6 +138,7 @@ export function translationExport(options) {
         watch(viteServer) {
             server = viteServer;
             server.watcher.on('all', onChange);
+            server.watcher.on('raw', onRawChange);
             watchPaths();
         },
         async close() {
@@ -129,6 +146,7 @@ export function translationExport(options) {
             pending = false;
             clearTimeout(timer);
             server?.watcher.off('all', onChange);
+            server?.watcher.off('raw', onRawChange);
             active?.controller.abort();
             await active?.finished;
             await running;
