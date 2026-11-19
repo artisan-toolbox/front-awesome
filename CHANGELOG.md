@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.0.0-beta.4] - 2026-11-19
+
+### Features
+
+- **Add UserPermissionEditor and expand scrollbar coverage** (`e40e242`)
+  Introduces the UserPermissionEditor feature (including the new editor component) and improves coverage for the scrollbar behavior across supported browsers. This matters because the user-permissions editing UI is a new functional surface, while scrollbar testing ensures the scrollbar component and styling work consistently beyond Chromium. User impact: users gain access to a dedicated permission editor UI; developers/testers get stronger assurance that scrollbar behavior is correct in Firefox and WebKit as well. Compatibility/migration: consumers should account for the additional exported component and any related localization assets; no direct migration guidance is specified in the commit summary, but new permissions editor UI implies new frontend integration points.
+
+- **Expand DataView criteria, selection, grouping, and paging** (`e3f1f80`)
+  Enhances the DataView functionality by expanding criteria handling (including selection-related filtering and more expressive criteria), and improving selection, grouping, and paging behaviors. This matters because DataView is typically a core UI for browsing and managing records; improved criteria and interaction models enable richer data exploration and more scalable navigation patterns. User impact: end-users can apply more advanced filter/criteria flows and see improved handling for selection, grouped presentation, and paginated navigation. Compatibility/migration: changes likely affect how criteria/selection/grouping inputs are interpreted in the DataView UI; integrations relying on prior criteria shape or slot expectations may need to adjust to the expanded behavior.
+
+### Fixes
+
+- **Regenerate Vite translation catalog on raw changes** (`e8d0a2b`)
+  Updates the Vite i18n build pipeline so the translation catalog is regenerated whenever raw translation content changes. This prevents stale or missing localized strings from being served in development/build outputs, improving reliability of UI text updates. User impact: localized UI strings should update correctly without requiring manual rebuilds or waiting for a subsequent cache invalidation. Compatibility/migration: no API or runtime behavior changes are implied beyond ensuring the translation assets stay in sync.
+
 ## Unreleased
 
 - Use beta stability flags for Front Awesome and Dapter in the README installation command.
