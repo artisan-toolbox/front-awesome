@@ -7,10 +7,13 @@ namespace ArtisanToolbox\FrontAwesome\Localization;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 use Illuminate\Translation\FileLoader;
 use Illuminate\Translation\MessageSelector;
 use InvalidArgumentException;
+use RuntimeException;
 use Symfony\Component\Process\Process;
 
 /** @internal */
@@ -155,15 +158,57 @@ final class TranslationExporter
         $types = preg_replace('/\.json$/', '', $output).'.d.ts';
         $files->ensureDirectoryExists(dirname($output));
 
-        if (! $files->exists($types) || $files->get($types) !== $declaration) {
-            $files->replace($types, $declaration);
-        }
-
-        if (! $files->exists($output) || $files->get($output) !== $json) {
-            $files->replace($output, $json);
-        }
+        $this->writeExportFile($files, $types, $declaration);
+        $this->writeExportFile($files, $output, $json);
 
         return ['output' => $output, 'types' => $types, 'watchPaths' => [$package, $application, $this->app->configPath('front-awesome.php')]];
+    }
+
+    private function writeExportFile(Filesystem $files, string $path, string $contents): void
+    {
+        if ($files->exists($path) && $files->get($path) === $contents) {
+            return;
+        }
+
+        if (PHP_OS_FAMILY !== 'Windows') {
+            $files->replace($path, $contents);
+
+            return;
+        }
+
+        clearstatcache(true, $path);
+        $path = realpath($path) ?: $path;
+        $temporary = dirname($path).'/.front-awesome-'.bin2hex(random_bytes(8)).'.tmp';
+        $stream = @fopen($temporary, 'xb');
+        throw_if($stream === false, RuntimeException::class, "Could not create a temporary translation file for {$path}.");
+
+        try {
+            try {
+                $written = @fwrite($stream, $contents);
+            } finally {
+                fclose($stream);
+            }
+            throw_if($written !== strlen($contents), RuntimeException::class, "Could not write the temporary translation file for {$path}.");
+
+            // An open reader can briefly block replacement of an existing file on Windows.
+            for ($attempt = 0; $attempt < 20; $attempt++) {
+                if (@rename($temporary, $path)) {
+                    return;
+                }
+
+                Sleep::usleep(50_000);
+            }
+
+            if (! @rename($temporary, $path)) {
+                $detail = error_get_last()['message'] ?? '';
+
+                throw new RuntimeException(trim("Could not replace the translation file {$path}. {$detail}"));
+            }
+        } finally {
+            if (is_file($temporary)) {
+                File::delete($temporary);
+            }
+        }
     }
 
     /** @return array{node_binary: string, include_application: bool, locales: list<string>, fallback_locale: string, include_files: list<string>, exclude_files: list<string>, include_regex: array{path: list<string>, file: list<string>}, exclude_regex: array{path: list<string>, file: list<string>}, exclude_keys: list<string>, output: string} */

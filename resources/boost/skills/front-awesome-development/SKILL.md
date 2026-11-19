@@ -352,7 +352,9 @@ Keep messages in Laravel PHP and JSON language files. The package always exports
 
 In the root Blade document, render `<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">`. In the existing Vite plugin, enable `frontAwesome({ webAwesome: 'core', translations: true })`, or select the installed licensed Pro edition. A custom executable or directory uses `translations: { php, artisan, cwd }`. Vite automatically exports before normal startup and builds.
 
-Development exports follow creation, edits, atomic replacement, and deletion of language files and `config/front-awesome.php`, including deletion and recreation of their directories. Set `translations.cwd` to the Laravel application root when it differs from the Vite root. The source preview checks the language roots and configuration path independently of Vite's polling. Unrelated configuration files do not trigger translation exports.
+Development exports follow creation, edits, atomic replacement, and deletion of language files and `config/front-awesome.php`, including deletion and recreation of their directories. Set `translations.cwd` to the Laravel application root when it differs from the Vite root. The source preview checks PHP and JSON files under the language roots and the configuration path independently of Vite's notifications. Unrelated configuration files do not trigger translation exports.
+
+On Windows, the source preview briefly retries replacing generated translation files when a reader keeps a file open. Close any process that holds a generated file persistently, then run the export again.
 
 For a programmatic Vite server, await `server.close()` before removing its working directory. Shutdown cancels queued exports, aborts the active exporter, and waits for its process and output streams to close. Intentional shutdown cancellation does not report a translation error.
 

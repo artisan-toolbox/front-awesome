@@ -1,7 +1,9 @@
-import { ChildProcess } from 'node:child_process';
+import { ChildProcess, execFile } from 'node:child_process';
 import {
     mkdir,
     mkdtemp,
+    open,
+    readdir,
     readFile,
     realpath,
     rename,
@@ -13,6 +15,8 @@ import {
 import { existsSync, type Stats, unwatchFile } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
+import { setTimeout as delay } from 'node:timers/promises';
+import { promisify } from 'node:util';
 import { build, createServer, type Plugin, type ViteDevServer } from 'vite';
 import { expect, test, vi } from 'vite-plus/test';
 import { frontAwesome } from '@artisan-toolbox/front-awesome/vite';
@@ -52,11 +56,7 @@ function controlledWatcher() {
             name: 'control-translation-watch-notifications',
             enforce: 'pre',
             configureServer(server: ViteDevServer) {
-                emit = server.watcher.emit.bind(server.watcher);
-                vi.spyOn(server.watcher, 'emit').mockImplementation((event, ...args) => {
-                    if (event === 'all' || event === 'raw' || event === 'ready') return false;
-                    return emit(event, ...args);
-                });
+                emit = muteWatcherNotifications(server);
             },
         } satisfies Plugin,
         change(file: string) {
@@ -66,6 +66,15 @@ function controlledWatcher() {
             emit('raw', 'change', directory, details);
         },
     };
+}
+
+function muteWatcherNotifications(server: ViteDevServer) {
+    const emit = server.watcher.emit.bind(server.watcher);
+    vi.spyOn(server.watcher, 'emit').mockImplementation((event, ...args) => {
+        if (event === 'all' || event === 'raw' || event === 'ready') return false;
+        return emit(event, ...args);
+    });
+    return emit;
 }
 
 async function close(server: ViteDevServer | undefined, root: string) {
@@ -152,6 +161,56 @@ test('fails a build when the exporter fails and leaves the prior catalog intact'
     }
 });
 
+test.skipIf(process.platform !== 'win32')(
+    'publishes a new catalog after a reader releases the old file',
+    async () => {
+        const root = await fixture();
+        const outputDir = join(root, 'generated');
+        const execute = promisify(execFile);
+        const exportCatalog = () =>
+            execute(
+                php,
+                [
+                    artisan,
+                    'front-awesome:export-translations',
+                    `--node=${process.execPath}`,
+                    '--no-ansi',
+                ],
+                { cwd: root },
+            );
+        let publishing: Promise<unknown> | undefined;
+        try {
+            await applicationMessage(root, 'Before replacement');
+            await exportCatalog();
+            await applicationMessage(root, 'After replacement');
+
+            const reader = await open(join(outputDir, 'catalog.json'), 'r');
+            try {
+                publishing = exportCatalog().then(
+                    () => undefined,
+                    (error: unknown) => error,
+                );
+                await expect
+                    .poll(async () => (await readdir(outputDir)).length, { timeout: 10000 })
+                    .toBe(3);
+                await expect(
+                    Promise.race([publishing, delay(150, 'still publishing')]),
+                ).resolves.toBe('still publishing');
+            } finally {
+                await reader.close();
+            }
+
+            expect(await publishing).toBeUndefined();
+            expect(await text(root)).toContain('After replacement');
+            expect((await readdir(outputDir)).sort()).toEqual(['catalog.d.ts', 'catalog.json']);
+        } finally {
+            await publishing;
+            await close(undefined, root);
+        }
+    },
+    30000,
+);
+
 test('reports invalid executable arguments without leaving an unhandled rejection', async () => {
     const root = await fixture();
     try {
@@ -176,50 +235,68 @@ test('reports invalid executable arguments without leaving an unhandled rejectio
     }
 });
 
-test('watches missing lang creation, changes, deletion, config, errors and recovery', async () => {
-    const root = await fixture();
-    let server: ViteDevServer | undefined;
-    try {
-        server = await createServer({
-            root,
-            configFile: false,
-            logLevel: 'silent',
-            plugins: [frontAwesome({ translations: { php, artisan } })],
-            server: { middlewareMode: true, hmr: false, watch: { usePolling: true, interval: 25 } },
-            optimizeDeps: { noDiscovery: true },
-        });
-        const send = vi.spyOn(server.ws, 'send');
-        vi.spyOn(server.config.logger, 'error').mockImplementation(() => {});
-        await server.transformRequest('/entry.js');
-        await expect.poll(() => server?.watcher.getWatched()[root]).toContain('entry.js');
-        await applicationMessage(root, 'First change');
-        await expect.poll(() => text(root), { timeout: 10000 }).toContain('First change');
-        await expect.poll(() => send.mock.calls).toContainEqual([{ type: 'full-reload' }]);
-        await writeFile(join(root, 'lang/en/app.php'), "<?php return ['broken' => new stdClass];");
-        await expect
-            .poll(() => send.mock.calls, { timeout: 10000 })
-            .toContainEqual([expect.objectContaining({ type: 'error' })]);
-        expect(await text(root)).toContain('First change');
-        send.mockClear();
-        await applicationMessage(root, 'First change');
-        await expect.poll(() => send.mock.calls).toContainEqual([{ type: 'full-reload' }]);
-        expect(await text(root)).toContain('First change');
-        await applicationMessage(root, 'Recovered');
-        await expect.poll(() => text(root), { timeout: 10000 }).toContain('Recovered');
-        await mkdir(join(root, 'config'));
-        await writeFile(
-            join(root, 'config/front-awesome.php'),
-            "<?php return ['exclude_keys' => ['app.*']];",
-        );
-        await expect.poll(() => text(root), { timeout: 10000 }).not.toContain('app.greeting');
-        await rm(join(root, 'config/front-awesome.php'));
-        await expect.poll(() => text(root), { timeout: 10000 }).toContain('Recovered');
-        await rm(join(root, 'lang/en/app.php'));
-        await expect.poll(() => text(root), { timeout: 10000 }).not.toContain('app.greeting');
-    } finally {
-        await close(server, root);
-    }
-}, 30000);
+test.each([false, true])(
+    'watches missing lang creation, changes, deletion, config, errors and recovery (missed recovery event: %s)',
+    async (missedRecoveryEvent) => {
+        const root = await fixture();
+        let server: ViteDevServer | undefined;
+        try {
+            server = await createServer({
+                root,
+                configFile: false,
+                logLevel: 'silent',
+                plugins: [frontAwesome({ translations: { php, artisan } })],
+                server: {
+                    middlewareMode: true,
+                    hmr: false,
+                    watch: { usePolling: true, interval: 25 },
+                },
+                optimizeDeps: { noDiscovery: true },
+            });
+            const send = vi.spyOn(server.ws, 'send');
+            vi.spyOn(server.config.logger, 'error').mockImplementation(() => {});
+            await server.transformRequest('/entry.js');
+            await expect.poll(() => server?.watcher.getWatched()[root]).toContain('entry.js');
+            await applicationMessage(root, 'First change');
+            await expect.poll(() => text(root), { timeout: 10000 }).toContain('First change');
+            await expect
+                .poll(() => send.mock.calls, { timeout: 10000 })
+                .toContainEqual([{ type: 'full-reload' }]);
+            await writeFile(
+                join(root, 'lang/en/app.php'),
+                "<?php return ['broken' => new stdClass];",
+            );
+            await expect
+                .poll(() => send.mock.calls, { timeout: 10000 })
+                .toContainEqual([expect.objectContaining({ type: 'error' })]);
+            expect(await text(root)).toContain('First change');
+            send.mockClear();
+            await applicationMessage(root, 'First change');
+            await expect
+                .poll(() => send.mock.calls, { timeout: 10000 })
+                .toContainEqual([{ type: 'full-reload' }]);
+            expect(await text(root)).toContain('First change');
+            if (missedRecoveryEvent) muteWatcherNotifications(server);
+            await applicationMessage(root, 'Recovered');
+            await expect
+                .poll(async () => (await text(root)).includes('Recovered'), { timeout: 10000 })
+                .toBe(true);
+            await mkdir(join(root, 'config'));
+            await writeFile(
+                join(root, 'config/front-awesome.php'),
+                "<?php return ['exclude_keys' => ['app.*']];",
+            );
+            await expect.poll(() => text(root), { timeout: 10000 }).not.toContain('app.greeting');
+            await rm(join(root, 'config/front-awesome.php'));
+            await expect.poll(() => text(root), { timeout: 10000 }).toContain('Recovered');
+            await rm(join(root, 'lang/en/app.php'));
+            await expect.poll(() => text(root), { timeout: 10000 }).not.toContain('app.greeting');
+        } finally {
+            await close(server, root);
+        }
+    },
+    30000,
+);
 
 test('exports language files created while Vite starts watching', async () => {
     const root = await fixture();

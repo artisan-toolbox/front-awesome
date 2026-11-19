@@ -17,6 +17,8 @@
 
 ## Unreleased
 
+- Refresh the Vite translation catalog after edits to nested language files even when Vite misses their notifications.
+- Retry atomic replacement of generated translation files when a Windows reader briefly holds them open.
 - Use the Playwright container user's home so Firefox can start, and trust the mounted Git checkout before Composer runs.
 - Run routine CI with the checked-in Composer and npm locks. Keep Windows runtime checks, and run browser and floating dependency checks for release candidates. A Markdown-only edit records a lightweight CI result.
 - Require the successful GitHub Actions push workflow for the exact release commit when publishing with a Maintainer build that supports release gates.

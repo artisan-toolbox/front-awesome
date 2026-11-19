@@ -1,5 +1,6 @@
 import { execFile } from 'node:child_process';
 import { readFileSync, statSync } from 'node:fs';
+import { readdir, stat } from 'node:fs/promises';
 import { dirname, isAbsolute, resolve } from 'node:path';
 import { promisify } from 'node:util';
 
@@ -19,9 +20,18 @@ export function translationExport(options) {
     let active;
     let lastExportFailed = false;
     const watched = new Set();
-    const inputStats = new Map();
+    let inputStats = new Map();
+    let inputScan;
 
     async function exportCatalog() {
+        if (server) {
+            await inputScan;
+            if (closed) return;
+            // Watch for changes made after the exporter starts reading its inputs.
+            inputStats = await snapshotInputs(manifest);
+            if (closed) return;
+        }
+
         const controller = new AbortController();
         const execution = execute(
             settings.php ?? process.env.PHP_BINARY ?? 'php',
@@ -60,14 +70,8 @@ export function translationExport(options) {
     }
 
     function watchPaths() {
-        const inputs = new Set(manifest.watchPaths);
-        for (const path of inputStats.keys()) {
-            if (!inputs.has(path)) inputStats.delete(path);
-        }
-
         const paths = new Set();
-        for (const path of inputs) {
-            if (!inputStats.has(path)) inputStats.set(path, readInputStat(path));
+        for (const path of manifest.watchPaths) {
             let parent = path;
             while (
                 !statSync(parent, { throwIfNoEntry: false })?.isDirectory() &&
@@ -91,14 +95,24 @@ export function translationExport(options) {
     }
 
     function pollInputs() {
-        let changed = false;
-        for (const [path, previous] of inputStats) {
-            const current = readInputStat(path);
-            if (!statsChanged(current, previous)) continue;
-            inputStats.set(path, current);
-            changed = true;
-        }
-        if (changed) scheduleExport();
+        if (closed || running || timer || inputScan) return;
+        inputScan = snapshotInputs(manifest)
+            .then((current) => {
+                if (closed || running || timer) return;
+                if (
+                    current.size !== inputStats.size ||
+                    [...current].some(
+                        ([path, stats]) =>
+                            !inputStats.has(path) || statsChanged(stats, inputStats.get(path)),
+                    )
+                ) {
+                    scheduleExport();
+                }
+                inputStats = current;
+            })
+            .finally(() => {
+                inputScan = undefined;
+            });
     }
 
     async function drain() {
@@ -128,6 +142,7 @@ export function translationExport(options) {
 
     function onChange(event, file) {
         const path = pathKey(isAbsolute(file) ? file : resolve(cwd, file));
+        if (path === pathKey(manifest.output) || path === pathKey(manifest.types)) return;
         const affected = manifest.watchPaths.some((watchPath) => {
             const root = pathKey(watchPath);
             return path === root || path.startsWith(`${root}/`) || root.startsWith(`${path}/`);
@@ -179,8 +194,8 @@ export function translationExport(options) {
             server.watcher.on('raw', onRawChange);
             server.watcher.once('ready', scheduleExport);
             watchPaths();
-            // Chokidar can remove every fs.watchFile listener for a path it stops polling.
-            inputPollTimer = setInterval(pollInputs, server.config.server.watch?.interval ?? 100);
+            const pollInterval = Math.max(250, server.config.server.watch?.interval ?? 0);
+            inputPollTimer = setInterval(pollInputs, pollInterval);
             inputPollTimer.unref();
             // Vite may have finished its initial scan before this hook.
             scheduleExport();
@@ -193,10 +208,11 @@ export function translationExport(options) {
             server?.watcher.off('all', onChange);
             server?.watcher.off('raw', onRawChange);
             server?.watcher.off('ready', scheduleExport);
-            inputStats.clear();
             active?.controller.abort();
             await active?.finished;
+            await inputScan;
             await running;
+            inputStats.clear();
         },
     };
 }
@@ -210,12 +226,38 @@ function statsChanged(current, previous) {
     );
 }
 
-function readInputStat(path) {
-    try {
-        return statSync(path, { throwIfNoEntry: false });
-    } catch {
-        return undefined;
+async function snapshotInputs(manifest) {
+    const snapshot = new Map();
+    const generated = new Set([pathKey(manifest.output), pathKey(manifest.types)]);
+    for (const input of manifest.watchPaths) {
+        const path = pathKey(input);
+        if (generated.has(path)) continue;
+        const stats = await stat(input).catch(() => undefined);
+        if (!stats) continue;
+        if (!stats.isDirectory()) {
+            snapshot.set(path, stats);
+            continue;
+        }
+
+        snapshot.set(path, null);
+        const entries = await readdir(input, { recursive: true, withFileTypes: true }).catch(
+            () => [],
+        );
+        await Promise.all(
+            entries.map(async (entry) => {
+                const file = resolve(entry.parentPath, entry.name);
+                const key = pathKey(file);
+                if (generated.has(key)) return;
+                if (entry.isDirectory()) {
+                    snapshot.set(key, null);
+                } else if (/\.(php|json)$/.test(key)) {
+                    const stats = await stat(file).catch(() => undefined);
+                    if (stats?.isFile()) snapshot.set(key, stats);
+                }
+            }),
+        );
     }
+    return snapshot;
 }
 
 function readCatalog(path) {
