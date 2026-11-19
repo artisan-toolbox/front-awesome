@@ -6,6 +6,7 @@
 - Run routine CI with the checked-in Composer and npm locks. Keep Windows runtime checks, and run browser and floating dependency checks for release candidates. A Markdown-only edit records a lightweight CI result.
 - Require the successful GitHub Actions push workflow for the exact release commit when publishing with a Maintainer build that supports release gates.
 - Track creation and replacement of Laravel translation inputs even when Vite misses their filesystem notifications.
+- Keep checking translation inputs when Vite stops polling a path, including replacements of `config/front-awesome.php` outside the Vite root.
 
 ## [1.0.0-beta.5] - 2026-11-19
 

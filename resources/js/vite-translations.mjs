@@ -1,5 +1,5 @@
 import { execFile } from 'node:child_process';
-import { readFileSync, statSync, unwatchFile, watchFile } from 'node:fs';
+import { readFileSync, statSync } from 'node:fs';
 import { dirname, isAbsolute, resolve } from 'node:path';
 import { promisify } from 'node:util';
 
@@ -11,6 +11,7 @@ export function translationExport(options) {
     let manifest;
     let server;
     let timer;
+    let inputPollTimer;
     let scheduledReload = false;
     let pendingExport;
     let running;
@@ -18,7 +19,7 @@ export function translationExport(options) {
     let active;
     let lastExportFailed = false;
     const watched = new Set();
-    const inputWatchers = new Map();
+    const inputStats = new Map();
 
     async function exportCatalog() {
         const controller = new AbortController();
@@ -60,26 +61,13 @@ export function translationExport(options) {
 
     function watchPaths() {
         const inputs = new Set(manifest.watchPaths);
-        for (const [path, listener] of inputWatchers) {
-            if (inputs.has(path)) continue;
-            unwatchFile(path, listener);
-            inputWatchers.delete(path);
+        for (const path of inputStats.keys()) {
+            if (!inputs.has(path)) inputStats.delete(path);
         }
 
         const paths = new Set();
         for (const path of inputs) {
-            if (!inputWatchers.has(path)) {
-                const listener = (current, previous) => {
-                    if (statsChanged(current, previous)) scheduleExport();
-                };
-                // Watch the input itself, including missing paths Vite cannot yet discover.
-                watchFile(
-                    path,
-                    { persistent: false, interval: server.config.server.watch?.interval ?? 100 },
-                    listener,
-                );
-                inputWatchers.set(path, listener);
-            }
+            if (!inputStats.has(path)) inputStats.set(path, readInputStat(path));
             let parent = path;
             while (
                 !statSync(parent, { throwIfNoEntry: false })?.isDirectory() &&
@@ -100,6 +88,17 @@ export function translationExport(options) {
             added.push(path);
         }
         if (added.length) server.watcher.add(added);
+    }
+
+    function pollInputs() {
+        let changed = false;
+        for (const [path, previous] of inputStats) {
+            const current = readInputStat(path);
+            if (!statsChanged(current, previous)) continue;
+            inputStats.set(path, current);
+            changed = true;
+        }
+        if (changed) scheduleExport();
     }
 
     async function drain() {
@@ -180,6 +179,9 @@ export function translationExport(options) {
             server.watcher.on('raw', onRawChange);
             server.watcher.once('ready', scheduleExport);
             watchPaths();
+            // Chokidar can remove every fs.watchFile listener for a path it stops polling.
+            inputPollTimer = setInterval(pollInputs, server.config.server.watch?.interval ?? 100);
+            inputPollTimer.unref();
             // Vite may have finished its initial scan before this hook.
             scheduleExport();
         },
@@ -187,11 +189,11 @@ export function translationExport(options) {
             closed = true;
             pendingExport = undefined;
             clearTimeout(timer);
+            clearInterval(inputPollTimer);
             server?.watcher.off('all', onChange);
             server?.watcher.off('raw', onRawChange);
             server?.watcher.off('ready', scheduleExport);
-            for (const [path, listener] of inputWatchers) unwatchFile(path, listener);
-            inputWatchers.clear();
+            inputStats.clear();
             active?.controller.abort();
             await active?.finished;
             await running;
@@ -201,11 +203,19 @@ export function translationExport(options) {
 
 function statsChanged(current, previous) {
     return (
-        current.size !== previous.size ||
-        current.mtimeMs !== previous.mtimeMs ||
-        current.ctimeMs !== previous.ctimeMs ||
-        current.ino !== previous.ino
+        current?.size !== previous?.size ||
+        current?.mtimeMs !== previous?.mtimeMs ||
+        current?.ctimeMs !== previous?.ctimeMs ||
+        current?.ino !== previous?.ino
     );
+}
+
+function readInputStat(path) {
+    try {
+        return statSync(path, { throwIfNoEntry: false });
+    } catch {
+        return undefined;
+    }
 }
 
 function readCatalog(path) {

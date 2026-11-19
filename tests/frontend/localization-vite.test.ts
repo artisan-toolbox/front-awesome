@@ -10,7 +10,7 @@ import {
     utimes,
     writeFile,
 } from 'node:fs/promises';
-import { existsSync, type Stats } from 'node:fs';
+import { existsSync, type Stats, unwatchFile } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { build, createServer, type Plugin, type ViteDevServer } from 'vite';
@@ -351,6 +351,47 @@ test.each([false, true])(
     },
     30000,
 );
+
+test('updates a replaced config outside the Vite root after shared polling stops', async () => {
+    const root = await fixture();
+    const client = join(root, 'client');
+    const config = join(root, 'config/front-awesome.php');
+    const replacement = `${config}.tmp`;
+    const watcher = controlledWatcher();
+    let server: ViteDevServer | undefined;
+    try {
+        await mkdir(client);
+        await applicationMessage(root, 'Included after config replacement');
+        server = await createServer({
+            root: client,
+            configFile: false,
+            logLevel: 'silent',
+            plugins: [watcher.plugin, frontAwesome({ translations: { php, artisan, cwd: root } })],
+            server: { middlewareMode: true, hmr: false, watch: { usePolling: true, interval: 25 } },
+            optimizeDeps: { noDiscovery: true },
+        });
+
+        const send = vi.spyOn(server.ws, 'send');
+        await mkdir(join(root, 'config'));
+        await writeFile(config, "<?php return ['exclude_keys' => ['app.*']];");
+        await expect.poll(() => text(root), { timeout: 10000 }).not.toContain('app.greeting');
+        await expect.poll(() => send.mock.calls).toContainEqual([{ type: 'full-reload' }]);
+
+        send.mockClear();
+        unwatchFile(config);
+        await writeFile(replacement, '<?php return [];');
+        await rename(replacement, config);
+
+        await expect
+            .poll(async () => (await text(root)).includes('Included after config replacement'), {
+                timeout: 10000,
+            })
+            .toBe(true);
+        await expect.poll(() => send.mock.calls).toContainEqual([{ type: 'full-reload' }]);
+    } finally {
+        await close(server, root);
+    }
+}, 30000);
 
 test('updates the catalog when a replacement config preserves its modification time', async () => {
     const root = await fixture();
