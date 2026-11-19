@@ -2,7 +2,21 @@
 
 ## Unreleased
 
-- Corrected the installation command to explicitly allow the required Dapter alpha on applications using Composer's default stability policy.
+- Configure the default color for bare `v-scrollbar` with `createFrontAwesome({ scrollbar: { defaultVariant: 'brand' } })`. The DataView table, print preview, and permission editor adopt the configured variant.
+
+- Add `v-scrollbar` with five theme modifiers and optional OverlayScrollbars options. The original HTML element owns scrolling, and the browser scrollbar remains available during server rendering and in forced colors.
+
+- Distinguish released Shift-click sorting from the source preview’s configurable modifier, icons, and header slots in the Boost skill.
+
+- Require Dapter `^1.0.0-beta.1` for the Composer integration and optional JavaScript peer dependency. Install Dapter beta.1 or later before refreshing Composer-delivered frontend dependencies.
+
+- Added platform-aware configurable DataView multi-sort modifiers, Font Awesome sort icons with literal-text overrides, and typed `head-ID` content slots. Existing full `header-ID` replacements remain supported.
+- Corrected ordinary header clicks at the end of a multi-sort direction cycle so the clicked column becomes the sole term instead of leaving another column primary.
+
+- Added prepared JSON vector inputs for Dapter PostgreSQL L2 search capabilities, including dimension and coordinate validation, source policy hints, and localized feedback.
+- Updated the borrowed Dapter handle integration for UUID browser persistence and portable `share()` links. Dapter continues to own expiration, version checks, restoration, and storage.
+
+- Corrected the installation command to explicitly allow the required Dapter beta on applications using Composer's default stability policy.
 - DataView now presents the field and global search, match operators, finite filters, field order terms, and offset presets advertised by a borrowed Dapter handle. Search fields retain focus during infinite reads and can be used inside application forms. Numeric searches reject drafts that would change value in JSON. Pagination distinguishes loaded, matching, and total counts and offers explicit cursor and saved-state recovery.
 - Added optional single or multiple occurrence selection, indexed row-key callbacks, contiguous grouped table cells, and typed selection in slots. Use `controlLabel` for application labels and the Laravel localization catalog for translated controls. Existing three-prop usage and layout, toolbar, filters, and pagination slots remain supported.
 
@@ -24,6 +38,9 @@
 ## Unreleased
 
 ### Features
+
+- Add the provider-neutral UserPermissionEditor for Inertia pages. It supports a searchable permission catalog, read-only access, complete boolean saves, and review of conflicting or unconfirmed writes.
+- Let the UserPermissionEditor grow with the catalog and keep its actions in view. Confirm discarding edits in a separate dialog with keyboard focus on Keep editing.
 
 - Add the optional DataView source preview with typed Dapter handles, declarative columns, cell slots, table, grid, and list layouts, capability-aware search and ordering, and source paging or infinite loading. Import it from `@artisan-toolbox/front-awesome/data-view`. Dapter remains optional for other Front Awesome imports.
 

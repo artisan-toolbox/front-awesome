@@ -24,7 +24,7 @@
                 >
             </div>
         </div>
-        <div class="print-paper-stage">
+        <div v-scrollbar class="print-paper-stage">
             <div
                 v-if="step.status === 'loading' || step.preview.status === 'loading'"
                 class="print-placeholder wa-stack wa-gap-m"
@@ -87,6 +87,7 @@ import { computed, ref, watch, type CSSProperties } from 'vue';
 import Button from '../components/WebAwesome/Button.vue';
 import Spinner from '../components/WebAwesome/Spinner.vue';
 import Callout from '../components/WebAwesome/Callout.vue';
+import { useScrollbarDirective } from '../scrollbar';
 import type { PrintStepView } from './types';
 import type { PrintingMessages } from './messages';
 const props = defineProps<{
@@ -95,6 +96,7 @@ const props = defineProps<{
     statusText: string;
 }>();
 defineEmits<{ retry: [] }>();
+const vScrollbar = useScrollbarDirective();
 const page = ref(0);
 const zoom = ref(100);
 watch(

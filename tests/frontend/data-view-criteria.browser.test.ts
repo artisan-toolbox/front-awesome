@@ -28,6 +28,25 @@ beforeEach(() => {
         ...definition,
         fields: {
             ...definition.fields,
+            embedding: {
+                search: {
+                    valueType: 'vector',
+                    matchTypes: ['vector'],
+                    vector: {
+                        engine: 'pgsql',
+                        metric: 'l2',
+                        dimensions: 3,
+                        maxDistance: 1,
+                        input: 'prepared_vector',
+                        precision: 'float32',
+                        maxCoordinateMagnitude: 1000000,
+                        threshold: 'inclusive',
+                        ranking: 'filter_only',
+                    },
+                },
+                order: null,
+                filters: null,
+            },
             amount: {
                 search: { valueType: 'number', matchTypes: ['equals'] },
                 order: { sortTypes: ['numeric', 'native'], directions: ['asc', 'desc'] },
@@ -448,3 +467,31 @@ test.each(['integer', 'number'] as const)(
         }
     },
 );
+
+test('submits prepared vector arrays, rejects invalid coordinates, and restores the accepted draft', async () => {
+    const adapter = await mount();
+    await page.getByText('Search and filters', { exact: true }).click();
+    const input = page.getByRole('textbox', { name: 'Search embedding' });
+    const group = controls('Search embedding');
+    await input.fill('[0,1]');
+    await group.getByRole('button', { name: 'Apply', exact: true }).click();
+    await expect
+        .element(page.getByRole('alert'))
+        .toHaveTextContent(
+            'Enter 3 finite numeric coordinates between -1000000 and 1000000 as a JSON array.',
+        );
+    expect(request).toHaveBeenCalledTimes(1);
+    await input.fill('[0,1,0]');
+    await group.getByRole('button', { name: 'Apply', exact: true }).click();
+    await expect
+        .poll(() => latest.fields.embedding?.search)
+        .toEqual({ value: [0, 1, 0], matchType: 'vector' });
+    await adapter.replaceState({
+        ...latest,
+        fields: { embedding: { search: { value: [1, 0, 0], matchType: 'vector' } } },
+    });
+    await expect.element(input).toHaveValue('[1,0,0]');
+    await group.getByRole('button', { name: 'Clear', exact: true }).click();
+    await expect.poll(() => latest.fields.embedding).toBeUndefined();
+    await expect.element(input).toHaveValue('');
+});

@@ -520,6 +520,36 @@ try {
             assert.ok(
                 await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
             );
+            const overlayRegion = page.locator('#theme-scrollbar');
+            const overlayRail = overlayRegion.locator('.os-scrollbar-vertical');
+            await overlayRail.waitFor({ state: 'attached' });
+            await overlayRegion.evaluate((element) => {
+                element.scrollTop = 60;
+            });
+            await page.emulateMedia({ forcedColors: 'active' });
+            await overlayRail.waitFor({ state: 'detached' });
+            assert.equal(
+                await overlayRegion.evaluate((element) => getComputedStyle(element).scrollbarColor),
+                'auto',
+            );
+            assert.equal(await overlayRegion.evaluate((element) => element.scrollTop), 60);
+            await page.emulateMedia({ forcedColors: 'none' });
+            await overlayRail.waitFor({ state: 'attached' });
+            assert.equal(await overlayRegion.evaluate((element) => element.scrollTop), 60);
+            await overlayRegion.evaluate((element) => {
+                element.setAttribute('data-test-responsive', '');
+            });
+            await page.setViewportSize({ width: 550, height: 800 });
+            await overlayRegion
+                .locator('.os-scrollbar-horizontal.os-scrollbar-visible')
+                .waitFor({ state: 'attached' });
+            await overlayRegion
+                .locator('.os-scrollbar-vertical.os-scrollbar-visible')
+                .waitFor({ state: 'detached' });
+            await page.setViewportSize({ width: 390, height: 800 });
+            await overlayRail.waitFor({ state: 'detached' });
+            await page.setViewportSize({ width: 800, height: 800 });
+            await overlayRail.waitFor({ state: 'attached' });
             await page.evaluate(() => {
                 document.body.innerHTML =
                     '<wa-page id="empty-page"><header slot="header">Standalone page</header><main>No navigation.</main></wa-page>';
@@ -538,6 +568,71 @@ try {
                     ),
                 0,
             );
+            await page.evaluate(() => {
+                document.documentElement.className = 'wa-light';
+                document.body.innerHTML = `
+                    <div class="fa-scrollbar" style="max-height: 80px; overflow: auto" role="region"
+                        aria-label="Scroll activity" tabindex="0">
+                        <div style="height: 240px">First activity</div>
+                        <p>Last activity</p>
+                    </div>
+                    <div class="fa-theme wa-dark" style="--color-gray-300: pink; --color-gray-950: navy">
+                        <div class="fa-scrollbar" style="max-height: 80px; overflow: auto" id="branded-scrollbar">
+                            <div style="height: 240px">Branded activity</div>
+                        </div>
+                        <div style="max-height: 80px; overflow: auto" id="native-scrollbar">
+                            <div style="height: 240px">Activity with system colors</div>
+                        </div>
+                    </div>`;
+            });
+            const scrollRegion = page.getByRole('region', { name: 'Scroll activity' });
+            await page.emulateMedia({ colorScheme: 'dark' });
+            const lightScrollbar = await scrollRegion.evaluate((element) => {
+                const style = getComputedStyle(element);
+                return { color: style.scrollbarColor, width: style.scrollbarWidth };
+            });
+            assert.ok(lightScrollbar.color.endsWith('rgb(255, 255, 255)'), lightScrollbar.color);
+            assert.equal(lightScrollbar.width, 'auto');
+            assert.equal(
+                await page
+                    .locator('#branded-scrollbar')
+                    .evaluate((element) => getComputedStyle(element).scrollbarColor),
+                'rgb(255, 192, 203) rgb(0, 0, 128)',
+            );
+            assert.equal(
+                await page
+                    .locator('#native-scrollbar')
+                    .evaluate((element) => getComputedStyle(element).scrollbarColor),
+                'auto',
+            );
+            await page.evaluate(() => {
+                document.documentElement.className = 'dark wa-dark';
+            });
+            await page.emulateMedia({ colorScheme: 'light' });
+            const darkScrollbar = await scrollRegion.evaluate(
+                (element) => getComputedStyle(element).scrollbarColor,
+            );
+            assert.notEqual(darkScrollbar, lightScrollbar.color);
+            assert.notEqual(darkScrollbar, 'auto');
+            await scrollRegion.focus();
+            await page.keyboard.press('End');
+            await page.waitForFunction(() => {
+                const region = document.activeElement;
+                return (
+                    region?.getAttribute('aria-label') === 'Scroll activity' && region.scrollTop > 0
+                );
+            });
+            const brandScrollbar = await scrollRegion.evaluate((element) => {
+                element.setAttribute('data-fa-scrollbar', 'brand');
+                return getComputedStyle(element).scrollbarColor;
+            });
+            assert.notEqual(brandScrollbar, darkScrollbar);
+            assert.notEqual(brandScrollbar, 'auto');
+            await page.emulateMedia({ forcedColors: 'active' });
+            assert.equal(
+                await scrollRegion.evaluate((element) => getComputedStyle(element).scrollbarColor),
+                'auto',
+            );
             assert.deepEqual(errors, []);
             results.push({
                 consumer: prime ? 'PrimeVue' : 'base without optional imports',
@@ -545,6 +640,7 @@ try {
                 interactionPairs: interactionPairs.length,
                 minimumContrast: Math.min(...contrasts.map((value) => value.ratio)),
                 page: 'desktop/mobile/padding/menu passed',
+                scrollbar: 'theme, keyboard, and live forced-colors fallback passed',
             });
         } finally {
             await page.close();

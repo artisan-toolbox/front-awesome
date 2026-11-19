@@ -2,7 +2,7 @@ import './app.css';
 import '@artisan-toolbox/front-awesome/web-awesome-tailwind';
 import '@awesome.me/webawesome/dist/components/button/button.js';
 import '@awesome.me/webawesome/dist/components/page/page.js';
-import { createApp, h } from 'vue';
+import { createApp, h, resolveDirective, withDirectives } from 'vue';
 import { createFrontAwesome } from '@artisan-toolbox/front-awesome';
 import Tag from '@artisan-toolbox/front-awesome/components/Tag.vue';
 import Icon from '@artisan-toolbox/front-awesome/components/Icon.vue';
@@ -12,6 +12,18 @@ const iconSource = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://
 createApp({
     render: () => [
         h('p', { id: 'native-text' }, 'Readable native text'),
+        withDirectives(
+            h(
+                'section',
+                {
+                    id: 'theme-scrollbar',
+                    'aria-label': 'Theme scroll activity',
+                    tabindex: 0,
+                },
+                [h('div', { style: 'height: 240px; min-width: 1200px' }, 'Notification history')],
+            ),
+            [[resolveDirective('scrollbar'), undefined, undefined, { brand: true }]],
+        ),
         ...['native', 'wrapper'].flatMap((kind) =>
             ['', 'p-0 border-0', 'p-4 border-4'].map((classes, index) => {
                 const content = () =>

@@ -8,7 +8,7 @@
         <Input
             :label="label"
             :size="size"
-            :hint="maxBytes ? t('fullTextLimit', { bytes: maxBytes }) : undefined"
+            :hint="hint"
             :model-value="draft"
             :failed="message || undefined"
             @update:model-value="edit"
@@ -57,6 +57,17 @@ const fieldCapability = computed(() =>
 const capability = computed(() =>
     props.field === undefined ? props.adapter.global?.search : fieldCapability.value,
 );
+const vectorPolicy = computed(() => fieldCapability.value?.available.vector);
+const hint = computed(() =>
+    vectorPolicy.value
+        ? t('vectorHint', {
+              dimensions: vectorPolicy.value.dimensions,
+              distance: vectorPolicy.value.maxDistance,
+          })
+        : maxBytes.value
+          ? t('fullTextLimit', { bytes: maxBytes.value })
+          : undefined,
+);
 const signature = () => JSON.stringify([capability.value?.available, capability.value?.current]);
 const { message, invalidate, run } = useControlFeedback(() => props.adapter, signature);
 const draft = ref('');
@@ -72,7 +83,8 @@ const maxBytes = computed(() => {
 watch(
     signature,
     () => {
-        draft.value = String(capability.value?.current?.value ?? '');
+        const current = capability.value?.current?.value;
+        draft.value = Array.isArray(current) ? JSON.stringify(current) : String(current ?? '');
         operator.value =
             fieldCapability.value?.current?.matchType ??
             fieldCapability.value?.available.matchTypes[0];
@@ -113,8 +125,43 @@ function submit() {
     }
     const live = fieldCapability.value;
     const matchType = operator.value;
-    if (!live || !matchType || !live.available.matchTypes.includes(matchType)) return;
+    if (
+        !live ||
+        !matchType ||
+        !live.available.matchTypes.some((available) => available === matchType)
+    )
+        return;
+    if (matchType === 'vector') {
+        const policy = live.available.vector;
+        let value: unknown;
+        try {
+            value = JSON.parse(raw);
+        } catch {
+            value = null;
+        }
+        if (
+            !policy ||
+            !Array.isArray(value) ||
+            value.length !== policy.dimensions ||
+            !value.every(
+                (coordinate: unknown) =>
+                    typeof coordinate === 'number' &&
+                    Number.isFinite(coordinate) &&
+                    Math.abs(coordinate) <= policy.maxCoordinateMagnitude,
+            )
+        ) {
+            invalidate();
+            message.value = t('invalidVector', { dimensions: policy?.dimensions ?? 0 });
+            return;
+        }
+        const coordinates: number[] = value.filter(
+            (coordinate): coordinate is number => typeof coordinate === 'number',
+        );
+        void run(() => live.call({ value: coordinates, matchType: 'vector' }));
+        return;
+    }
     const type = live.available.valueType;
+    if (type === 'vector') return;
     const value = type === 'string' ? raw : parseSearchNumber(raw, type);
     if (value === null) {
         invalidate();

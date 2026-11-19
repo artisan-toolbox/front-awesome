@@ -98,6 +98,16 @@ export type DataViewCellScope<
     K extends OccurrenceKey = never,
 > = DataViewItemScope<H, K> & Cell<H>;
 
+export type DataViewSortDirection = null | 0 | 1 | -1;
+type Head<H extends DataViewHandle> = Pick<Cell<H>, 'column'> & {
+    name: string;
+    sortDirection: DataViewSortDirection;
+};
+export type DataViewHeadScope<
+    H extends DataViewHandle,
+    K extends OccurrenceKey = never,
+> = DataViewScope<H, K> & Head<H>;
+
 type Slots<H extends DataViewHandle, Scope, ItemScope> = {
     [
         Name in
@@ -115,6 +125,8 @@ type Slots<H extends DataViewHandle, Scope, ItemScope> = {
     [Name in 'grid-item' | 'list-item']?: (scope: ItemScope) => unknown;
 } & {
     [Name in `cell-${string}`]?: (scope: ItemScope & Cell<H>) => unknown;
+} & {
+    [Name in `head-${string}`]?: (scope: Scope & Head<H>) => unknown;
 } & {
     [Name in `header-${string}`]?: (scope: Scope & Pick<Cell<H>, 'column'>) => unknown;
 };

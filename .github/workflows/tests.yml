@@ -66,13 +66,17 @@ jobs:
       - name: Verify PHP type coverage
         run: composer test:types
 
-      - name: Install Chromium for browser coverage
+      - name: Install engines for browser coverage
         if: matrix.os == 'ubuntu-latest' && matrix.stability == 'prefer-stable'
-        run: npx playwright install --with-deps chromium --only-shell
+        run: npx playwright install --with-deps chromium firefox webkit --only-shell
 
       - name: Verify shared theme production consumers
         if: matrix.os == 'ubuntu-latest' && matrix.stability == 'prefer-stable'
         run: npm run test:theme
+
+      - name: Verify Vue scrollbars in Firefox and WebKit
+        if: matrix.os == 'ubuntu-latest' && matrix.stability == 'prefer-stable'
+        run: npm run test:scrollbar
 
       - name: Report runtime test coverage
         if: matrix.os == 'ubuntu-latest' && matrix.stability == 'prefer-stable'

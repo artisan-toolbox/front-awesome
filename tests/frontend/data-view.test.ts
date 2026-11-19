@@ -41,6 +41,7 @@ test('distinguishes decoded properties, computed values, and presentation-only c
 test('keeps Dapter optional in the root and generated component barrels and compiles SFC macros', async () => {
     for (const file of [
         'resources/js/index.ts',
+        'resources/js/dataViewOptions.ts',
         'resources/js/components/index.ts',
         'resources/js/components/WebAwesome/index.ts',
     ]) {

@@ -246,6 +246,14 @@
           "title": "preserves boolean bindings before and after Web Awesome registers the button"
         },
         {
+          "file": "tests/frontend/data-view-sort.browser.test.ts",
+          "title": "keeps header replacement precedence and its original scope"
+        },
+        {
+          "file": "tests/frontend/data-view-sort.browser.test.ts",
+          "title": "reports null head direction when cursor paging disallows the advertised sort type"
+        },
+        {
           "file": "tests/frontend/popover.browser.test.ts",
           "title": "accepts the public Button trigger and preserves autofocus and native close links"
         },
@@ -397,6 +405,14 @@
         {
           "file": "tests/frontend/upstream-interactions.browser.test.ts",
           "title": "keeps grouped checkbox and switch choices independently submittable"
+        },
+        {
+          "file": "tests/frontend/user-permission-editor.browser.test.ts",
+          "title": "preserves the reported order and sends every boolean after an offscreen edit"
+        },
+        {
+          "file": "tests/frontend/user-permission-editor.browser.test.ts",
+          "title": "searches an accented group and reaches permissions beyond the progressive limit"
         }
       ]
     },
@@ -624,6 +640,18 @@
         {
           "file": "tests/frontend/appearance.browser.test.ts",
           "title": "mounts the appearance selector and keeps both styling systems in sync with the saved choice"
+        },
+        {
+          "file": "tests/frontend/data-view-sort.browser.test.ts",
+          "title": "renders default Font Awesome icons and changes direction icons through the public wrapper"
+        },
+        {
+          "file": "tests/frontend/data-view-sort.browser.test.ts",
+          "title": "inherits Font Awesome family and variant while rendering character overrides as text"
+        },
+        {
+          "file": "tests/frontend/data-view-sort.browser.test.ts",
+          "title": "passes numeric head states and exact scope while retaining sorting and pending feedback"
         },
         {
           "file": "tests/frontend/icon.browser.test.ts",

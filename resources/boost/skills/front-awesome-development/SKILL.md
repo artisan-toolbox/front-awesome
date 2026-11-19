@@ -13,7 +13,7 @@ Use Laravel 13.36 or later within Laravel 13.x, PHP 8.5, Inertia 3, Vue 3.5, Tai
 
 For applications on Laravel 13.0 through 13.35, update Laravel within 13.x before upgrading Front Awesome. It requires Illuminate Translation `^13.36` because earlier releases renumber numeric JSON translation keys.
 
-1. To install the `1.x` beta, run `composer require 'artisan-toolbox/front-awesome:^1.0@beta' 'artisan-toolbox/dapter:^1.0@alpha'` in the application root before installing frontend dependencies. Both prereleases need an explicit root requirement on a default-stable Composer host. Keep these stability exceptions scoped to the two packages. Dapter's JavaScript package is needed only for DataView. When compatible stable releases are available, use their documented stable constraints instead.
+1. To install the `1.x` beta, run `composer require 'artisan-toolbox/front-awesome:^1.0@beta' 'artisan-toolbox/dapter:^1.0.0-beta.1'` in the application root before installing frontend dependencies. Both prereleases need an explicit root requirement on a default-stable Composer host. Keep these stability exceptions scoped to the two packages. Dapter's JavaScript package is needed only for DataView. When compatible stable releases are available, use their documented stable constraints instead.
 2. Declare both frontend packages in the application's `package.json`. Mosaicast is a peer dependency of Front Awesome. Run `npm install --install-links ./vendor/artisan-toolbox/front-awesome ./vendor/artisan-toolbox/mosaicast` from the application root. Keep `install-links=true` in the application's `.npmrc` so `npm ci` uses the same mode.
 3. Add `frontAwesome()` from `@artisan-toolbox/front-awesome/vite` alongside `@vitejs/plugin-vue` in the application's Vite plugins. It recognizes `wa-` custom elements automatically and preserves existing custom element matchers and Vue compiler options.
 4. Import `@artisan-toolbox/front-awesome/styles.css` after Tailwind in the application's CSS entry. If the application needs the standard Web Awesome stylesheet, import `@artisan-toolbox/front-awesome/web-awesome.css` from the JavaScript entry.
@@ -274,6 +274,10 @@ Publish the editable branding file with `php artisan vendor:publish --tag=front-
 
 Use the shared `@theme` variables for colors, fonts, spacing, radii, and complete shadows. The class-based dark variant follows `.dark`; `createFrontAwesome({ appearance: true })` manages `.dark`, `.wa-light`, and `.wa-dark`. Use one appearance controller per document. Add `fa-theme` to local branding scopes.
 
+In the scrollbar source preview, load the shared theme and install `createFrontAwesome()` to register `v-scrollbar`. Apply it to a named HTML element with a bounded size and `overflow: auto` or `overflow: scroll`. Bare `v-scrollbar` defaults to neutral. In the existing plugin registration, set `createFrontAwesome({ scrollbar: { defaultVariant: 'brand' } })` to choose the default for that app, including the DataView table, print preview, and permission editor. The modifiers `.neutral`, `.brand`, `.success`, `.warning`, and `.danger` override the app default.
+
+Pass optional OverlayScrollbars settings with `v-scrollbar.brand="{ scrollbars: { autoHide: 'leave' } }"`. Import `ScrollbarOptions` for a typed binding. The original element receives native scroll events and keeps its scroll position when options change. The fallback uses the browser scrollbar for server rendering, native form controls, and forced colors. Use `fa-scrollbar` or a variant class such as `fa-scrollbar-brand` for CSS-only styling. See the [scrollbar guide](https://atb.dev.br/docs/front-awesome/scrollbar/).
+
 The published template includes complete commented ramps for neutral, success, warning, and danger customization through the physical `gray`, `green`, `yellow`, and `red` Tailwind palettes. Uncomment and replace all eleven stops of a ramp. These changes also affect utilities and other components that use that physical palette. Tailwind's native `neutral` palette remains separate from the gray-backed Web Awesome neutral role. Existing application-owned branding files are preserved when republishing. Compare the updated package template with your file and copy the desired examples without using `--force`.
 
 For optional PrimeVue 4 styled mode, install `primevue` and `@primeuix/themes`, import `frontAwesomePrimeVueTheme` from `@artisan-toolbox/front-awesome/primevue`, and pass it as PrimeVue's `theme` option. Keep its named CSS layer and `.wa-dark` selector. Removing this import removes the optional adapter.
@@ -432,7 +436,7 @@ The Drawer exposes `preview`, `settings`, `settings-extra`, `summary`, and `foot
 
 ## Present Dapter results with DataView
 
-Use the optional `@artisan-toolbox/front-awesome/data-view` entry when an application needs a table, grid, or list backed by an existing Dapter source. Front Awesome 1.0.0-beta.3 includes the three-layout renderer. Install Dapter 1.0.0-alpha.1 through Composer first, then add `"@artisan-toolbox/dapter": "file:vendor/artisan-toolbox/dapter"` and run npm install. Dapter is optional for the other Front Awesome entries.
+Use the optional `@artisan-toolbox/front-awesome/data-view` entry when an application needs a table, grid, or list backed by an existing Dapter source. Front Awesome 1.0.0-beta.3 includes the three-layout renderer. Install Dapter 1.0.0-beta.1 through Composer first, then add `"@artisan-toolbox/dapter": "file:vendor/artisan-toolbox/dapter"` and run npm install. Dapter is optional for the other Front Awesome entries.
 
 Start with the Front Awesome Vite and stylesheet setup above and a registered Dapter source named `Catalog` that returns rows such as `{ "id": 1, "name": "Notebook" }`. Complete [Dapter installation](https://atb.dev.br/docs/dapter/installation) before rendering the component.
 
@@ -466,6 +470,16 @@ The initial table displays Notebook in bold. The Grid control changes presentati
 
 Declare layouts in display order. Grid and list each require `#grid-item` or `#list-item`. A single layout has no selector. Grid-only and list-only configurations need no columns. Row keys must be unique finite numbers or strings; pass a scalar property name or callback. Use `size="s"`, `"m"`, or `"l"`, table `striped` and `hover`, and column `align` of `start`, `center`, or `end`.
 
+The unreleased local preview also renders PostgreSQL vector-only field searches. Enter a JSON array of the advertised number of finite numeric coordinates. For example, `[0, 1, 0]` submits a prepared three-dimensional vector. The hint shows the maximum inclusive L2 distance. Invalid dimensions or coordinates remain a local draft without an HTTP request. DataView preserves the source's declared result order and does not generate embeddings.
+
+URL state and sharing remain owned by Dapter. With protocol 2 and URL persistence enabled, ordinary links hold a UUID whose requested state expires in localStorage. Use `catalog.share()` in an application control or a slot's `adapter.share()` for a portable link. The same borrowed handle supplies that function. Dapter checks the DataStore class version and turns a valid shared snapshot into a new local UUID. Missing or expired local state returns to defaults. DataView does not add another storage policy or share prop.
+
+Front Awesome beta.3 uses Shift-click to add a second sort term. The matching unpublished Front Awesome source uses Command-click on macOS and Control-click on Windows and Linux for header multi-sort. Configure `createFrontAwesome({ dataView: { multiSortKey: 'shift' } })` to select `auto`, `meta`, `ctrl`, `shift`, or `alt`. A plain click in a multi-term order selects that field alone. At its last allowed direction it restarts the clicked field rather than leaving a different column primary. A single-term order still cycles to clear. Modifier clicks at the last direction clear only their own term.
+
+In that unpublished source, default sort icons use Font Awesome `classic` `solid` with `sort`, `sort-up`, and `sort-down`. Configure `dataView.sortIcons.family` and `variant`, and override `ascending`, `descending`, or `unsorted` with `{ name: 'arrow-up' }` or a literal character such as `'↑'`. Icon objects can override their own family and variant. The existing public Icon integration owns kit and source resolution. Strings are text, not HTML.
+
+In that unpublished source, use `#head-name="{ name, sortDirection }"` for a column whose ID is `name`. `name` is its configured label. `sortDirection` is `null` when unavailable, `0` when unsorted, `1` ascending, or `-1` descending. The typed scope also provides `column`, the exact `adapter`, `view`, and `selection`. This content replaces the label, icon, and priority inside the built-in button, retaining keyboard/modifier handling and primary accepted `aria-sort`. The older `#header-name` full replacement remains supported and takes precedence. `useDataViewOptions()` exposes the resolved readonly plugin configuration without requiring Dapter in the base plugin entry.
+
 Configure source, decoders, actions, URL state, live updates, polling, and infinite loading in `useDataAdapter`. Pass its exact handle as `adapter`. DataView rejects creator options and requires a keyed remount when replacing the handle. It has no `source` shorthand or top-level `columns` option. Borrow the same handle for sibling controls or another DataView.
 
 The local Front Awesome preview adds the criteria editor, selection, grouping, localized controls, and richer paging feedback described below. Check the installed Front Awesome source before using these additions.
@@ -481,3 +495,13 @@ Keep prefilled keys scoped to the current owner or tenant. The component prunes 
 Use the optional localization service with the exported Laravel `front-awesome::data-view` messages. Without that service the controls use English. Return a label from `controlLabel(subject)` for a field, filter, typed option, or selectable row. Return `undefined` to use the standard label.
 
 The `#pagination`, `#loading`, `#empty`, `#error`, and `#integration-error` slots replace their own regions. Use `#actions` and `#footer` for application-specific controls. Dapter owns URL restoration, live and polling configuration, and infinite loading. DataView reports available counts, offers a cursor restart when needed, and exposes explicit retry on a paused infinite window. [DataView guides](https://atb.dev.br/docs/front-awesome/data-view)
+
+## User permission editor
+
+Use `@artisan-toolbox/front-awesome/components/UserPermissionEditor.vue` when an Inertia application provides a permission catalog for an authenticated user. Publish the editor capability as the shared `userPermissionEditor` prop with `version: 1` and a same-origin `endpoint`. The backend must authorize every read and write.
+
+Use `v-model:open` with `subject-id` and an optional `subject-label`. To reuse one modal for many rows, type a component ref with the root export `UserPermissionEditorHandle` and call `editor.value?.show({ subjectId: user.id, subjectLabel: user.name })`. Pass integer IDs outside JavaScript's safe range as strings. The editor loads the selected subject when opened and keeps filtered changes in the full draft.
+
+Closing the editor or selecting another subject with unsaved changes opens a discard confirmation. Keep editing or press Escape to return to the current draft.
+
+Return a catalog and editable boolean values on GET, keyed by the subject's `user` query parameter. Accept a complete boolean map and its revision on PUT. Return `204` when saved and `409` for a stale revision. The editor loads current values before offering another save if the outcome is uncertain. It uses the application localization service with the `front-awesome::user-permission-editor` catalog and an English fallback. See the [permission editor guide](https://atb.dev.br/docs/front-awesome/user-permission-editor).

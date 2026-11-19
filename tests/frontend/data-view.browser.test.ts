@@ -5,15 +5,17 @@ import {
     type HttpRequestConfig,
     type HttpResponse,
 } from '@inertiajs/core';
-import { afterEach, beforeEach, expect, test, vi } from 'vite-plus/test';
+import { afterEach, beforeEach, expect, onTestFinished, test, vi } from 'vite-plus/test';
 import { page, userEvent } from 'vitest/browser';
 import { createApp, nextTick, h, shallowRef, type App } from 'vue';
 import Fixture from './DataViewFixture.vue';
+import { createFrontAwesome } from '@artisan-toolbox/front-awesome';
 import { DataView } from '@artisan-toolbox/front-awesome/data-view';
 import { useDataAdapter, defineActions } from '@artisan-toolbox/dapter';
 import corpus from '@artisan-toolbox/dapter/contracts/read-v1.json';
 import { decodeRow, intent, response } from './data-view-fixtures';
 import '@artisan-toolbox/front-awesome/web-awesome.css';
+import themeCss from '../theme-consumer/app.css?inline';
 const original = http.getClient();
 const request = vi.fn<(config: HttpRequestConfig) => Promise<HttpResponse>>();
 const cleanups: (() => void)[] = [];
@@ -94,6 +96,39 @@ test('renders grid alone without columns or a selector', async () => {
         .not.toBeInTheDocument();
     expect(request).toHaveBeenCalledTimes(1);
 });
+
+test('inherits the app scrollbar variant on the table viewport and preserves horizontal scroll', async () => {
+    const style = document.createElement('style');
+    style.textContent = themeCss;
+    document.head.append(style);
+    onTestFinished(() => style.remove());
+    request.mockResolvedValue(respond(response()));
+    mount({}, (app, container) => {
+        container.style.width = '360px';
+        container.classList.add('fa-theme', 'wa-light');
+        app.use(createFrontAwesome({ scrollbar: { defaultVariant: 'danger' } }));
+    });
+    const table = page.getByRole('table');
+    await expect.element(table).toBeVisible();
+    const element = table.element();
+    if (!(element instanceof HTMLTableElement) || !element.parentElement) {
+        throw new Error('Expected a native table in its scroll viewport.');
+    }
+    const viewport = element.parentElement;
+    element.style.minWidth = '1000px';
+    expect(viewport.getAttribute('data-fa-scrollbar')).toBe('danger');
+    await expect
+        .poll(() => viewport.querySelector('.os-scrollbar-horizontal.os-scrollbar-visible'))
+        .not.toBeNull();
+    viewport.scrollLeft = 90;
+    expect(viewport.scrollLeft).toBe(90);
+
+    await page.getByRole('button', { name: 'Grid', exact: true }).click();
+    await expect.element(table).not.toBeInTheDocument();
+    expect(viewport.isConnected).toBe(false);
+    expect(request).toHaveBeenCalledTimes(1);
+});
+
 test('orders through the advertised alias and keeps accepted aria-sort while a request is pending', async () => {
     request.mockResolvedValueOnce(respond(response()));
     mount();
@@ -620,10 +655,10 @@ test.each([false, true])(
     },
 );
 
-test('restores source defaults from an invalid saved state with an explicit reset', async () => {
+test('discards an invalid saved reference and retains an explicit reset to defaults', async () => {
     const originalUrl = location.href;
     const saved = new URL(originalUrl);
-    saved.searchParams.set('dapter[invalid-snapshot]', 'broken');
+    saved.searchParams.set('catalog.invalid-snapshot', 'broken');
     history.replaceState(history.state, '', saved.href);
     const replace = vi.spyOn(router, 'replace').mockImplementation((options) => {
         if (typeof options.url === 'string') history.replaceState(history.state, '', options.url);
@@ -633,13 +668,27 @@ test('restores source defaults from an invalid saved state with an explicit rese
         replace.mockRestore();
         history.replaceState(history.state, '', originalUrl);
     });
+    request.mockResolvedValue(
+        respond({
+            ...response(),
+            browserState: {
+                key: 'catalog',
+                version: 'a'.repeat(64),
+                expiration: { minutes: 240 },
+            },
+        }),
+    );
     mount({ historyId: 'invalid-snapshot' });
-    await expect.element(page.getByText('The saved adapter state is invalid.')).toBeVisible();
-    expect(request).not.toHaveBeenCalled();
-    request.mockResolvedValueOnce(respond(response()));
+    await expect.element(page.getByText('ALPHA', { exact: true })).toBeVisible();
+    await expect
+        .poll(() => new URL(location.href).searchParams.has('catalog.invalid-snapshot'))
+        .toBe(false);
+    expect(request).toHaveBeenCalledTimes(1);
+    expect(JSON.parse(String(request.mock.calls[0]?.[0].data))).toEqual({ version: 2 });
     await page.getByRole('button', { name: 'Reset to source defaults' }).click();
     await expect.element(page.getByText('ALPHA', { exact: true })).toBeVisible();
-    expect(request).toHaveBeenCalledTimes(1);
+    expect(request).toHaveBeenCalledTimes(2);
+    expect(JSON.parse(String(request.mock.calls[1]?.[0].data))).toEqual({ version: 2 });
 });
 
 test('passes protocol-one rows and explicit authorized HTTP actions through a presentation slot', async () => {

@@ -227,6 +227,7 @@
     "./printing": "./resources/js/printing/index.ts",
     "./printing/PrintDrawer.vue": "./resources/js/printing/PrintDrawer.vue",
     "./localization": "./resources/js/localization/index.ts",
+    "./components/UserPermissionEditor.vue": "./resources/js/user-permission-editor/UserPermissionEditor.vue",
     "./components/Language.vue": "./resources/js/preferences/Language.vue",
     "./components/Timezone.vue": "./resources/js/preferences/Timezone.vue",
     "./components/Currency.vue": "./resources/js/preferences/Currency.vue",
@@ -243,6 +244,7 @@
     "dev": "vp dev",
     "test": "vp test run --project unit",
     "test:browser": "vp test run --project chromium",
+    "test:scrollbar": "vp test run --mode scrollbar --project firefox --project webkit",
     "test:coverage": "vp test run --coverage",
     "check": "vp check && npm run typecheck && npm run theme:check && npm run components:check && npm run examples:check && npm run translations:check",
     "check:fix": "vp check --fix",
@@ -267,6 +269,7 @@
   "dependencies": {
     "@awesome.me/webawesome": "^3.14.0",
     "@vueuse/core": "^14.0.0",
+    "overlayscrollbars": "2.17.1",
     "vue-i18n": "^11.4.18"
   },
   "devDependencies": {
@@ -285,7 +288,7 @@
     "vue-tsc": "^3.3.14"
   },
   "peerDependencies": {
-    "@artisan-toolbox/dapter": "^1.0.0-alpha.1",
+    "@artisan-toolbox/dapter": "^1.0.0-beta.1",
     "@artisan-toolbox/mosaicast": "^1.1.1",
     "@artisan-toolbox/qztray": "^1.3.0",
     "@inertiajs/vue3": "^3.0.0",

@@ -11,4 +11,6 @@ export type {
     DataViewItemScope,
     DataViewCellScope,
     DataViewSlots,
+    DataViewHeadScope,
+    DataViewSortDirection,
 } from './types';

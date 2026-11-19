@@ -1,4 +1,5 @@
 @layer theme, base, wa-native, wa-base, wa-utilities, wa-color-palette, wa-color-variant, wa-theme, wa-theme-dimension, wa-theme-overrides, app-branding, primevue, components, utilities;
+@import 'overlayscrollbars/overlayscrollbars.css' layer(base);
 /* Retain native theme inputs referenced at runtime by the optional PrimeVue preset. */
 @import 'tailwindcss' theme(static);
 @import './theme/tokens.css';
@@ -35,5 +36,84 @@
             [slot='footer']
         ) {
         padding: revert-layer;
+    }
+}
+
+@layer components {
+    [data-fa-scrollbar] {
+        --fa-scrollbar-overlay-ready: 1;
+    }
+
+    .fa-scrollbar,
+    [data-fa-scrollbar='neutral'] {
+        --fa-scrollbar-thumb: var(--wa-color-text-quiet, GrayText);
+    }
+
+    .fa-scrollbar-brand,
+    [data-fa-scrollbar='brand'] {
+        --fa-scrollbar-thumb: var(--wa-color-brand-fill-loud, GrayText);
+    }
+
+    .fa-scrollbar-success,
+    [data-fa-scrollbar='success'] {
+        --fa-scrollbar-thumb: var(--wa-color-success-fill-loud, GrayText);
+    }
+
+    .fa-scrollbar-warning,
+    [data-fa-scrollbar='warning'] {
+        --fa-scrollbar-thumb: var(--wa-color-warning-fill-loud, GrayText);
+    }
+
+    .fa-scrollbar-danger,
+    [data-fa-scrollbar='danger'] {
+        --fa-scrollbar-thumb: var(--wa-color-danger-fill-loud, GrayText);
+    }
+
+    @media (forced-colors: none) {
+        .fa-scrollbar,
+        .fa-scrollbar-brand,
+        .fa-scrollbar-success,
+        .fa-scrollbar-warning,
+        .fa-scrollbar-danger,
+        [data-fa-scrollbar] {
+            scrollbar-color: var(--fa-scrollbar-thumb) var(--wa-color-surface-default, Canvas);
+        }
+    }
+
+    .fa-scrollbar-overlay {
+        --os-size: 14px;
+        --os-padding-perpendicular: 3px;
+        --os-padding-axis: 4px;
+        --os-track-border-radius: 999px;
+        --os-track-bg: transparent;
+        --os-track-bg-hover: var(--wa-color-surface-raised, Canvas);
+        --os-track-bg-active: var(--os-track-bg-hover);
+        --os-handle-border-radius: 999px;
+        --os-handle-bg: var(--fa-scrollbar-thumb, GrayText);
+        --os-handle-bg-hover: color-mix(
+            in oklab,
+            var(--os-handle-bg),
+            var(--wa-color-text-normal, CanvasText) 25%
+        );
+        --os-handle-bg-active: var(--os-handle-bg-hover);
+        --os-handle-min-size: 40px;
+        --os-handle-perpendicular-size: 60%;
+        --os-handle-perpendicular-size-hover: 100%;
+        --os-handle-perpendicular-size-active: 100%;
+        --os-handle-interactive-area-offset: 4px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .fa-scrollbar-overlay,
+        .fa-scrollbar-overlay .os-scrollbar-track,
+        .fa-scrollbar-overlay .os-scrollbar-handle {
+            transition: none;
+        }
+    }
+
+    @media print {
+        .fa-scrollbar-overlay {
+            display: none;
+        }
     }
 }

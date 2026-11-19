@@ -2,12 +2,30 @@ export type * from './WebAwesome/componentProps';
 import { createMosaicast } from '@artisan-toolbox/mosaicast';
 import type { MosaicastPluginOptions } from '@artisan-toolbox/mosaicast';
 import type { App, Plugin } from 'vue';
+import { dataViewOptionsKey, resolveDataViewOptions } from './dataViewOptions';
+import type { DataViewOptions, ResolvedDataViewOptions } from './dataViewOptions';
+export { useDataViewOptions } from './dataViewOptions';
+export type {
+    DataViewOptions,
+    DataViewMultiSortKey,
+    DataViewSortIcon,
+    ResolvedDataViewOptions,
+} from './dataViewOptions';
 import { initializeFlashToast } from './WebAwesome/flashToast';
 import type { FlashToastOptions } from './WebAwesome/flashToast';
 import { toastKey, toastService } from './WebAwesome/toast';
 import type { ToastService } from './WebAwesome/toast';
 import { initializeAppearance } from './preferences/appearance';
 import type { PreferencesService } from './preferences/types';
+import {
+    createScrollbarDirective,
+    legacyScrollbarDirective,
+    scrollbarDirective,
+    scrollbarDirectiveKey,
+    type ScrollbarPluginOptions,
+} from './scrollbar';
+export { scrollbarDirective };
+export type { ScrollbarOptions, ScrollbarPluginOptions, ScrollbarVariant } from './scrollbar';
 export { createPreferences, usePreferences } from './preferences';
 export type {
     Preferences,
@@ -50,9 +68,15 @@ export type { TagProps } from './WebAwesome/tagProps';
 export type { TooltipProps } from './WebAwesome/tooltipProps';
 export type { PopoverProps } from './WebAwesome/popoverProps';
 export type { PageProps } from './WebAwesome/pageProps';
+export { default as UserPermissionEditor } from './user-permission-editor/UserPermissionEditor.vue';
+export type {
+    UserPermissionEditorHandle,
+    UserPermissionEditorSubject,
+} from './user-permission-editor/protocol';
 
 export interface FrontAwesomeServices {
     toast: ToastService;
+    dataView?: ResolvedDataViewOptions;
     localization?: LocalizationService;
     preferences?: PreferencesService;
 }
@@ -65,15 +89,22 @@ declare module 'vue' {
     interface ComponentCustomProperties {
         $frontAwesome: FrontAwesomeServices;
     }
+
+    interface GlobalDirectives {
+        vScrollbar: typeof scrollbarDirective;
+        vFaScrollbar: typeof legacyScrollbarDirective;
+    }
 }
 
 export interface FrontAwesomeOptions {
     mosaicast?: MosaicastPluginOptions;
+    dataView?: DataViewOptions;
     flashToast?: FlashToastOptions;
     appearance?: boolean;
     printing?: FrontAwesomePrinting;
     localization?: LocalizationService;
     preferences?: PreferencesService;
+    scrollbar?: ScrollbarPluginOptions;
 }
 
 // Mosaicast 1.1 keeps its Inertia listener for the document lifetime.
@@ -86,13 +117,22 @@ export function createFrontAwesome({
     printing,
     localization,
     preferences,
+    dataView,
+    scrollbar,
 }: FrontAwesomeOptions = {}): Plugin {
+    const dataViewOptions = resolveDataViewOptions(dataView);
+    const configuredScrollbar = createScrollbarDirective(scrollbar);
     return {
         install(app) {
+            app.directive('scrollbar', configuredScrollbar);
+            app.directive('fa-scrollbar', legacyScrollbarDirective);
+            app.provide(dataViewOptionsKey, dataViewOptions);
+            app.provide(scrollbarDirectiveKey, configuredScrollbar);
             app.provide(toastKey, toastService);
             app.config.globalProperties.$frontAwesome = {
                 ...app.config.globalProperties.$frontAwesome,
                 toast: toastService,
+                dataView: dataViewOptions,
             };
             if (preferences) preferences.install(app);
             if (localization) localization.install(app);

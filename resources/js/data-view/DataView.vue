@@ -98,7 +98,7 @@
             >
         </div>
         <div class="data-view-results min-w-0" :aria-busy="state.adapter.paging.loading">
-            <div v-if="activeView === 'table'" class="data-view-scroll overflow-x-auto">
+            <div v-if="activeView === 'table'" v-scrollbar class="data-view-scroll overflow-x-auto">
                 <table
                     class="data-view-table"
                     :class="{
@@ -128,22 +128,48 @@
                                         v-if="head.order"
                                         appearance="plain"
                                         :size="size ?? 'm'"
-                                        :title="t(head.order.canAdd ? 'sortShift' : 'sortHeader')"
+                                        :title="
+                                            head.order.canAdd
+                                                ? t('sortModifier', {
+                                                      key: t(modifierLabels[sortModifier]),
+                                                  })
+                                                : t('sortHeader')
+                                        "
                                         @click="clickHeader(head.column, $event)"
                                     >
-                                        {{ head.column.label
-                                        }}<span v-if="head.order.current">
-                                            {{ head.order.current.direction === 'asc' ? '↑' : '↓' }}
-                                            {{
-                                                state.adapter.global?.multi_order
-                                                    ? head.order.current.priority
-                                                    : ''
-                                            }}</span
-                                        ><span v-if="head.order.pending">
-                                            ({{ t('pending') }})</span
+                                        <slot
+                                            :name="`head-${head.id}`"
+                                            v-bind="{ ...scope, name: head.column.label }"
+                                            :column="head.column"
+                                            :sort-direction="head.sortDirection"
                                         >
+                                            {{ head.column.label }}
+                                            <span aria-hidden="true">
+                                                <template v-if="typeof head.icon === 'string'">{{
+                                                    head.icon
+                                                }}</template>
+                                                <Icon
+                                                    v-else-if="head.icon"
+                                                    v-bind="head.icon"
+                                                    library="default"
+                                                />
+                                                {{
+                                                    state.adapter.global?.multi_order
+                                                        ? head.order.current?.priority
+                                                        : ''
+                                                }}
+                                            </span>
+                                        </slot>
+                                        <span v-if="head.order.pending"> ({{ t('pending') }})</span>
                                     </Button>
-                                    <template v-else>{{ head.column.label }}</template>
+                                    <slot
+                                        v-else
+                                        :name="`head-${head.id}`"
+                                        v-bind="{ ...scope, name: head.column.label }"
+                                        :column="head.column"
+                                        :sort-direction="head.sortDirection"
+                                        >{{ head.column.label }}</slot
+                                    >
                                 </slot>
                             </th>
                         </tr>
@@ -234,6 +260,10 @@
 import { computed, onBeforeUpdate, shallowRef, watch, watchEffect } from 'vue';
 import { useDataAdapter, type DataAdapterProps } from '@artisan-toolbox/dapter';
 import Button from '../components/WebAwesome/Button.vue';
+import Icon from '../components/WebAwesome/Icon.vue';
+import { useDataViewOptions } from '../dataViewOptions';
+import { useScrollbarDirective } from '../scrollbar';
+import { useSortModifier, sortModifierPressed } from './sortModifier';
 import Spinner from '../components/WebAwesome/Spinner.vue';
 import Callout from '../components/WebAwesome/Callout.vue';
 import DataViewToolbar from './DataViewToolbar.vue';
@@ -257,6 +287,7 @@ import type {
     ResultKey,
     DataViewLabelSubject,
     DataViewViews,
+    DataViewSortDirection,
 } from './types';
 import { orderModel } from './OrderModel';
 import { useControlFeedback, type ControlLabel } from './controlFeedback';
@@ -267,6 +298,7 @@ import { useDocumentId } from './documentId';
 type Row = H['data'][number];
 type Key = ResultKey<Row, K>;
 defineOptions({ inheritAttrs: false });
+const vScrollbar = useScrollbarDirective();
 const props = defineProps<{
     adapter: H;
     views: DataViewViews<NoInfer<H>['data'][number]>;
@@ -301,6 +333,14 @@ const emit = defineEmits<{
 }>();
 const state = { adapter: useDataAdapter<H>(props.adapter) };
 const t = useDataViewText();
+const options = useDataViewOptions();
+const sortModifier = useSortModifier(options.multiSortKey);
+const modifierLabels = {
+    meta: 'sortKeyMeta',
+    ctrl: 'sortKeyCtrl',
+    shift: 'sortKeyShift',
+    alt: 'sortKeyAlt',
+} as const;
 const editorGeneration = shallowRef(0);
 watch(
     () => !!state.adapter.definition,
@@ -443,7 +483,23 @@ const headers = computed(() => {
             hasPrimary = true;
             ariaSort = order.accepted.direction === 'asc' ? 'ascending' : 'descending';
         }
-        return { column, id: columnId(column), order, ariaSort };
+        const sortDirection: DataViewSortDirection = !order
+            ? null
+            : !order.current
+              ? 0
+              : order.current.direction === 'asc'
+                ? 1
+                : -1;
+        const icon = !order
+            ? null
+            : options.sortIcons[
+                  sortDirection === 1
+                      ? 'ascending'
+                      : sortDirection === -1
+                        ? 'descending'
+                        : 'unsorted'
+              ];
+        return { column, id: columnId(column), order, ariaSort, sortDirection, icon };
     });
 });
 const sortFeedback = useControlFeedback(
@@ -464,7 +520,9 @@ function clickHeader(column: DataViewColumn<Row>, event: MouseEvent) {
     const order = orderModel(state.adapter, column.orderBy);
     if (order)
         void sortFeedback.run(
-            () => order.cycle(event.shiftKey) ?? Promise.resolve({ status: 'superseded' }),
+            () =>
+                order.cycle(sortModifierPressed(sortModifier.value, event)) ??
+                Promise.resolve({ status: 'superseded' }),
         );
 }
 </script>

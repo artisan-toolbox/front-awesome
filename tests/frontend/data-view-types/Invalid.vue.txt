@@ -1,5 +1,10 @@
 <template>
     <DataView :adapter="catalog" :views="{ table: { columns: [{ field: 'name', label: 'Name' }] } }" row-key="id" source="WrongOwner">
+        <template #head-name="{ name, sortDirection, adapter, selection }">
+            {{ name.toFixed() }} {{ sortDirection.toUpperCase() }}
+            {{ adapter.data[0].missing }}
+            <button @click="selection?.set('invalid-head-key', true)">Invalid head key</button>
+        </template>
         <template #cell-name="{ row, adapter }">
             {{ row.missing }}
             <button @click="adapter.fields?.status?.filters?.selected?.call({ value: 19 })">Invalid filter</button>

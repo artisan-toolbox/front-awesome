@@ -7,6 +7,23 @@
     --radius-md: 0.625rem;
     --shadow-md: 0 4px 12px rgb(0 0 0 / 0.15);
 }
+
+#theme-scrollbar {
+    max-height: 80px;
+    overflow: hidden auto;
+}
+
+@media (width <= 600px) {
+    #theme-scrollbar[data-test-responsive] {
+        overflow: auto hidden;
+    }
+}
+
+@media (width <= 400px) {
+    #theme-scrollbar[data-test-responsive] {
+        overflow: visible;
+    }
+}
 @layer app-branding {
     .custom-brand {
         --color-brand-50: var(--color-indigo-50);

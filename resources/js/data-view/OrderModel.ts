@@ -33,9 +33,12 @@ export function orderModel(adapter: DataViewHandle, field: string | undefined) {
             (requested?.kind === 'fields' ? requested.terms.length : 0) <
                 adapter.global.multi_order_limit);
     function cycle(add: boolean) {
-        const next = current
+        const nextDirection = current
             ? directions[directions.indexOf(current.direction) + 1]
             : directions[0];
+        const replacingMultiple =
+            !add && requested?.kind === 'fields' && requested.terms.length > 1;
+        const next = nextDirection ?? (replacingMultiple ? directions[0] : undefined);
         const sortType = current?.sortType ?? sortTypes[0];
         if (!next) return capability?.clear();
         if (sortType && (!add || canAdd))

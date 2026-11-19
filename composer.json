@@ -23,7 +23,7 @@
     ],
     "require": {
         "php": "^8.5",
-        "artisan-toolbox/dapter": "^1.0.0-alpha.1",
+        "artisan-toolbox/dapter": "^1.0.0-beta.1",
         "artisan-toolbox/maintainer": "^1.10.0",
         "artisan-toolbox/mosaicast": "^1.1.1",
         "artisan-toolbox/qztray": "^1.4",

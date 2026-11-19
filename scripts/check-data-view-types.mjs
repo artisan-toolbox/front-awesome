@@ -77,6 +77,8 @@ try {
         /Type 'number' is not assignable to type '"active" \| "archived"'/,
         /Type 'string' is not assignable to type 'number'/,
         /Type '"missing"' is not assignable to type 'DataViewRowKey/,
+        /Property 'toUpperCase' does not exist on type '(?:0 \| 1 \| -1|0)'/,
+        /Argument of type 'string' is not assignable to parameter of type 'number'/,
     ];
     if (result.status === 0 || checks.some((check) => !check.test(diagnostics))) {
         process.stderr.write(diagnostics);

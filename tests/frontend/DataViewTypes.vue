@@ -10,6 +10,12 @@
                 subject.kind === 'row' ? subject.row.name + subject.key.toFixed() : undefined
         "
     >
+        <template #head-name="{ name, sortDirection, adapter, column, selection }">
+            {{ name.toUpperCase() }} {{ column.label }}
+            {{ sortDirection === null ? 'Unavailable' : sortDirection.toFixed() }}
+            {{ adapter.data[0]?.name.toUpperCase() }}
+            <span>{{ selection?.keys[0]?.toFixed() }}</span>
+        </template>
         <template #cell-name="{ row, adapter, value, rowKey, selected, selection }">
             {{ rowKey.toFixed() }} {{ selected }}
             <button @click="selection?.set(rowKey, true)">Select</button>
@@ -74,6 +80,8 @@ import {
     type DataViewItemScope,
     type DataViewCellScope,
     type DataViewSlots,
+    type DataViewHeadScope,
+    type DataViewSortDirection,
 } from '@artisan-toolbox/front-awesome/data-view';
 import { decodeRow, definition } from './data-view-fixtures';
 const finiteDefinition = {
@@ -117,7 +125,19 @@ type Row = H['data'][number];
 const scope: DataViewScope<H> = { adapter: catalog, view: 'table' };
 const item: DataViewItemScope<H> = { ...scope, row: { id: 1, name: 'Notebook' }, index: 0 };
 const cell: DataViewCellScope<H> = { ...item, column: views.table.columns[0], value: 'Notebook' };
-const slots: DataViewSlots<H> = { 'cell-name': ({ row }) => row.name };
+const head: DataViewHeadScope<H> = {
+    ...scope,
+    column: views.table.columns[0],
+    name: 'Name',
+    sortDirection: 0,
+};
+const direction: DataViewSortDirection = head.sortDirection;
+void direction;
+const slots: DataViewSlots<H> = {
+    'cell-name': ({ row }) => row.name,
+    'head-name': ({ name, sortDirection }) => name + sortDirection,
+};
+slots['head-name']?.(head);
 slots['cell-name']?.(cell);
 const oldKey: DataViewRowKey<Row> = (row) => row.id;
 oldKey(item.row);

@@ -5,7 +5,20 @@ import { playwright } from '@vitest/browser-playwright';
 import { defineConfig } from 'vite-plus';
 import { frontAwesome } from '@artisan-toolbox/front-awesome/vite';
 
-export default defineConfig({
+const browserDependencies = {
+    noDiscovery: true,
+    include: [
+        '@artisan-toolbox/mosaicast',
+        'vue/server-renderer',
+        'vue',
+        '@inertiajs/vue3',
+        '@inertiajs/core',
+        'lit',
+        'vite-plus/test',
+    ],
+};
+
+export default defineConfig(({ mode }) => ({
     root: 'tests/frontend',
     cacheDir: resolve(
         import.meta.dirname,
@@ -63,18 +76,7 @@ export default defineConfig({
             },
             {
                 extends: true,
-                optimizeDeps: {
-                    noDiscovery: true,
-                    include: [
-                        '@artisan-toolbox/mosaicast',
-                        'vue/server-renderer',
-                        'vue',
-                        '@inertiajs/vue3',
-                        '@inertiajs/core',
-                        'lit',
-                        'vite-plus/test',
-                    ],
-                },
+                optimizeDeps: browserDependencies,
                 test: {
                     include: [
                         'tests/frontend/**/*.browser.test.ts',
@@ -95,6 +97,26 @@ export default defineConfig({
                     },
                 },
             },
+            ...(mode === 'scrollbar'
+                ? [
+                      {
+                          extends: true as const,
+                          optimizeDeps: browserDependencies,
+                          test: {
+                              include: ['tests/frontend/scrollbar.browser.test.ts'],
+                              browser: {
+                                  enabled: true,
+                                  headless: true,
+                                  provider: playwright(),
+                                  instances: [
+                                      { browser: 'firefox' as const, name: 'firefox' },
+                                      { browser: 'webkit' as const, name: 'webkit' },
+                                  ],
+                              },
+                          },
+                      },
+                  ]
+                : []),
         ],
         coverage: {
             include: ['resources/js/**/*.{mjs,ts,vue}'],
@@ -112,4 +134,4 @@ export default defineConfig({
             reportsDirectory: 'build/coverage/frontend',
         },
     },
-});
+}));

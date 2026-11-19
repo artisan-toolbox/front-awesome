@@ -47,7 +47,7 @@ function mount(overrides: Partial<PrintBridge> = {}, options: Partial<PrintingOp
             expect(injected).toBe(printing);
             return () => h(PrintDrawer);
         },
-    }).use(createFrontAwesome({ printing }));
+    }).use(createFrontAwesome({ printing, scrollbar: { defaultVariant: 'brand' } }));
     app.mount(container);
     onTestFinished(() => {
         app.unmount();
@@ -314,6 +314,7 @@ test('centers fit-page PDF paper under Tailwind Preflight and retains page contr
     const image = container.querySelector<HTMLImageElement>('.print-paper');
     const stage = container.querySelector('.print-paper-stage');
     if (!image || !stage) throw new Error('Expected PDF paper and its preview stage.');
+    expect(stage.getAttribute('data-fa-scrollbar')).toBe('brand');
     const imageRect = image.getBoundingClientRect();
     const stageRect = stage.getBoundingClientRect();
     expect(getComputedStyle(image).display).toBe('block');
