@@ -1,3 +1,4 @@
+import { ChildProcess } from 'node:child_process';
 import {
     mkdir,
     mkdtemp,
@@ -5,13 +6,14 @@ import {
     realpath,
     rename,
     rm,
+    stat,
     utimes,
     writeFile,
 } from 'node:fs/promises';
-import { existsSync } from 'node:fs';
+import { existsSync, type Stats } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
-import { build, createServer, type ViteDevServer } from 'vite';
+import { build, createServer, type Plugin, type ViteDevServer } from 'vite';
 import { expect, test, vi } from 'vite-plus/test';
 import { frontAwesome } from '@artisan-toolbox/front-awesome/vite';
 import { createLocalization } from '../../resources/js/localization';
@@ -39,6 +41,33 @@ async function applicationMessage(root: string, value: string) {
     await writeFile(join(root, 'lang/en/app.php'), `<?php return ['greeting' => '${value}'];`);
 }
 
+async function exportEvents(root: string) {
+    return (await readFile(join(root, 'export-events'), 'utf8')).trim().split('\n');
+}
+
+function controlledWatcher() {
+    let emit: ViteDevServer['watcher']['emit'];
+    return {
+        plugin: {
+            name: 'control-translation-watch-notifications',
+            enforce: 'pre',
+            configureServer(server: ViteDevServer) {
+                emit = server.watcher.emit.bind(server.watcher);
+                vi.spyOn(server.watcher, 'emit').mockImplementation((event, ...args) => {
+                    if (event === 'all' || event === 'raw' || event === 'ready') return false;
+                    return emit(event, ...args);
+                });
+            },
+        } satisfies Plugin,
+        change(file: string) {
+            emit('all', 'change', file);
+        },
+        rawChange(directory: string, details: { curr: Stats; prev: Stats }) {
+            emit('raw', 'change', directory, details);
+        },
+    };
+}
+
 async function close(server: ViteDevServer | undefined, root: string) {
     await server?.close();
     await rm(root, { recursive: true, force: true });
@@ -52,6 +81,10 @@ function processExists(pid: number) {
         if (error instanceof Error && 'code' in error && error.code === 'ESRCH') return false;
         throw error;
     }
+}
+
+function hasSpawn(value: object): value is { spawn: (...args: never[]) => unknown } {
+    return 'spawn' in value && typeof value.spawn === 'function';
 }
 
 test('exports through the real Laravel command before a clean Vite build scans JSON imports', async () => {
@@ -215,6 +248,46 @@ test('exports language files created while Vite starts watching', async () => {
     }
 }, 30000);
 
+test('updates the catalog when Vite misses creation and deletion events', async () => {
+    const root = await fixture();
+    const directory = join(root, 'lang/en');
+    const input = join(directory, 'app.json');
+    const watcher = controlledWatcher();
+    let server: ViteDevServer | undefined;
+    try {
+        server = await createServer({
+            root,
+            configFile: false,
+            logLevel: 'silent',
+            plugins: [
+                watcher.plugin,
+                frontAwesome({ translations: { php: process.execPath, artisan: exportProcess } }),
+            ],
+            server: { middlewareMode: true, hmr: false },
+            optimizeDeps: { noDiscovery: true },
+        });
+        await expect
+            .poll(() => exportEvents(root), { timeout: 10000 })
+            .toEqual(['Started {}', 'Finished {}', 'Started {}', 'Finished {}']);
+        const send = vi.spyOn(server.ws, 'send');
+        await mkdir(directory, { recursive: true });
+        await writeFile(input, '{"greeting":"New language directory"}');
+
+        await expect.poll(() => text(root), { timeout: 10000 }).toContain('New language directory');
+        await expect.poll(() => send.mock.calls).toContainEqual([{ type: 'full-reload' }]);
+
+        send.mockClear();
+        const prev = await stat(directory);
+        await rm(input);
+        await utimes(directory, prev.atime, new Date('2026-01-01T00:00:00Z'));
+        watcher.rawChange(directory, { prev, curr: await stat(directory) });
+        await expect.poll(() => text(root), { timeout: 10000 }).toBe('{}');
+        await expect.poll(() => send.mock.calls).toContainEqual([{ type: 'full-reload' }]);
+    } finally {
+        await close(server, root);
+    }
+}, 30000);
+
 test.each([false, true])(
     'watches configuration creation and directory replacement outside the Vite root (existing directory: %s)',
     async (existingDirectory) => {
@@ -355,33 +428,74 @@ test('selects literal native locale imports from the chosen installed edition wi
 
 test('serializes active exports and runs a trailing export for changes during a child process', async () => {
     const root = await fixture();
+    const input = join(root, 'lang/en/app.json');
+    const pause = join(root, 'pause-export');
+    const initial = '{"greeting":"Initial"}';
+    const active = '{"greeting":"Active export"}';
+    const trailing = '{"greeting":"Trailing export"}';
+    const initialEvents = [
+        `Started ${initial}`,
+        `Finished ${initial}`,
+        `Started ${initial}`,
+        `Finished ${initial}`,
+    ];
+    const watcher = controlledWatcher();
     let server: ViteDevServer | undefined;
     try {
-        await applicationMessage(root, 'Initial');
+        await mkdir(join(root, 'lang/en'), { recursive: true });
+        await writeFile(input, initial);
         server = await createServer({
             root,
             configFile: false,
             logLevel: 'silent',
-            plugins: [frontAwesome({ translations: { php, artisan } })],
-            server: { middlewareMode: true, hmr: false, watch: { usePolling: true, interval: 25 } },
+            plugins: [
+                watcher.plugin,
+                frontAwesome({ translations: { php: process.execPath, artisan: exportProcess } }),
+            ],
+            server: { middlewareMode: true, hmr: false },
             optimizeDeps: { noDiscovery: true },
         });
-        await writeFile(join(root, 'delay-export'), '1');
+        await expect.poll(() => exportEvents(root), { timeout: 10000 }).toEqual(initialEvents);
+        await writeFile(pause, '');
+        await writeFile(input, active);
+        watcher.change(input);
         await expect
-            .poll(() => server?.watcher.getWatched()[join(root, 'lang/en')])
-            .toContain('app.php');
-        await applicationMessage(root, 'Active export');
-        await expect.poll(() => text(root), { timeout: 10000 }).toContain('Active export');
-        await applicationMessage(root, 'Trailing export');
-        await expect.poll(() => text(root), { timeout: 10000 }).toContain('Trailing export');
-        expect((await readFile(join(root, 'export-runs'), 'utf8')).trim().split('\n')).toHaveLength(
-            2,
-        );
-        await expect(readFile(join(root, 'overlapping-export'), 'utf8')).rejects.toThrow();
+            .poll(() => exportEvents(root), { timeout: 10000 })
+            .toEqual([...initialEvents, `Started ${active}`]);
+        expect(await text(root)).toBe(initial);
+
+        await writeFile(input, trailing);
+        const launcher = ChildProcess.prototype;
+        if (!hasSpawn(launcher)) {
+            throw new Error('Expected the Node child process launcher.');
+        }
+        const spawn = vi.spyOn(launcher, 'spawn');
+        vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+        try {
+            watcher.change(input);
+            await vi.runOnlyPendingTimersAsync();
+            expect(spawn).not.toHaveBeenCalled();
+        } finally {
+            vi.useRealTimers();
+            spawn.mockRestore();
+        }
+        await rm(pause);
+
+        await expect
+            .poll(() => exportEvents(root), { timeout: 10000 })
+            .toEqual([
+                ...initialEvents,
+                `Started ${active}`,
+                `Finished ${active}`,
+                `Started ${trailing}`,
+                `Finished ${trailing}`,
+            ]);
+        expect(await text(root)).toBe(trailing);
     } finally {
+        await rm(pause, { force: true });
         await close(server, root);
     }
-});
+}, 30000);
 
 test('waits for an aborted exporter to exit before server close resolves', async () => {
     const root = await fixture();

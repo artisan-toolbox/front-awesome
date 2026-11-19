@@ -2,98 +2,159 @@ name: tests
 
 on:
   push:
-    branches:
-      - 1.x
-      - '*.x'
+    branches: ['*.x']
   pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '19 7 * * 2'
 
 permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}-${{ github.event_name == 'pull_request' && 'latest' || github.sha }}
   cancel-in-progress: true
 
 jobs:
-  tests:
-    runs-on: ${{ matrix.os }}
+  plan:
+    name: Select checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    outputs:
+      checks: ${{ steps.plan.outputs.checks }}
+      compatibility: ${{ steps.plan.outputs.compatibility }}
+      browsers: ${{ steps.plan.outputs.browsers }}
+      coverage: ${{ steps.plan.outputs.coverage }}
+      playwright: ${{ steps.plan.outputs.playwright }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - run: node --test scripts/ci-plan.test.mjs
+      - id: plan
+        run: node scripts/ci-plan.mjs
 
+  linux:
+    name: Linux quality and build
+    needs: plan
+    if: needs.plan.outputs.checks == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+      - run: composer validate --no-check-publish
+      - run: php vendor/bin/maintainer quality:check --no-interaction
+      - run: composer test:types
+      - name: Verify generated assets and examples
+        run: |
+          npm run theme:check
+          npm run components:check
+          npm run examples:check
+          npm run translations:check
+      - run: npm run build
+
+  windows:
+    name: Windows runtime
+    needs: plan
+    if: needs.plan.outputs.checks == 'true'
+    runs-on: windows-2025
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+      - run: php vendor/bin/maintainer quality:check --no-interaction --tool=pest --tool=vite-plus-test
+      - run: node scripts/check-data-view-types.mjs
+
+  compatibility:
+    name: PHP compatibility (${{ matrix.dependencies }})
+    needs: plan
+    if: needs.plan.outputs.compatibility == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        php: [8.5]
-        laravel: [13.*]
-        stability: [prefer-lowest, prefer-stable]
-        include:
-          - laravel: 13.*
-            testbench: 11.*
-
-    name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
-
+        dependencies: [lowest, latest]
     steps:
-      - name: Checkout code
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, fileinfo, sqlite, pdo_sqlite, bcmath, intl
-          ini-values: error_reporting=E_ALL
-          tools: composer:v2
-          coverage: ${{ matrix.os == 'ubuntu-latest' && matrix.stability == 'prefer-stable' && 'xdebug' || 'none' }}
-
-      - name: Install dependencies
-        run: |
-          composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update
-          composer require --dev "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
-          composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress --no-scripts
-          composer run prepare
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v7
+          persist-credentials: false
+      - uses: ./.github/actions/setup
         with:
-          node-version: 24
-          cache: npm
+          composer-mode: ${{ matrix.dependencies }}
+          frontend: 'false'
+      - run: composer test:unit
+      - run: composer test:types
 
-      - name: Install frontend dependencies
-        run: npm ci
-
-      - name: Run configured quality checks
-        run: php vendor/bin/maintainer quality:check --no-interaction
-
-      - name: Verify PHP type coverage
-        run: composer test:types
-
-      - name: Install engines for browser coverage
-        if: matrix.os == 'ubuntu-latest' && matrix.stability == 'prefer-stable'
-        run: npx playwright install --with-deps chromium firefox webkit --only-shell
-
-      - name: Verify shared theme production consumers
-        if: matrix.os == 'ubuntu-latest' && matrix.stability == 'prefer-stable'
-        run: npm run test:theme
-
-      - name: Verify Vue scrollbars in Firefox and WebKit
-        if: matrix.os == 'ubuntu-latest' && matrix.stability == 'prefer-stable'
-        run: npm run test:scrollbar
-
+  browsers:
+    name: Browser integration
+    needs: plan
+    if: needs.plan.outputs.browsers == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    container:
+      image: mcr.microsoft.com/playwright:v${{ needs.plan.outputs.playwright }}-noble
+      options: --ipc=host
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+        with:
+          coverage: ${{ needs.plan.outputs.coverage == 'true' && 'xdebug' || 'none' }}
+      - run: npm run test:theme
+      - run: npm run test:scrollbar
+      - if: needs.plan.outputs.coverage != 'true'
+        run: npm run test:browser
       - name: Report runtime test coverage
-        if: matrix.os == 'ubuntu-latest' && matrix.stability == 'prefer-stable'
+        if: needs.plan.outputs.coverage == 'true'
         env:
           COMPOSER_ALLOW_XDEBUG: '1'
           XDEBUG_MODE: coverage
         run: |
           composer test:coverage -- --coverage-html build/coverage/php
           npm run test:coverage
-
       - name: Upload coverage reports
-        if: matrix.os == 'ubuntu-latest' && matrix.stability == 'prefer-stable'
+        if: needs.plan.outputs.coverage == 'true'
         uses: actions/upload-artifact@v7
         with:
           name: coverage-reports
           path: build/coverage/
           if-no-files-found: error
 
-      - name: Build the Vite consumer fixture
-        run: npm run build
+  ci:
+    name: CI
+    if: ${{ !cancelled() }}
+    needs: [plan, linux, windows, compatibility, browsers]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Require every selected job
+        env:
+          PLAN_RESULT: ${{ needs.plan.result }}
+          LINUX_RESULT: ${{ needs.linux.result }}
+          WINDOWS_RESULT: ${{ needs.windows.result }}
+          COMPATIBILITY_RESULT: ${{ needs.compatibility.result }}
+          BROWSERS_RESULT: ${{ needs.browsers.result }}
+          CHECKS_REQUIRED: ${{ needs.plan.outputs.checks }}
+          COMPATIBILITY_REQUIRED: ${{ needs.plan.outputs.compatibility }}
+          BROWSERS_REQUIRED: ${{ needs.plan.outputs.browsers }}
+        run: |
+          set -eu
+          test "$PLAN_RESULT" = success
+          verify() {
+            case "$2:$3" in
+              true:success|false:skipped) ;;
+              *) echo "::error::$1 was $3 (required: $2)"; return 1 ;;
+            esac
+          }
+          verify Linux "$CHECKS_REQUIRED" "$LINUX_RESULT"
+          verify Windows "$CHECKS_REQUIRED" "$WINDOWS_RESULT"
+          verify Compatibility "$COMPATIBILITY_REQUIRED" "$COMPATIBILITY_RESULT"
+          verify Browsers "$BROWSERS_REQUIRED" "$BROWSERS_RESULT"

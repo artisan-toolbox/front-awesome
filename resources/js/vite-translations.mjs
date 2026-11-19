@@ -1,5 +1,5 @@
 import { execFile } from 'node:child_process';
-import { readFileSync, statSync } from 'node:fs';
+import { readFileSync, statSync, unwatchFile, watchFile } from 'node:fs';
 import { dirname, isAbsolute, resolve } from 'node:path';
 import { promisify } from 'node:util';
 
@@ -18,6 +18,7 @@ export function translationExport(options) {
     let active;
     let lastExportFailed = false;
     const watched = new Set();
+    const inputWatchers = new Map();
 
     async function exportCatalog() {
         const controller = new AbortController();
@@ -50,7 +51,7 @@ export function translationExport(options) {
                 throw new Error('Front Awesome translation export returned an invalid manifest.');
             }
             manifest = parsed;
-            if (server) watchPaths();
+            if (server && !closed) watchPaths();
         } finally {
             await finished;
             active = undefined;
@@ -58,8 +59,27 @@ export function translationExport(options) {
     }
 
     function watchPaths() {
+        const inputs = new Set(manifest.watchPaths);
+        for (const [path, listener] of inputWatchers) {
+            if (inputs.has(path)) continue;
+            unwatchFile(path, listener);
+            inputWatchers.delete(path);
+        }
+
         const paths = new Set();
-        for (const path of manifest.watchPaths) {
+        for (const path of inputs) {
+            if (!inputWatchers.has(path)) {
+                const listener = (current, previous) => {
+                    if (statsChanged(current, previous)) scheduleExport();
+                };
+                // Watch the input itself, including missing paths Vite cannot yet discover.
+                watchFile(
+                    path,
+                    { persistent: false, interval: server.config.server.watch?.interval ?? 100 },
+                    listener,
+                );
+                inputWatchers.set(path, listener);
+            }
             let parent = path;
             while (
                 !statSync(parent, { throwIfNoEntry: false })?.isDirectory() &&
@@ -119,9 +139,11 @@ export function translationExport(options) {
     }
 
     function scheduleExport(reload = false) {
+        if (closed) return;
         scheduledReload ||= reload;
         clearTimeout(timer);
         timer = setTimeout(() => {
+            timer = undefined;
             pendingExport = { reload: scheduledReload || pendingExport?.reload === true };
             scheduledReload = false;
             if (!running) {
@@ -135,16 +157,14 @@ export function translationExport(options) {
     function onRawChange(event, file, details) {
         if (event !== 'change') return;
         const { curr, prev } = details ?? {};
-        if (!curr?.isFile() || !prev?.isFile()) return;
-
-        // Polling can report a replacement or edit even when the normalized watcher skips it.
-        if (
-            curr.size !== prev.size ||
-            curr.mtimeMs !== prev.mtimeMs ||
-            curr.ctimeMs !== prev.ctimeMs ||
-            curr.ino !== prev.ino
-        ) {
+        if (!curr || !prev || !statsChanged(curr, prev)) return;
+        if (curr.isFile() && prev.isFile()) {
             onChange(event, file);
+        } else if (curr.isDirectory() || prev.isDirectory()) {
+            const directory = pathKey(file);
+            if (manifest.watchPaths.some((input) => directory.startsWith(`${pathKey(input)}/`))) {
+                scheduleExport();
+            }
         }
     }
 
@@ -170,11 +190,22 @@ export function translationExport(options) {
             server?.watcher.off('all', onChange);
             server?.watcher.off('raw', onRawChange);
             server?.watcher.off('ready', scheduleExport);
+            for (const [path, listener] of inputWatchers) unwatchFile(path, listener);
+            inputWatchers.clear();
             active?.controller.abort();
             await active?.finished;
             await running;
         },
     };
+}
+
+function statsChanged(current, previous) {
+    return (
+        current.size !== previous.size ||
+        current.mtimeMs !== previous.mtimeMs ||
+        current.ctimeMs !== previous.ctimeMs ||
+        current.ino !== previous.ino
+    );
 }
 
 function readCatalog(path) {

@@ -26,6 +26,10 @@
 /config/maintainer.php         export-ignore
 /config/maintainer_secrets.php export-ignore
 /.npmrc             export-ignore
+/composer.lock      export-ignore
+/.nvmrc             export-ignore
+/scripts/ci-plan.mjs export-ignore
+/scripts/ci-plan.test.mjs export-ignore
 
 /.audit export-ignore
 
