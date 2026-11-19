@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.0.0-beta.5] - 2026-11-19
+
+### Fixes
+
+- **Schedule Vite translation exports after watcher is ready** (`176fef2`)
+  Refines the Vite translation export scheduler/reload behavior so exports are triggered at the right point in the Vite watcher lifecycle. Instead of relying on a simple pending flag, the scheduler now tracks a single queued export (`pendingExport`) with an optional `reload` request, and records `lastExportFailed` to determine whether a subsequent successful export should be followed by a full reload.
+
+When draining the export queue, the logic conditionally sends Vite WS `{ type: 'full-reload' }` only when a reload is explicitly requested or when it detects that the translation output file’s contents changed (using a new helper to read/compare catalog output before vs. after). This reduces unnecessary full reloads while ensuring the UI updates correctly after successful translation regeneration.
+
+It also adds a debounced `scheduleExport()` and ties it to Vite watcher lifecycle events (including scheduling an initial export when the watcher reports `ready`), while still covering cases where Vite’s initial scan may already have completed. During `watch()`, the implementation safely no-ops if `viteServer.config.server.watch === null`, and on `close()` it clears any queued export state.
+
+User impact: development-time translation updates become more reliable—especially when language files are created under the Vite project root during server startup—without causing excessive full page reloads.
+
+Compatibility/migration: no documented breaking API/config changes; this is an internal behavior refinement. Developers relying on translation exports during Vite startup should see improved correctness.
+
 ## [1.0.0-beta.4] - 2026-11-19
 
 ### Features
