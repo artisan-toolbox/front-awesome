@@ -1,6 +1,9 @@
 name: Install Front Awesome test dependencies
 description: Install Composer before npm and reuse downloaded archives
 inputs:
+  php-version:
+    description: PHP version to install
+    default: '8.5'
   composer-mode:
     description: Install from the lockfile or resolve with prefer-lowest or prefer-stable
     default: install
@@ -28,11 +31,12 @@ runs:
         printf 'version=%s\n' "$version" >> "$GITHUB_OUTPUT"
 
     - name: Set up CI dependencies
-      uses: artisan-toolbox/maintainer@f3ace73a7020f1a76a62fa3c9137b1b541bb8cc8 # 1.14.3
+      uses: artisan-toolbox/maintainer@c46eefa9d82cdfcd53c83c06c810ca2d3b0c7c33 # 1.14.4
       env:
         NPM_CONFIG_AUDIT: 'false'
         NPM_CONFIG_FUND: 'false'
       with:
+        php-version: ${{ inputs.php-version }}
         php-extensions: dom, curl, libxml, mbstring, zip, fileinfo, sqlite, pdo_sqlite, bcmath, intl
         php-coverage: ${{ inputs.coverage }}
         composer-mode: ${{ inputs.composer-mode }}

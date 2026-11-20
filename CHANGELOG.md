@@ -201,6 +201,9 @@ Compatibility/migration needs:
 
 ## [Unreleased]
 
+- Test PHP 8.5 and 8.6 in CI with the Maintainer 1.14.4 setup action.
+- Generate the same localization titlecase exceptions on PHP 8.5 and 8.6 by using mbstring for both sides of the comparison.
+
 ### Fixed
 
 - Watch existing directories for translation inputs instead of registering missing files or children already covered by a watched ancestor. Refresh directory subscriptions on creation and removal so configuration publication, atomic replacement, and directory recreation regenerate the catalog, including when the Laravel working directory is outside the Vite root.

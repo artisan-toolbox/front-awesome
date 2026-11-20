@@ -37,38 +37,49 @@ jobs:
         run: node scripts/ci-plan.mjs
 
   linux:
-    name: Linux quality and build
+    name: Linux quality and build${{ matrix.php == '8.6' && ' / PHP 8.6' || '' }}
     needs: plan
     if: needs.plan.outputs.checks == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.5', '8.6']
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup
         with:
+          php-version: ${{ matrix.php }}
           composer-validation: strict
       - run: composer ci:check
 
   windows:
-    name: Windows runtime
+    name: Windows runtime${{ matrix.php == '8.6' && ' / PHP 8.6' || '' }}
     needs: plan
     if: needs.plan.outputs.checks == 'true'
     runs-on: windows-2025
     timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.5', '8.6']
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup
+        with:
+          php-version: ${{ matrix.php }}
       - run: composer quality:check -- --tool=pest --tool=vite-plus-test
         env:
           MAINTAINER_PEST_PARALLEL: 'false'
       - run: node scripts/check-data-view-types.mjs
 
   compatibility:
-    name: PHP compatibility (${{ matrix.dependencies }})
+    name: PHP compatibility (${{ matrix.dependencies }})${{ matrix.php == '8.6' && ' / PHP 8.6' || '' }}
     needs: plan
     if: needs.plan.outputs.compatibility == 'true'
     runs-on: ubuntu-24.04
@@ -76,6 +87,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        php: ['8.5', '8.6']
         dependencies: [lowest, latest]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -83,6 +95,7 @@ jobs:
           persist-credentials: false
       - uses: ./.github/actions/setup
         with:
+          php-version: ${{ matrix.php }}
           composer-mode: ${{ matrix.dependencies == 'lowest' && 'prefer-lowest' || 'prefer-stable' }}
           npm-install: 'false'
       - run: composer quality:check -- --tool=pest

@@ -11,20 +11,21 @@ for ($code = 0; $code <= 0x10ffff; $code++) {
     if ($code >= 0xd800 && $code <= 0xdfff) continue;
     $character = mb_chr($code, 'UTF-8');
     $title = mb_ucfirst($character, 'UTF-8');
-    if ($character !== $title || mb_strtoupper($character, 'UTF-8') !== $character) {
+    $upper = mb_strtoupper($character, 'UTF-8');
+    $first = mb_substr($upper, 0, 1, 'UTF-8');
+    $rest = mb_substr($upper, 1, encoding: 'UTF-8');
+    $fallback = $first . mb_strtolower($rest, 'UTF-8');
+    if ($fallback !== $title) {
         $characters[$character] = $title;
     }
 }
 echo json_encode($characters, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
 `;
-const mappings = JSON.parse(
+// Compute both sides with the same Unicode tables. Node may know a different set of characters.
+const exceptions = JSON.parse(
     execFileSync(process.env.PHP_BINARY ?? 'php', ['-r', source], { encoding: 'utf8' }),
 );
-const exceptions = Object.entries(mappings).filter(([character, title]) => {
-    const [first = '', ...rest] = Array.from(character.toUpperCase());
-    return first + rest.join('').toLowerCase() !== title;
-});
-const generated = `${JSON.stringify(Object.fromEntries(exceptions), null, 2)}\n`;
+const generated = `${JSON.stringify(exceptions, null, 2)}\n`;
 if (process.argv.includes('--check')) {
     if (readFileSync(output, 'utf8') !== generated) {
         throw new Error(
@@ -34,4 +35,4 @@ if (process.argv.includes('--check')) {
 } else {
     writeFileSync(output, generated);
 }
-console.info(`Verified ${exceptions.length} PHP titlecase exceptions.`);
+console.info(`Verified ${Object.keys(exceptions).length} PHP titlecase exceptions.`);
