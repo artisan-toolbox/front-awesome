@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.0.0-beta.7] - 2026-11-20
+
+### Tests
+
+- **Stabilize browser style checks and cap unit test workers** (`af5237f`)
+  Move the pointer away from both the native and Vue fixtures before comparing static styles so hover state cannot distort the comparison. The Option scenario deliberately hovers the native Espresso option to cover the case where the pointer is left over a fixture. Cap Pest and Vitest unit test runs at four workers by default. Pest remains serial by default on Windows; set `MAINTAINER_PEST_PARALLEL=true` to retain parallel execution there or use `MAINTAINER_PEST_PROCESSES` to change the worker count. `composer test` now runs PHPStan, Pint, and Pest through Maintainer in strict, non-interactive mode, then runs the type tests. Automation that depends on the previous direct script calls or their order may need updating. The development skill guide also marks previously previewed features as released: beta.4 field synchronization for autofill and restored values, `v-scrollbar` configuration through `createFrontAwesome()`, and beta.6 translation source checks independent of Vite notifications and file-replacement retries on Windows. Those guide updates do not change runtime behavior.
+
+### Continuous Integration
+
+- **Test Front Awesome on PHP 8.6** (`162546a`)
+  Run Linux quality and build checks, Windows runtime tests, and lowest- and latest-dependency checks on both PHP 8.5 and 8.6. Disable matrix fail-fast so a failure in one configuration does not cancel the others. PHP 8.5 jobs keep their existing names, while PHP 8.6 jobs add a ` / PHP 8.6` suffix. The shared setup action upgrades Maintainer from 1.14.2 to 1.14.4 and explicitly defaults to PHP 8.5; callers can select another version with `php-version`. Localization casing generation now compares `mb_ucfirst` with the uppercase-first, lowercase-rest fallback entirely in PHP, removing differences caused by Node's Unicode tables and producing the same exceptions on both tested PHP versions. The generator still supports `PHP_BINARY` and `--check` and reports the exception count from the generated object.
+
+- **Limit the Playwright HOME override to browser commands** (`a22b4a6`)
+  Save the container user's home as `BROWSER_CONTAINER_HOME` and use it as `HOME` only for the theme, scrollbar, browser, and browser coverage test commands. This lets Firefox start with the correct home without changing the runner's Docker CLI home during setup or PHP coverage. Mark the mounted Git checkout as trusted before Composer runs.
+
 ## [1.0.0-beta.6] - 2026-11-20
 
 ### Features
