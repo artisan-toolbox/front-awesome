@@ -1,5 +1,40 @@
 # Changelog
 
+## [1.0.0-beta.6] - 2026-11-20
+
+### Features
+
+- **Separate role assignments from permission groups** (`d227528`)
+  Organizes the permission editor and its sidebar into Permission Groups and Role Assignments. Sections show enabled and total counts for the visible entries, and rows distinguish Allowed/Denied permissions from Assigned/Unassigned roles. Enabled rows are highlighted, and status badges are hidden from assistive technology when the checkbox already conveys the state. Selecting a sidebar entry closes the other sections, focuses the selected section, and scrolls within the catalog without discarding draft changes; saving remains explicit. Search shows a match count only for nonempty queries with results.
+
+Documents `kind: 'permissions'` and `kind: 'roles'` for catalog sections and optional decorative section and row icons. To display icons, return `iconFamily: 'classic'` and lowercase, hyphen-separated icon names, and supply the family through Web Awesome; omitting `iconFamily` keeps icons hidden. English, Spanish, and Brazilian Portuguese copy now covers roles and permissions. Consumers that still reference `user-permission-editor.results` must update that reference because the key was removed.
+
+### Fixes
+
+- **Rescan Laravel translation inputs and retry Windows file replacement** (`30faa76`)
+  Makes translation previews rescan PHP and JSON files under Laravel's language roots and `config/front-awesome.php` independently of Vite notifications. This catches edits, newly created files, and replacements even when Vite misses an event, including replacement of `config/front-awesome.php` outside the Vite root. Set `translations.cwd` to the Laravel root when it differs from the Vite root. On Windows, atomic output replacement retries briefly when a reader holds a generated file open; if the lock persists, close the process and rerun the export. Export diagnostics go to stderr so fixture JSON remains parseable, and Pest reports Artisan export errors when verifying browser locales.
+
+- **Keep Vite translation exports active after polling stops** (`5536fb6`)
+  Keeps the Vite translation exporter active after polling ends, so translation output can continue to refresh instead of becoming stale when polling stops.
+
+- **Use Playwright's home directory for Composer caching** (`ebb9efc`)
+  Stores Composer's cache under the Playwright user's home directory and marks the checked-out CI workspace as trusted by Git. This lets Composer reuse cached downloads in browser jobs without Git rejecting the workspace over an ownership mismatch.
+
+### Continuous Integration
+
+- **Consolidate CI setup and quality checks under Maintainer** (`f7f615c`)
+  Adds a reusable CI action that installs Composer dependencies before npm dependencies and caches downloaded archives through Maintainer. The action reads Node.js 24.22.2 from `.nvmrc`, fails if the pin is empty, and still sets up Node.js when PHP compatibility jobs skip npm. It exposes Composer dependency mode, validation, coverage, and npm installation settings. The test workflow replaces the combined matrix with planner-selected Linux quality and build checks, serial Windows runtime tests, lowest and latest PHP dependency checks, and browser integration in a version-matched Playwright container. The planner is tested before it selects jobs; the browser plan controls expanded theme and scrollbar checks and whether to run browser tests directly or collect and upload coverage. The workflow adds manual and scheduled runs and cancels superseded PR runs.
+
+Adds `composer quality:check` and `composer ci:check`, routes type coverage through a dedicated script, invokes PHP tools through Composer's `@php`, and raises the analysis memory limit to 2 GB. Updates the Artisan Toolbox, Larastan, and Pest type-coverage constraints and removes the direct PHPStan constraint and its explicit upper bound. Maintainer now defaults to parallel Pest runs; set `MAINTAINER_PEST_PARALLEL=false` to retain serial execution. Its standalone Vue type check is removed because Vite Plus includes Vue type checking. Maintainer also gains per-task AI model and locale settings and points its release workflow to `tests.yml`. Contributor documentation explains the new commands and runtime setup. Git can now track `composer.lock`, while Git archives omit it, `.nvmrc`, and the internal CI planning and type-coverage scripts.
+
+- **Select CI jobs by event and changed files** (`44b78dc`)
+  Introduces a CI plan selector that uses the workflow event and changed files to decide which checks to run, rather than running every job for every change. Adds Composer and npm download caching so selected jobs can reuse dependencies instead of downloading them again.
+
+### Maintenance
+
+- **Prepare the 1.0.0-beta.6 release** (`488080d`)
+  Bumps `@artisan-toolbox/front-awesome` and the README release badge from 1.0.0-beta.5 to 1.0.0-beta.6. Adds the dated beta.6 release notes and an Unreleased section. The displayed PHP (^8.5) and Laravel (^13.36) requirements are unchanged.
+
 ## [1.0.0-beta.6] - 2026-11-19
 
 ### Fixes
