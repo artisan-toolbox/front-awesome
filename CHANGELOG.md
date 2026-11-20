@@ -17,10 +17,16 @@
 
 ## Unreleased
 
+- Use the Maintainer 1.14.2 root action for Composer setup across quality, compatibility, browser, and coverage jobs.
+- Require Larastan 3.12.1 and Pest Type Coverage 5.1.1 as development minimums. The updated coverage plugin supports the collected-data API in PHPStan 2.3.6 and later, so Composer can resolve PHPStan through the development tools.
+- Separate role assignments from permission groups in the user permission editor. Sidebar navigation opens and focuses one group, and each group shows its allowed or assigned count alongside explicit row states.
+- Render optional Font Awesome catalog icons alongside group and permission labels when the provider sends an icon family and names.
 - Refresh the Vite translation catalog after edits to nested language files even when Vite misses their notifications.
 - Retry atomic replacement of generated translation files when a Windows reader briefly holds them open.
 - Use the Playwright container user's home so Firefox can start, and trust the mounted Git checkout before Composer runs.
-- Run routine CI with the checked-in Composer and npm locks. Keep Windows runtime checks, and run browser and floating dependency checks for release candidates. A Markdown-only edit records a lightweight CI result.
+- Use the checked-in Composer and npm locks for routine Linux and Windows checks. Run Chromium for runtime changes and all browser checks for frontend source, browser fixture, dependency, and CI changes. Release candidates run the complete matrix. A Markdown-only edit records a lightweight CI result.
+- Run `composer ci:check` to reproduce the locked Linux quality checks and consumer build without repeating frontend checks. PHP type coverage now fails if the report omits a source file that Pest supports.
+- Keep compatibility-run diagnostics on standard error so the translation fixture returns valid JSON with the lowest supported Symfony dependencies.
 - Require the successful GitHub Actions push workflow for the exact release commit when publishing with a Maintainer build that supports release gates.
 - Track creation and replacement of Laravel translation inputs even when Vite misses their filesystem notifications.
 - Keep checking translation inputs when Vite stops polling a path, including replacements of `config/front-awesome.php` outside the Vite root.

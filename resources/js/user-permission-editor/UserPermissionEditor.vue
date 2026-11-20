@@ -143,6 +143,7 @@
                         ref="catalog"
                         :key="state.draft.snapshot.subject"
                         :sections="state.draft.snapshot.sections"
+                        :icon-family="state.draft.snapshot.iconFamily"
                         :values="state.draft.snapshot.values"
                         :changes="state.draft.changes"
                         :can-update="state.draft.snapshot.canUpdate"

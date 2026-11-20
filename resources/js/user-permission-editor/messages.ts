@@ -4,14 +4,19 @@ import { chooseMessage, replaceMessage } from '../localization/laravelMessages';
 
 export const english = {
     title: 'User permissions',
-    search: 'Find a permission',
+    search: 'Find a permission or role',
     sections: 'Permission sections',
-    matching: ':count matching permission|:count matching permissions',
-    results: ':count permission|:count permissions',
-    noResults: 'No permissions match your search.',
-    empty: 'This catalog has no permissions.',
+    permissionGroups: 'Permission groups',
+    roleAssignments: 'Role assignments',
+    permissionSummary: ':enabled of :total allowed',
+    roleSummary: ':enabled of :total assigned',
+    assigned: 'Assigned',
+    unassigned: 'Unassigned',
+    matching: ':count result|:count results',
+    noResults: 'No permissions or roles match your search.',
+    empty: 'This catalog has no permissions or roles.',
     clearSearch: 'Clear search',
-    showMore: 'Show more permissions',
+    showMore: 'Show more',
     allowed: 'Allowed',
     denied: 'Denied',
     readOnly: 'Read only. You can view these permissions.',
@@ -57,9 +62,10 @@ type Message = keyof typeof english;
 
 export function useEditorText() {
     const localization = inject(localizationKey, undefined);
-    return (key: Message, count?: number): string => {
+    return (key: Message, values?: number | Record<string, number>): string => {
         const name = `front-awesome::user-permission-editor.${key}`;
-        const params = count === undefined ? {} : { count };
+        const count = typeof values === 'number' ? values : undefined;
+        const params = typeof values === 'number' ? { count: values } : (values ?? {});
         const translated = localization?.t(name, params);
         if (translated && translated !== name) return translated;
         const line = english[key];

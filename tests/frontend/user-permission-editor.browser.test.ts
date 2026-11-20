@@ -6,7 +6,8 @@ import { createApp, h, type App, type Component } from 'vue';
 import Fixture from './PermissionEditorFixture.vue';
 import { createFrontAwesome } from '@artisan-toolbox/front-awesome';
 import { createLocalization } from '@artisan-toolbox/front-awesome/localization';
-import '@artisan-toolbox/front-awesome/web-awesome.css';
+import '../theme-consumer/app.css';
+import '@artisan-toolbox/front-awesome/web-awesome-tailwind';
 
 const inertiaRoot: Component = InertiaApp;
 const original = http.getClient();
@@ -119,7 +120,7 @@ const toggleReadPermission = async () => {
     if (input instanceof HTMLElement) input.focus();
     await userEvent.keyboard(' ');
 };
-const find = () => page.getByRole('searchbox', { name: 'Find a permission' });
+const find = () => page.getByRole('searchbox', { name: 'Find a permission or role' });
 const save = () => page.getByRole('button', { name: 'Save changes', exact: true });
 const open = async (button = 'Show Jordan') =>
     page.getByRole('button', { name: button, exact: true }).click();
@@ -195,7 +196,7 @@ test('grows for long catalogs and fits shorter search results', async () => {
     expect(full.bottom).toBeLessThan(900);
     expect(save().element().getBoundingClientRect().bottom).toBeLessThan(full.bottom);
 
-    await page.getByRole('button', { name: 'Show more permissions' }).click();
+    await page.getByRole('button', { name: 'Show more' }).click();
     await expect
         .element(page.getByRole('checkbox', { name: 'Permission 077' }))
         .toBeInTheDocument();
@@ -426,26 +427,146 @@ test('retries refreshing actor access separately when a self-edit is already com
     expect(transport.mock.calls.filter(([request]) => request.method === 'put')).toHaveLength(1);
 });
 
-test('keeps search and actions visible above a scrollable dark desktop catalog', async () => {
+test('navigates between permission groups and roles while keeping the draft and scrollbars', async () => {
     await page.viewport(1280, 900);
     document.documentElement.classList.add('wa-dark');
     cleanups.push(() => document.documentElement.classList.remove('wa-dark'));
-    transport.mockResolvedValueOnce(reply(200, permissions({ many: 40 })));
-    mount();
+    const snapshot = permissions({ many: 40 });
+    snapshot.sections.splice(1, 0, {
+        id: 'billing',
+        kind: 'permissions',
+        order: 'alphabetical',
+        name: 'Billing',
+        description: '',
+        abilities: [{ key: 'billing::pay', name: 'Pay invoices', description: '' }],
+    });
+    snapshot.values['billing::pay'] = false;
+    for (let number = 0; number < 24; number++) {
+        const key = `group${number}::read`;
+        snapshot.sections.splice(-1, 0, {
+            id: `group${number}`,
+            kind: 'permissions',
+            order: 'alphabetical',
+            name: `Group ${number}`,
+            description: '',
+            abilities: [{ key, name: 'Read', description: '' }],
+        });
+        snapshot.values[key] = false;
+    }
+    transport.mockResolvedValueOnce(reply(200, snapshot));
+    mount(undefined, (app) =>
+        app.use(createFrontAwesome({ scrollbar: { defaultVariant: 'brand' } })),
+    );
     await open();
     await expect.element(find()).toBeVisible();
     const navigation = page.getByRole('navigation', { name: 'Permission sections' });
     await expect.element(navigation).toBeVisible();
+    await expect.element(navigation.getByText('Permission groups')).toBeVisible();
+    await expect.element(navigation.getByText('Role assignments')).toBeVisible();
+    const group = page.getByRole('region', { name: 'Permission groups' });
+    const roles = page.getByRole('region', { name: 'Role assignments' });
+    await expect.element(group.getByText('0 of 42 allowed')).toBeVisible();
     await expect
         .poll(() => {
             const groupList = document.querySelector('.catalog-groups');
             return groupList ? groupList.scrollHeight > groupList.clientHeight : false;
         })
         .toBe(true);
-    await navigation.getByRole('button', { name: 'Roles', exact: true }).click();
-    await expect.element(page.getByRole('checkbox', { name: 'Operator' })).toBeVisible();
+    const dialog = document.querySelector<HTMLElement>('wa-dialog.permission-editor');
+    dialog?.style.setProperty('--wa-color-brand-fill-loud', '#d8ed43');
+    for (const selector of ['.editor-content', '.catalog-index', '.catalog-groups']) {
+        expect(dialog?.querySelector(selector)?.getAttribute('data-fa-scrollbar')).toBe('brand');
+    }
+    for (const selector of ['.catalog-index', '.catalog-groups']) {
+        await expect
+            .poll(() => {
+                const thumb = dialog?.querySelector(
+                    `${selector} > .os-scrollbar-vertical.os-scrollbar-visible .os-scrollbar-handle`,
+                );
+                return thumb ? getComputedStyle(thumb).backgroundColor : '';
+            })
+            .toBe('rgb(216, 237, 67)');
+    }
+
+    await toggleReadPermission();
+    await expect.element(group.getByText('1 of 42 allowed')).toBeVisible();
+    const changed = group.getByRole('listitem').filter({ hasText: 'Review invoices' });
+    await expect.element(changed.getByText('Allowed', { exact: true })).toBeVisible();
+
+    await group.getByRole('button', { name: /Billing.*0 of 1 allowed/ }).click();
+    await expect.element(readPermission()).toBeVisible();
+    await expect.element(group.getByRole('checkbox', { name: 'Pay invoices' })).toBeVisible();
+    const roleLink = navigation.getByRole('button', { name: 'Roles', exact: true }).element();
+    if (roleLink instanceof HTMLElement) roleLink.focus();
+    await userEvent.keyboard('{Enter}');
+    const rolesTrigger = roles.getByRole('button', { name: /Roles.*0 of 1 assigned/ });
+    await expect
+        .poll(() => document.activeElement?.shadowRoot?.activeElement)
+        .toBe(rolesTrigger.element());
+    await expect.element(rolesTrigger).toHaveAttribute('aria-expanded', 'true');
+    const list = dialog?.querySelector<HTMLElement>('.catalog-groups');
+    expect(list?.scrollTop).toBeGreaterThan(0);
+    expect(rolesTrigger.element().getBoundingClientRect().top).toBeLessThan(
+        list?.getBoundingClientRect().bottom ?? 0,
+    );
+    await expect.element(readPermission()).not.toBeInTheDocument();
+    await expect
+        .element(group.getByRole('checkbox', { name: 'Pay invoices' }))
+        .not.toBeInTheDocument();
+    await expect.element(roles.getByRole('checkbox', { name: 'Operator' })).toBeVisible();
+    await expect.element(roles.getByText('Unassigned', { exact: true })).toBeVisible();
+    await expect.element(page.getByText('1 unsaved change')).toBeVisible();
     await expect.element(find()).toBeVisible();
     await expect.element(save()).toBeVisible();
+
+    await navigation.getByRole('button', { name: 'Órdenes', exact: true }).click();
+    await expect.element(readPermission()).toBeChecked();
+    await expect.element(roles.getByRole('checkbox', { name: 'Operator' })).not.toBeInTheDocument();
+    await find().fill('Manage requests');
+    await expect.element(group).not.toBeInTheDocument();
+    await expect.element(roles.getByRole('checkbox', { name: 'Operator' })).toBeVisible();
+});
+
+test('shows decorative catalog icons and explicit states for read-only permissions', async () => {
+    const snapshot = permissions({ canUpdate: false, read: true });
+    transport.mockResolvedValueOnce(
+        reply(200, {
+            ...snapshot,
+            iconFamily: 'classic',
+            sections: snapshot.sections.map((section) =>
+                section.id === 'reports'
+                    ? {
+                          ...section,
+                          icon: 'folder-open',
+                          abilities: section.abilities.map((ability) => ({
+                              ...ability,
+                              icon: 'file-invoice',
+                          })),
+                      }
+                    : section,
+            ),
+        }),
+    );
+    mount();
+    await open();
+    await expect
+        .element(page.getByText('Read only. You can view these permissions.'))
+        .toBeVisible();
+    const groups = page.getByRole('region', { name: 'Permission groups' });
+    await expect.element(groups.getByText('Allowed', { exact: true })).toBeVisible();
+    await expect.element(groups.getByText('Denied', { exact: true })).toBeVisible();
+    await expect.element(groups.getByRole('checkbox')).not.toBeInTheDocument();
+    await expect.element(page.getByRole('navigation').getByText('Órdenes')).toBeVisible();
+    expect(
+        document.querySelectorAll(
+            'wa-icon[name="folder-open"][family="classic"][aria-hidden="true"]',
+        ),
+    ).toHaveLength(2);
+    expect(
+        document.querySelectorAll(
+            'wa-icon[name="file-invoice"][family="classic"][aria-hidden="true"]',
+        ),
+    ).toHaveLength(2);
 });
 
 test('uses host localization for its labels and leaves the provider labels intact', async () => {

@@ -8,100 +8,156 @@
                 with-clear
                 @update:model-value="setQuery"
             />
-            <span class="catalog-result-count" role="status">
-                {{ text(needle ? 'matching' : 'results', resultCount) }}
+            <span v-if="needle && resultCount" class="catalog-result-count" role="status">
+                {{ text('matching', resultCount) }}
             </span>
         </div>
 
-        <div v-if="visibleSections.length" class="catalog-layout">
+        <div v-if="categories.length" class="catalog-layout">
             <nav
                 v-if="visibleSections.length > 1"
                 v-scrollbar
                 class="catalog-index"
                 :aria-label="text('sections')"
             >
-                <Button
-                    v-for="section in visibleSections"
-                    :key="section.key"
-                    class="catalog-index-button"
-                    type="button"
-                    appearance="plain"
-                    size="s"
-                    :aria-current="selected === section.key ? 'location' : undefined"
-                    @click="visitSection(section.key)"
-                >
-                    <span class="index-label">{{ section.name }}</span>
-                </Button>
+                <div v-for="category in categories" :key="category.kind" class="index-category">
+                    <p>{{ text(category.title) }}</p>
+                    <ul>
+                        <li v-for="section in category.sections" :key="section.key">
+                            <Button
+                                class="catalog-index-button"
+                                type="button"
+                                appearance="plain"
+                                size="s"
+                                :aria-controls="sectionId(section.key)"
+                                :aria-current="selected === section.key ? 'location' : undefined"
+                                @click="visitSection(section.key)"
+                            >
+                                <Icon
+                                    v-if="section.icon && iconFamily"
+                                    slot="start"
+                                    :name="section.icon"
+                                    :family="iconFamily"
+                                    aria-hidden="true"
+                                />
+                                <span class="index-label">{{ section.name }}</span>
+                            </Button>
+                        </li>
+                    </ul>
+                </div>
             </nav>
 
             <div v-scrollbar ref="list" class="catalog-groups">
-                <Accordion mode="multiple" appearance="plain">
-                    <AccordionItem
-                        v-for="section in visibleSections"
-                        :id="sectionId(section.key)"
-                        :key="section.key"
-                        :expanded="expanded.has(section.key)"
-                        @update:expanded="setExpanded(section.key, $event)"
-                    >
-                        <span slot="label" class="section-heading">
-                            <strong class="section-name">{{ section.name }}</strong>
-                            <small>{{ text('results', section.abilities.length) }}</small>
-                        </span>
-                        <template v-if="expanded.has(section.key)">
-                            <p v-if="section.description" class="section-description">
-                                {{ section.description }}
-                            </p>
+                <section
+                    v-for="category in categories"
+                    :key="category.kind"
+                    :aria-labelledby="`${id}-${category.kind}`"
+                    class="catalog-category"
+                >
+                    <h2 :id="`${id}-${category.kind}`">{{ text(category.title) }}</h2>
+                    <Accordion mode="multiple" appearance="plain">
+                        <AccordionItem
+                            v-for="section in category.sections"
+                            :id="sectionId(section.key)"
+                            :key="section.key"
+                            class="catalog-section"
+                            :expanded="expanded.has(section.key)"
+                            @update:expanded="setExpanded(section.key, $event)"
+                        >
+                            <span slot="label" class="section-heading">
+                                <strong class="section-name">
+                                    <Icon
+                                        v-if="section.icon && iconFamily"
+                                        :name="section.icon"
+                                        :family="iconFamily"
+                                        aria-hidden="true"
+                                    />
+                                    {{ section.name }}
+                                </strong>
+                                <small>{{ section.summary }}</small>
+                            </span>
+                            <template v-if="expanded.has(section.key)">
+                                <p v-if="section.description" class="section-description">
+                                    {{ section.description }}
+                                </p>
 
-                            <ul class="abilities">
-                                <li
-                                    v-for="ability in section.abilities.slice(
-                                        0,
-                                        limit(section.key),
-                                    )"
-                                    :key="ability.key"
-                                    class="ability"
+                                <ul class="abilities">
+                                    <li
+                                        v-for="ability in section.abilities.slice(
+                                            0,
+                                            limit(section.key),
+                                        )"
+                                        :key="ability.key"
+                                        class="ability"
+                                        :class="{ 'is-allowed': allowed(ability.key) }"
+                                    >
+                                        <Checkbox
+                                            v-if="canUpdate"
+                                            :data-ability="ability.key"
+                                            :model-value="allowed(ability.key)"
+                                            :disabled="busy"
+                                            :hint="ability.description"
+                                            :failed="errorFor(ability.key)"
+                                            @update:model-value="
+                                                emit('change', ability.key, $event)
+                                            "
+                                        >
+                                            <strong class="ability-name">
+                                                <Icon
+                                                    v-if="ability.icon && iconFamily"
+                                                    :name="ability.icon"
+                                                    :family="iconFamily"
+                                                    aria-hidden="true"
+                                                />
+                                                {{ ability.name }}
+                                            </strong>
+                                        </Checkbox>
+                                        <div v-else>
+                                            <strong class="ability-name">
+                                                <Icon
+                                                    v-if="ability.icon && iconFamily"
+                                                    :name="ability.icon"
+                                                    :family="iconFamily"
+                                                    aria-hidden="true"
+                                                />
+                                                {{ ability.name }}
+                                            </strong>
+                                            <p
+                                                v-if="ability.description"
+                                                class="ability-description"
+                                            >
+                                                {{ ability.description }}
+                                            </p>
+                                        </div>
+                                        <span
+                                            class="ability-value"
+                                            :aria-hidden="canUpdate || undefined"
+                                        >
+                                            {{
+                                                text(
+                                                    allowed(ability.key)
+                                                        ? category.on
+                                                        : category.off,
+                                                )
+                                            }}
+                                        </span>
+                                    </li>
+                                </ul>
+
+                                <Button
+                                    v-if="section.abilities.length > limit(section.key)"
+                                    class="catalog-more"
+                                    size="s"
+                                    appearance="outlined"
+                                    type="button"
+                                    @click="setLimit(section.key, limit(section.key) + pageSize)"
                                 >
-                                    <Checkbox
-                                        v-if="canUpdate"
-                                        :data-ability="ability.key"
-                                        :model-value="allowed(ability.key)"
-                                        :disabled="busy"
-                                        :hint="ability.description"
-                                        :failed="errorFor(ability.key)"
-                                        @update:model-value="emit('change', ability.key, $event)"
-                                    >
-                                        {{ ability.name }}
-                                    </Checkbox>
-                                    <div v-else>
-                                        <strong>{{ ability.name }}</strong>
-                                        <p v-if="ability.description" class="ability-description">
-                                            {{ ability.description }}
-                                        </p>
-                                    </div>
-                                    <span
-                                        :class="[
-                                            'ability-value',
-                                            { 'is-allowed': allowed(ability.key) },
-                                        ]"
-                                    >
-                                        {{ text(allowed(ability.key) ? 'allowed' : 'denied') }}
-                                    </span>
-                                </li>
-                            </ul>
-
-                            <Button
-                                v-if="section.abilities.length > limit(section.key)"
-                                class="catalog-more"
-                                size="s"
-                                appearance="outlined"
-                                type="button"
-                                @click="setLimit(section.key, limit(section.key) + pageSize)"
-                            >
-                                {{ text('showMore') }}
-                            </Button>
-                        </template>
-                    </AccordionItem>
-                </Accordion>
+                                    {{ text('showMore') }}
+                                </Button>
+                            </template>
+                        </AccordionItem>
+                    </Accordion>
+                </section>
             </div>
         </div>
         <div v-else class="catalog-empty" role="status">
@@ -119,6 +175,7 @@ import Accordion from '../components/WebAwesome/Accordion.vue';
 import AccordionItem from '../components/WebAwesome/AccordionItem.vue';
 import Button from '../components/WebAwesome/Button.vue';
 import Checkbox from '../components/WebAwesome/Checkbox.vue';
+import Icon from '../components/WebAwesome/Icon.vue';
 import Input from '../components/WebAwesome/Input.vue';
 import { useScrollbarDirective } from '../scrollbar';
 import { useEditorText } from './messages';
@@ -127,6 +184,7 @@ import type { Section, Values } from './protocol';
 
 const props = defineProps<{
     sections: Section[];
+    iconFamily?: string;
     values: Values;
     changes: ReadonlyMap<string, boolean>;
     canUpdate: boolean;
@@ -144,6 +202,22 @@ const limits = shallowRef<ReadonlyMap<string, number>>(new Map());
 const list = useTemplateRef<HTMLDivElement>('list');
 const id = useId();
 const pageSize = 40;
+const categoryLabels = [
+    {
+        kind: 'permissions',
+        title: 'permissionGroups',
+        summary: 'permissionSummary',
+        on: 'allowed',
+        off: 'denied',
+    },
+    {
+        kind: 'roles',
+        title: 'roleAssignments',
+        summary: 'roleSummary',
+        on: 'assigned',
+        off: 'unassigned',
+    },
+] as const;
 
 function normalize(text: string) {
     return text.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
@@ -170,6 +244,21 @@ const visibleSections = computed(() =>
         return matches.length ? [{ key, ...section, abilities: matches }] : [];
     }),
 );
+const categories = computed(() =>
+    categoryLabels.flatMap((category) => {
+        const sections = visibleSections.value
+            .filter(({ kind }) => kind === category.kind)
+            .map((section) => ({
+                ...section,
+                summary: text(category.summary, {
+                    enabled: section.abilities.filter(({ key }) => allowed(key)).length,
+                    total: section.abilities.length,
+                }),
+            }));
+        return sections.length ? [{ ...category, sections }] : [];
+    }),
+);
+
 const resultCount = computed(() =>
     visibleSections.value.reduce((total, section) => total + section.abilities.length, 0),
 );
@@ -177,7 +266,7 @@ const resultCount = computed(() =>
 watch(
     [needle, () => props.sections],
     () => {
-        const first = visibleSections.value[0]?.key;
+        const first = categories.value[0]?.sections[0]?.key;
         selected.value = first ?? '';
         expanded.value = new Set(first ? [first] : []);
         limits.value = new Map();
@@ -208,7 +297,10 @@ function setExpanded(key: string, open: boolean) {
     if (open) {
         next.add(key);
         selected.value = key;
-    } else next.delete(key);
+    } else {
+        next.delete(key);
+        if (selected.value === key) selected.value = Array.from(next).at(-1) ?? '';
+    }
     expanded.value = next;
 }
 
@@ -220,10 +312,21 @@ function limit(key: string) {
     return limits.value.get(key) ?? pageSize;
 }
 
-function visitSection(key: string) {
+async function visitSection(key: string) {
     selected.value = key;
-    setExpanded(key, true);
-    document.getElementById(sectionId(key))?.scrollIntoView({ block: 'nearest' });
+    expanded.value = new Set([key]);
+    await nextTick();
+
+    const container = list.value;
+    if (!container) return;
+    const items = Array.from(container.querySelectorAll('wa-accordion-item'));
+    const item = items.find((element) => element.id === sectionId(key));
+    if (!item) return;
+    await Promise.all(items.map((element) => element.updateComplete));
+    if (selected.value !== key) return;
+
+    item.focus({ preventScroll: true });
+    container.scrollTop += item.getBoundingClientRect().top - container.getBoundingClientRect().top;
 }
 
 function errorFor(key: string) {
@@ -288,16 +391,38 @@ defineExpose({ focusAbility });
     background: var(--wa-color-surface-lowered);
     overflow: auto;
 }
+.index-category + .index-category {
+    margin-block-start: var(--wa-space-m);
+    padding-block-start: var(--wa-space-s);
+    border-block-start: var(--wa-border-width-s) solid var(--wa-color-surface-border);
+}
+.index-category p {
+    margin: 0;
+    padding: var(--wa-space-2xs) var(--wa-space-s);
+    color: var(--wa-color-text-quiet);
+    font-size: var(--wa-font-size-s);
+    font-weight: var(--wa-font-weight-semibold);
+}
+.index-category ul,
+.abilities {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
 .catalog-index-button {
     display: block;
+    inline-size: 100%;
 }
 .catalog-index-button::part(base) {
     justify-content: flex-start;
     inline-size: 100%;
+    min-block-size: 2.5rem;
 }
 .catalog-index [aria-current='location'] {
     background: var(--wa-color-brand-fill-quiet);
     border-radius: var(--wa-border-radius-s);
+    color: var(--wa-color-brand-on-quiet);
+    font-weight: var(--wa-font-weight-semibold);
 }
 .index-label {
     display: block;
@@ -309,57 +434,112 @@ defineExpose({ focusAbility });
     min-inline-size: 0;
     overflow: auto;
     overscroll-behavior: contain;
-    padding: var(--wa-space-xs) var(--wa-space-l) var(--wa-space-m);
+    padding: var(--wa-space-s) var(--wa-space-l) var(--wa-space-m);
+}
+.catalog-category + .catalog-category {
+    margin-block-start: var(--wa-space-l);
+}
+.catalog-category h2 {
+    margin: 0 0 var(--wa-space-xs);
+    color: var(--wa-color-text-quiet);
+    font-size: var(--wa-font-size-s);
+    font-weight: var(--wa-font-weight-semibold);
+}
+.catalog-category wa-accordion {
+    border: 0;
+    overflow: visible;
+}
+.catalog-section {
+    --spacing: var(--wa-space-s);
+    --show-duration: 0ms;
+    --hide-duration: 0ms;
+    margin-block-end: var(--wa-space-xs);
+    border: var(--wa-border-width-s) solid var(--wa-color-surface-border);
+    border-radius: var(--wa-border-radius-m);
+}
+.catalog-section::part(button) {
+    min-block-size: 2.75rem;
+    border-radius: var(--wa-border-radius-m);
+}
+.catalog-section[expanded]::part(button) {
+    background: var(--wa-color-surface-lowered);
+    border-end-start-radius: 0;
+    border-end-end-radius: 0;
+}
+.catalog-section[expanded]::part(content) {
+    border-block-start: var(--wa-border-width-s) solid var(--wa-color-surface-border);
 }
 .section-heading {
     display: flex;
+    flex: 1;
     flex-wrap: wrap;
     align-items: baseline;
-    column-gap: var(--wa-space-m);
-    row-gap: var(--wa-space-2xs);
+    justify-content: space-between;
+    gap: var(--wa-space-2xs) var(--wa-space-m);
+    text-align: start;
 }
 .section-name,
 .ability {
     overflow-wrap: anywhere;
+}
+.ability-name {
+    color: var(--wa-color-text-normal);
+}
+.section-name wa-icon,
+.ability-name wa-icon {
+    margin-inline-end: var(--wa-space-2xs);
+    color: var(--wa-color-text-quiet);
 }
 .section-heading small,
 .section-description,
 .ability-description {
     color: var(--wa-color-text-quiet);
 }
+.section-heading small {
+    white-space: nowrap;
+    font-size: var(--wa-font-size-s);
+    font-weight: var(--wa-font-weight-normal);
+}
 .section-description,
 .ability-description {
-    margin-block: 0;
-}
-.section-description {
-    margin-block-end: var(--wa-space-xs);
+    margin: 0;
     font-size: var(--wa-font-size-s);
 }
+.section-description {
+    margin-block-end: var(--wa-space-s);
+}
 .abilities {
-    margin: 0;
-    padding: 0;
-    list-style: none;
+    display: grid;
+    gap: var(--wa-space-2xs);
 }
 .ability {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
-    gap: var(--wa-space-s);
     align-items: start;
-    padding: var(--wa-space-s) 0;
-    border-block-end: var(--wa-border-width-s) solid var(--wa-color-surface-border);
+    gap: var(--wa-space-xs);
+    padding: var(--wa-space-xs) var(--wa-space-s);
+    border-radius: var(--wa-border-radius-s);
+    background: var(--wa-color-surface-lowered);
 }
-.ability:last-child {
-    border-block-end: 0;
+.ability.is-allowed {
+    background: var(--wa-color-success-fill-quiet);
 }
 .ability-value {
-    color: var(--wa-color-text-quiet);
-    font-size: var(--wa-font-size-s);
+    align-self: start;
+    padding: var(--wa-space-3xs) var(--wa-space-xs);
+    border: var(--wa-border-width-s) solid var(--wa-color-surface-border);
+    border-radius: var(--wa-border-radius-pill);
+    background: var(--wa-color-surface-default);
+    color: var(--wa-color-text-normal);
+    font-size: var(--wa-font-size-xs);
+    font-weight: var(--wa-font-weight-semibold);
+    line-height: 1.5;
 }
-.ability-value.is-allowed {
+.is-allowed .ability-value {
+    border-color: var(--wa-color-success-border-quiet);
     color: var(--wa-color-success-on-quiet);
 }
 .ability-description {
-    font-size: var(--wa-font-size-s);
     margin-block-start: var(--wa-space-2xs);
 }
 .catalog-more {

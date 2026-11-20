@@ -23,25 +23,24 @@
     ],
     "require": {
         "php": "^8.5",
-        "artisan-toolbox/dapter": "^1.0.0-beta.1",
-        "artisan-toolbox/maintainer": "^1.10.0",
-        "artisan-toolbox/mosaicast": "^1.1.1",
-        "artisan-toolbox/qztray": "^1.4",
+        "artisan-toolbox/dapter": "^1.0.0-beta.3",
+        "artisan-toolbox/maintainer": "^1.14.3",
+        "artisan-toolbox/mosaicast": "^1.3.1",
+        "artisan-toolbox/qztray": "^1.5.1",
         "illuminate/support": "^13.0",
         "illuminate/translation": "^13.36",
         "inertiajs/inertia-laravel": "^3.0"
     },
     "require-dev": {
         "driftingly/rector-laravel": "^2.5",
-        "larastan/larastan": "^3.9",
+        "larastan/larastan": "^3.12.1",
         "laravel/pao": "^1.0",
         "laravel/pint": "^1.29",
         "orchestra/testbench": "^11.0",
         "pestphp/pest": "^5.0",
         "pestphp/pest-plugin-laravel": "^5.0",
-        "pestphp/pest-plugin-type-coverage": "^5.0.2",
+        "pestphp/pest-plugin-type-coverage": "^5.1.1",
         "phpstan/extension-installer": "^1.4",
-        "phpstan/phpstan": "^2.2.8 <2.3.6",
         "rector/rector": "^2.6.2"
     },
     "autoload": {
@@ -74,28 +73,36 @@
             "@php vendor/bin/testbench serve --ansi"
         ],
         "lint": [
-            "vendor/bin/pint --parallel"
+            "@php vendor/bin/pint --parallel"
         ],
         "lint:check": [
-            "vendor/bin/pint --parallel --test"
+            "@php vendor/bin/pint --parallel --test"
         ],
         "analyse": [
-            "vendor/bin/phpstan analyse --memory-limit=512M"
+            "@php vendor/bin/phpstan analyse --memory-limit=2G"
         ],
         "test:types": [
-            "vendor/bin/pest --type-coverage --min=100 --memory-limit=512M --no-cache"
+            "@php scripts/check-type-coverage.php"
         ],
         "test:coverage": [
-            "vendor/bin/pest --coverage"
+            "@php vendor/bin/pest --coverage"
         ],
         "test:unit": [
-            "vendor/bin/pest --parallel"
+            "@php vendor/bin/pest --parallel"
         ],
         "test": [
             "@analyse",
             "@lint:check",
             "@test:types",
             "@test:unit"
+        ],
+        "ci:check": [
+            "Composer\\Config::disableProcessTimeout",
+            "@composer validate --strict --no-check-publish",
+            "@test",
+            "npm run check",
+            "npm test",
+            "npm run build"
         ],
         "clear": [
             "@php vendor/bin/testbench package:purge-skeleton --ansi"

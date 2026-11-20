@@ -18,6 +18,7 @@ export interface Ability {
     key: string;
     name: string;
     description: string;
+    icon?: string;
 }
 
 export interface Section {
@@ -25,6 +26,7 @@ export interface Section {
     id: string;
     name: string;
     description: string;
+    icon?: string;
     order: 'alphabetical' | 'locked';
     abilities: Ability[];
 }
@@ -36,6 +38,7 @@ export interface Snapshot {
     revision: string;
     canUpdate: boolean;
     isCurrentUser: boolean;
+    iconFamily?: string;
     sections: Section[];
     values: Values;
 }
@@ -60,6 +63,12 @@ function object(value: unknown): value is Record<string, unknown> {
 
 function text(value: unknown): value is string {
     return typeof value === 'string' && value.trim().length > 0;
+}
+
+function iconName(value: unknown): string | undefined {
+    return typeof value === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value)
+        ? value
+        : undefined;
 }
 
 export function normalizeSubject({
@@ -149,7 +158,15 @@ export function readSnapshot(input: string, subject: Subject): Snapshot | undefi
     }
 
     const sourceValues = snapshot.values;
-    const sections: Section[] = snapshot.sections;
+    const iconFamily = iconName(snapshot.iconFamily);
+    const sections = snapshot.sections.map((section) => ({
+        ...section,
+        icon: iconFamily ? iconName(section.icon) : undefined,
+        abilities: section.abilities.map((ability) => ({
+            ...ability,
+            icon: iconFamily ? iconName(ability.icon) : undefined,
+        })),
+    }));
     const groups = new Set<string>();
     const entries = new Map<string, boolean>();
     for (const section of sections) {
@@ -176,6 +193,7 @@ export function readSnapshot(input: string, subject: Subject): Snapshot | undefi
         revision: snapshot.revision,
         canUpdate: snapshot.canUpdate,
         isCurrentUser: snapshot.isCurrentUser,
+        iconFamily,
         sections,
         values: Object.fromEntries(entries),
     };

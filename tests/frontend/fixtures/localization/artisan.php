@@ -6,6 +6,8 @@ use Illuminate\Contracts\Console\Kernel;
 use Orchestra\Testbench\Foundation\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 
+ini_set('display_errors', 'stderr');
+
 require dirname(__DIR__, 4).'/vendor/autoload.php';
 
 $app = Application::create(options: ['extra' => ['providers' => [FrontAwesomeServiceProvider::class]]]);

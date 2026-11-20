@@ -5,19 +5,28 @@ import { pathToFileURL } from 'node:url';
 const documentation =
     /^(?:README|CHANGELOG|LICENSE|AGENTS|AGENTS_PACKAGE|CLAUDE)\.md$|^(?:\.github|resources\/boost\/skills)\/.*\.md$/;
 const composer = /^composer\.(?:json|lock)$/;
-const workflow = /^\.github\/(?:workflows|actions)\/.*\.ya?ml$/;
+const workflow = /^(?:\.github\/(?:workflows|actions)\/|scripts\/ci-plan(?:\.test)?\.mjs$)/;
+const phpTests =
+    /^(?:tests\/(?:(?:Feature|Unit)\/.+|ArchTest)\.php|phpunit\.xml\.dist|phpstan\.neon\.dist|pint\.json|rector\.php)$/;
+const browserInputs =
+    /^(?:package(?:-lock)?\.json|\.npmrc|\.nvmrc|vite\.config\.ts)$|^(?:resources\/(?:js|css)\/|scripts\/|tests\/theme-consumer\/|tests\/frontend\/scrollbar)/i;
 
 export function planChecks(event, subject, files) {
     const extended =
         event === 'schedule' ||
         event === 'workflow_dispatch' ||
         (event === 'push' && subject.startsWith('chore(release): prepare ')) ||
-        files?.some((file) => workflow.test(file)) === true;
+        files?.some((file) => !documentation.test(file) && workflow.test(file)) === true;
+    const full = extended || files === null;
+    const fullBrowsers =
+        full || files.some((file) => composer.test(file) || browserInputs.test(file));
 
     return {
-        checks: extended || files === null || files.some((file) => !documentation.test(file)),
-        compatibility: extended || files === null || files.some((file) => composer.test(file)),
-        browsers: extended,
+        checks: full || files.some((file) => !documentation.test(file)),
+        compatibility: full || files.some((file) => composer.test(file)),
+        browsers:
+            fullBrowsers || files.some((file) => !documentation.test(file) && !phpTests.test(file)),
+        fullBrowsers,
         coverage: event === 'schedule',
     };
 }

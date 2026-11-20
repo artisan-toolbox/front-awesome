@@ -86,6 +86,38 @@ test('reads the complete snapshot without coercing values or imposing a front-en
     });
 });
 
+test('reads optional catalog icons without treating malformed presentation as invalid access data', () => {
+    const snapshot = response();
+    const [orders, roles] = snapshot.sections;
+    const input = {
+        ...snapshot,
+        iconFamily: 'sharp-duotone',
+        sections: [
+            {
+                ...orders,
+                icon: 'file-invoice',
+                abilities: [
+                    { ...orders.abilities[0], icon: 'pen' },
+                    { ...orders.abilities[1], icon: '../../not-an-icon' },
+                ],
+            },
+            { ...roles, icon: { name: 'users' } },
+        ],
+    };
+    const parsed = readSnapshot(JSON.stringify(input), { id: '001' });
+    expect(parsed?.iconFamily).toBe('sharp-duotone');
+    expect(parsed?.sections[0].icon).toBe('file-invoice');
+    expect(parsed?.sections[0].abilities.map(({ icon }) => icon)).toEqual(['pen', undefined]);
+    expect(parsed?.sections[1].icon).toBeUndefined();
+    expect(parsed?.values).toEqual(snapshot.values);
+
+    const disabled = readSnapshot(JSON.stringify({ ...input, iconFamily: null }), { id: '001' });
+    expect(disabled?.iconFamily).toBeUndefined();
+    expect(disabled?.sections[0].icon).toBeUndefined();
+    expect(disabled?.sections[0].abilities[0].icon).toBeUndefined();
+    expect(disabled?.values).toEqual(snapshot.values);
+});
+
 test.each([
     { subject: '1' },
     { canUpdate: 'true' },

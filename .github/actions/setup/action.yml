@@ -2,8 +2,8 @@ name: Install Front Awesome test dependencies
 description: Install Composer before npm and reuse downloaded archives
 inputs:
   composer-mode:
-    description: Composer install or update mode
-    default: locked
+    description: Install from the lockfile or resolve with prefer-lowest or prefer-stable
+    default: install
   frontend:
     description: Install the npm dependencies
     default: 'true'
@@ -13,43 +13,23 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2
+    - name: Set up CI dependencies
+      uses: artisan-toolbox/maintainer@498f5f8723cbed3d24af0ba90870ca26010db4df # 1.14.2
       with:
-        php-version: '8.5'
-        extensions: dom, curl, libxml, mbstring, zip, fileinfo, sqlite, pdo_sqlite, bcmath, intl
-        ini-values: error_reporting=E_ALL, display_errors=stderr
-        tools: composer:v2
-        coverage: ${{ inputs.coverage }}
+        php-extensions: dom, curl, libxml, mbstring, zip, fileinfo, sqlite, pdo_sqlite, bcmath, intl
+        php-coverage: ${{ inputs.coverage }}
+        composer-mode: ${{ inputs.composer-mode }}
+        composer-scripts: 'false'
 
-    - name: Locate Composer download cache
-      id: composer
+    - name: Discover Testbench packages
       shell: bash
-      run: echo "path=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+      run: composer run prepare
 
-    - name: Cache Composer package downloads
-      uses: actions/cache@v5
-      with:
-        path: ${{ steps.composer.outputs.path }}
-        key: composer-${{ runner.os }}-${{ inputs.composer-mode }}-${{ hashFiles('composer.lock', 'composer.json') }}
-        restore-keys: composer-${{ runner.os }}-${{ inputs.composer-mode }}-
-
-    - name: Install PHP dependencies
-      shell: bash
-      env:
-        COMPOSER_MODE: ${{ inputs.composer-mode }}
-      run: |
-        case "$COMPOSER_MODE" in
-          locked) composer install --prefer-dist --no-interaction --no-progress --no-scripts ;;
-          lowest) composer update --prefer-lowest --prefer-dist --no-interaction --no-progress --no-scripts ;;
-          latest) composer update --prefer-stable --prefer-dist --no-interaction --no-progress --no-scripts ;;
-          *) echo "Unknown Composer mode $COMPOSER_MODE" >&2; exit 1 ;;
-        esac
-        composer run prepare
-
-    - uses: actions/setup-node@v7
+    - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+      if: inputs.frontend == 'true'
       with:
         node-version-file: .nvmrc
-        cache: ${{ inputs.frontend == 'true' && 'npm' || '' }}
+        cache: npm
 
     - name: Install npm dependencies
       if: inputs.frontend == 'true'

@@ -24,6 +24,7 @@ jobs:
       checks: ${{ steps.plan.outputs.checks }}
       compatibility: ${{ steps.plan.outputs.compatibility }}
       browsers: ${{ steps.plan.outputs.browsers }}
+      full-browsers: ${{ steps.plan.outputs.fullBrowsers }}
       coverage: ${{ steps.plan.outputs.coverage }}
       playwright: ${{ steps.plan.outputs.playwright }}
     steps:
@@ -46,16 +47,7 @@ jobs:
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup
-      - run: composer validate --no-check-publish
-      - run: php vendor/bin/maintainer quality:check --no-interaction
-      - run: composer test:types
-      - name: Verify generated assets and examples
-        run: |
-          npm run theme:check
-          npm run components:check
-          npm run examples:check
-          npm run translations:check
-      - run: npm run build
+      - run: composer ci:check
 
   windows:
     name: Windows runtime
@@ -68,7 +60,8 @@ jobs:
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup
-      - run: php vendor/bin/maintainer quality:check --no-interaction --tool=pest --tool=vite-plus-test
+      - run: php vendor/bin/pest
+      - run: npm test
       - run: node scripts/check-data-view-types.mjs
 
   compatibility:
@@ -87,7 +80,7 @@ jobs:
           persist-credentials: false
       - uses: ./.github/actions/setup
         with:
-          composer-mode: ${{ matrix.dependencies }}
+          composer-mode: ${{ matrix.dependencies == 'lowest' && 'prefer-lowest' || 'prefer-stable' }}
           frontend: 'false'
       - run: composer test:unit
       - run: composer test:types
@@ -120,8 +113,10 @@ jobs:
       - uses: ./.github/actions/setup
         with:
           coverage: ${{ needs.plan.outputs.coverage == 'true' && 'xdebug' || 'none' }}
-      - run: npm run test:theme
-      - run: npm run test:scrollbar
+      - if: needs.plan.outputs.full-browsers == 'true'
+        run: npm run test:theme
+      - if: needs.plan.outputs.full-browsers == 'true'
+        run: npm run test:scrollbar
       - if: needs.plan.outputs.coverage != 'true'
         run: npm run test:browser
       - name: Report runtime test coverage
@@ -134,7 +129,7 @@ jobs:
           npm run test:coverage
       - name: Upload coverage reports
         if: needs.plan.outputs.coverage == 'true'
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: coverage-reports
           path: build/coverage/
@@ -144,6 +139,7 @@ jobs:
     name: CI
     if: ${{ !cancelled() }}
     needs: [plan, linux, windows, compatibility, browsers]
+    permissions: {}
     runs-on: ubuntu-24.04
     timeout-minutes: 2
     steps:

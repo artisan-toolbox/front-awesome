@@ -504,6 +504,10 @@ Use `@artisan-toolbox/front-awesome/components/UserPermissionEditor.vue` when an
 
 Use `v-model:open` with `subject-id` and an optional `subject-label`. To reuse one modal for many rows, type a component ref with the root export `UserPermissionEditorHandle` and call `editor.value?.show({ subjectId: user.id, subjectLabel: user.name })`. Pass integer IDs outside JavaScript's safe range as strings. The editor loads the selected subject when opened and keeps filtered changes in the full draft.
 
+Send permission groups with `kind: 'permissions'` and roles with `kind: 'roles'`. The editor shows them in separate sections and keeps draft changes when the operator selects a section in the sidebar. Permission rows show Allowed or Denied. Role rows show Assigned or Unassigned. The operator saves the draft explicitly.
+
+To show decorative Font Awesome icons, return `iconFamily: 'classic'` on the GET response and an `icon` name such as `file-invoice` on a section or ability. Use lowercase names with hyphens between words. The application must provide the selected Font Awesome family through Web Awesome. Omit `iconFamily` to hide the catalog icons.
+
 Closing the editor or selecting another subject with unsaved changes opens a discard confirmation. Keep editing or press Escape to return to the current draft.
 
 Return a catalog and editable boolean values on GET, keyed by the subject's `user` query parameter. Accept a complete boolean map and its revision on PUT. Return `204` when saved and `409` for a stale revision. The editor loads current values before offering another save if the outcome is uncertain. It uses the application localization service with the `front-awesome::user-permission-editor` catalog and an English fallback. See the [permission editor guide](https://atb.dev.br/docs/front-awesome/user-permission-editor).

@@ -30,6 +30,7 @@
 /.nvmrc             export-ignore
 /scripts/ci-plan.mjs export-ignore
 /scripts/ci-plan.test.mjs export-ignore
+/scripts/check-type-coverage.php export-ignore
 
 /.audit export-ignore
 
