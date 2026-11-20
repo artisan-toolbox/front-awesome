@@ -29,8 +29,10 @@ function translationFixture(string $relative, string $contents): void
 
 function exportedTranslations(): array
 {
-    expect(Artisan::call('front-awesome:export-translations', ['--manifest' => true]))->toBe(0);
-    $manifest = json_decode(Artisan::output(), true, flags: JSON_THROW_ON_ERROR);
+    $status = Artisan::call('front-awesome:export-translations', ['--manifest' => true]);
+    $output = Artisan::output();
+    expect($status)->toBe(0, $output);
+    $manifest = json_decode($output, true, flags: JSON_THROW_ON_ERROR);
 
     return [$manifest, json_decode(file_get_contents($manifest['output']), true, flags: JSON_THROW_ON_ERROR)];
 }
@@ -304,6 +306,6 @@ it('allows the tooling host to override the configured Node executable', functio
     config(['front-awesome.translations.node_binary' => 'missing-front-awesome-node-executable']);
     $node = (new ExecutableFinder)->find('node');
     expect($node)->not->toBeNull();
-    expect(Artisan::call('front-awesome:export-translations', ['--node' => $node]))->toBe(0);
+    expect(Artisan::call('front-awesome:export-translations', ['--node' => $node]))->toBe(0, Artisan::output());
     expect(file_exists(config('front-awesome.translations.output')))->toBeTrue();
 });

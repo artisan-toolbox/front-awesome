@@ -1,6 +1,10 @@
 import { readFile } from 'node:fs/promises';
 import { compileScript, parse } from '@vue/compiler-sfc';
 import { expect, test } from 'vite-plus/test';
+import { createSSRApp, h } from 'vue';
+import { renderToString } from 'vue/server-renderer';
+import { useDataAdapter } from '@artisan-toolbox/dapter';
+import { DataView } from '@artisan-toolbox/front-awesome/data-view';
 import {
     groupingColumn,
     groupRows,
@@ -78,10 +82,6 @@ test('rejects ambiguous presentation and nonexistent row keys in TypeScript', ()
 });
 
 test('reports invalid JavaScript layout and ownership inputs at the presentation boundary', async () => {
-    const { createSSRApp, h } = await import('vue');
-    const { renderToString } = await import('vue/server-renderer');
-    const { useDataAdapter } = await import('@artisan-toolbox/dapter');
-    const { DataView } = await import('@artisan-toolbox/front-awesome/data-view');
     function render(overrides: object) {
         const app = createSSRApp({
             setup() {

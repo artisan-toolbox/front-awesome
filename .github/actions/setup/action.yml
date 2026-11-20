@@ -4,8 +4,11 @@ inputs:
   composer-mode:
     description: Install from the lockfile or resolve with prefer-lowest or prefer-stable
     default: install
-  frontend:
-    description: Install the npm dependencies
+  composer-validation:
+    description: Composer manifest validation mode passed to Maintainer
+    default: none
+  npm-install:
+    description: Install the npm dependencies in addition to the Node.js runtime
     default: 'true'
   coverage:
     description: PHP coverage driver
@@ -13,25 +16,27 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Read the Node.js version
+      id: node
+      shell: bash
+      run: |
+        version=$(tr -d '\r\n' < .nvmrc)
+        if [[ -z "$version" ]]; then
+          echo '::error::.nvmrc must specify a Node.js version.'
+          exit 1
+        fi
+        printf 'version=%s\n' "$version" >> "$GITHUB_OUTPUT"
+
     - name: Set up CI dependencies
       uses: artisan-toolbox/maintainer@498f5f8723cbed3d24af0ba90870ca26010db4df # 1.14.2
+      env:
+        NPM_CONFIG_AUDIT: 'false'
+        NPM_CONFIG_FUND: 'false'
       with:
         php-extensions: dom, curl, libxml, mbstring, zip, fileinfo, sqlite, pdo_sqlite, bcmath, intl
         php-coverage: ${{ inputs.coverage }}
         composer-mode: ${{ inputs.composer-mode }}
-        composer-scripts: 'false'
-
-    - name: Discover Testbench packages
-      shell: bash
-      run: composer run prepare
-
-    - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-      if: inputs.frontend == 'true'
-      with:
-        node-version-file: .nvmrc
-        cache: npm
-
-    - name: Install npm dependencies
-      if: inputs.frontend == 'true'
-      shell: bash
-      run: npm ci --no-audit --no-fund
+        composer-validation: ${{ inputs.composer-validation }}
+        node-version: ${{ steps.node.outputs.version }}
+        npm-install: ${{ inputs.npm-install }}
+        npm-cache: ${{ inputs.npm-install }}

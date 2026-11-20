@@ -17,7 +17,10 @@
 
 ## Unreleased
 
-- Use the Maintainer 1.14.2 root action for Composer setup across quality, compatibility, browser, and coverage jobs.
+- Provision Node.js from `.nvmrc` in both PHP compatibility jobs so the translation exporter can verify browser locales without installing npm dependencies. Pest reports the Artisan error when a translation export fails.
+- Use the Maintainer 1.14.2 setup action for Composer and npm and run standard Linux and Windows checks through Maintainer. Run Vue type checking once through `npm run check`, then run PHP type coverage and the consumer build as package-specific gates.
+- Run the localization build, configuration watcher, and exporter lifecycle tests in separate Vitest files. Isolate Web Awesome tests that start before custom element registration so they can run in any order.
+- Run the light and dark reset inventories in parallel. Settle shadow DOM transitions before comparing native and Vue styles.
 - Require Larastan 3.12.1 and Pest Type Coverage 5.1.1 as development minimums. The updated coverage plugin supports the collected-data API in PHPStan 2.3.6 and later, so Composer can resolve PHPStan through the development tools.
 - Separate role assignments from permission groups in the user permission editor. Sidebar navigation opens and focuses one group, and each group shows its allowed or assigned count alongside explicit row states.
 - Render optional Font Awesome catalog icons alongside group and permission labels when the provider sends an icon family and names.

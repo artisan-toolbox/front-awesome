@@ -96,12 +96,11 @@
             "@test:types",
             "@test:unit"
         ],
+        "quality:check": "@php vendor/bin/maintainer quality:check --no-interaction --strict",
         "ci:check": [
             "Composer\\Config::disableProcessTimeout",
-            "@composer validate --strict --no-check-publish",
-            "@test",
-            "npm run check",
-            "npm test",
+            "@quality:check",
+            "@test:types",
             "npm run build"
         ],
         "clear": [

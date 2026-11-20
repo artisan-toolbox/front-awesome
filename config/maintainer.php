@@ -8,7 +8,6 @@ use ArtisanToolbox\Maintainer\Quality\Contracts\RunsRectorFix;
 use ArtisanToolbox\Maintainer\Quality\Contracts\RunsVitePlusCheck;
 use ArtisanToolbox\Maintainer\Quality\Contracts\RunsVitePlusCheckFix;
 use ArtisanToolbox\Maintainer\Quality\Contracts\RunsVitePlusTest;
-use ArtisanToolbox\Maintainer\Quality\Contracts\RunsVueTscCheck;
 
 return [
     'ai' => [
@@ -46,7 +45,6 @@ return [
             RunsPintCheck::class,
             RunsVitePlusCheck::class,
             RunsVitePlusTest::class,
-            RunsVueTscCheck::class,
             RunsPhpStanCheck::class,
         ],
         'pest' => [

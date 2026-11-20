@@ -1,86 +1,20 @@
-import { expect, onTestFinished, test, vi } from 'vite-plus/test';
-import { createApp, h, nextTick, reactive } from 'vue';
-import type { Component } from 'vue';
-import type WaIcon from '@awesome.me/webawesome/dist/components/icon/icon.js';
+import { expect, onTestFinished, test } from 'vite-plus/test';
+import { h, reactive } from 'vue';
 import Icon from '@artisan-toolbox/front-awesome/components/WebAwesome/Icon.vue';
-import BareBooleanIcon from './BareBooleanIcon.vue';
+import { webAwesomeFixture, ready } from './fixtures/web-awesome';
+
+const mount = webAwesomeFixture('wa-icon');
 
 function svgUrl(id: string) {
     return `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path id="${id}" fill="currentColor" d="M0 0h16v16H0z"/></svg>`)}`;
 }
-
-function mount(component: Component) {
-    const container = document.createElement('div');
-    document.body.append(container);
-    const app = createApp(component);
-    app.mount(container);
-    onTestFinished(() => {
-        app.unmount();
-        container.remove();
-    });
-    const icon = container.querySelector<WaIcon>('wa-icon');
-    if (!icon) throw new Error('Expected the public Icon component.');
-    return { container, icon };
-}
-
-async function ready(icon: WaIcon) {
-    await vi.dynamicImportSettled();
-    await customElements.whenDefined('wa-icon');
-    await nextTick();
-    await icon.updateComplete;
-}
-
-test('preserves boolean presence and numeric rotation before registration and through live updates', async () => {
-    expect(customElements.get('wa-icon')).toBeUndefined();
-    const state = reactive({ enabled: false, rotate: 45 });
-    const { icon } = mount({
-        render: () =>
-            h(Icon, {
-                autoWidth: state.enabled,
-                swapOpacity: state.enabled,
-                rotate: state.rotate,
-            }),
-    });
-    const bare = mount(BareBooleanIcon).icon;
-    expect(icon.hasAttribute('auto-width')).toBe(false);
-    expect(icon.hasAttribute('swap-opacity')).toBe(false);
-    expect(icon.getAttribute('rotate')).toBe('45');
-    expect(bare.hasAttribute('auto-width')).toBe(true);
-    expect(bare.hasAttribute('swap-opacity')).toBe(true);
-    await ready(icon);
-    await ready(bare);
-    expect(icon.autoWidth).toBe(false);
-    expect(icon.swapOpacity).toBe(false);
-    expect(icon.rotate).toBe(45);
-    expect(bare.autoWidth).toBe(true);
-    expect(bare.swapOpacity).toBe(true);
-
-    const after = mount({
-        render: () => h(Icon, { 'auto-width': state.enabled, 'swap-opacity': state.enabled }),
-    }).icon;
-    await ready(after);
-    for (const enabled of [true, false]) {
-        state.enabled = enabled;
-        state.rotate = enabled ? 90 : 0;
-        await ready(icon);
-        await ready(after);
-        for (const element of [icon, after]) {
-            expect(element.autoWidth).toBe(enabled);
-            expect(element.swapOpacity).toBe(enabled);
-            expect(element.hasAttribute('auto-width')).toBe(enabled);
-            expect(element.hasAttribute('swap-opacity')).toBe(enabled);
-        }
-        expect(icon.rotate).toBe(state.rotate);
-        expect(icon.getAttribute('rotate')).toBe(String(state.rotate));
-    }
-});
 
 test('loads real SVGs, forwards original events, and inherits application styling and accessibility', async () => {
     const state = reactive({ label: 'Saved', src: svgUrl('loaded-icon') });
     const loads: Event[] = [];
     const errors: Event[] = [];
     const clicks: MouseEvent[] = [];
-    const { icon } = mount({
+    const { element: icon } = mount({
         render: () =>
             h('div', { style: { color: 'rgb(42, 60, 90)', fontSize: '27px' } }, [
                 h(Icon, {
@@ -149,7 +83,7 @@ test('retains native custom library options and name precedence over src', async
     onTestFinished(() => unregisterIconLibrary('front-awesome-test'));
     const state = reactive({ library: 'front-awesome-test' });
     const loads: Event[] = [];
-    const { icon } = mount({
+    const { element: icon } = mount({
         render: () =>
             h(Icon, {
                 name: 'custom-home',

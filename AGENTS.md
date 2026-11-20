@@ -12,7 +12,8 @@ This repository is a Laravel package. Keep the package focused, idiomatic, and e
 
 ## Quick Commands
 
-- Full validation: `composer test`
+- PHP validation: `composer test`
+- Locked Linux CI checks and consumer build: `composer ci:check`
 - Formatting check: `composer lint:check`
 - Static analysis: `composer analyse`
 - Pest tests: `composer test:unit`
@@ -51,7 +52,7 @@ The Web Awesome and Inertia references come from the versions installed by `npm 
 - Install Artisan Toolbox JavaScript packages from the corresponding Composer package under `vendor/artisan-toolbox`. Run Composer before npm in development and CI.
 - Keep realtime transport in Mosaicast. Build future Front Awesome integrations on the Mosaicast client and Laravel package.
 - Run `npm run check`, `npm test`, and `npm run build` for frontend changes. The build exercises the Vite consumer fixture.
-- Run `php vendor/bin/maintainer quality:check` for the configured PHP and frontend checks. Use Maintainer for the `1.x` release workflow.
+- Run `composer quality:check` for the configured PHP and frontend checks. The Vite Plus check includes Vue type checking. CI uses the Maintainer setup action to install the runtime in `.nvmrc` even when a PHP compatibility job skips npm. The translation exporter calls Node.js directly. Use Maintainer for the `1.x` release workflow.
 
 ## Shared theme maintenance
 

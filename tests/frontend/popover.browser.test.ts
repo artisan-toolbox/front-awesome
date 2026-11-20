@@ -1,96 +1,17 @@
-import { expect, onTestFinished, test, vi } from 'vite-plus/test';
+import { expect, onTestFinished, test } from 'vite-plus/test';
 import { page, userEvent } from 'vitest/browser';
 import { createApp, h, nextTick, reactive, shallowRef } from 'vue';
-import type { Component, ComponentPublicInstance } from 'vue';
+import type { ComponentPublicInstance } from 'vue';
 import type WaPopover from '@awesome.me/webawesome/dist/components/popover/popover.js';
 import Button from '@artisan-toolbox/front-awesome/components/WebAwesome/Button.vue';
 import Popover from '@artisan-toolbox/front-awesome/components/WebAwesome/Popover.vue';
-import BareBooleanPopover from './BareBooleanPopover.vue';
+import { webAwesomeFixture, ready, expectPopoverOpen as shown } from './fixtures/web-awesome';
 
-function mount(component: Component) {
-    const container = document.createElement('div');
-    document.body.append(container);
-    const app = createApp(component);
-    app.mount(container);
-    onTestFinished(() => {
-        app.unmount();
-        container.remove();
-    });
-    const popover = container.querySelector<WaPopover>('wa-popover');
-    if (!popover) throw new Error('Expected the public Popover component.');
-    return { popover, container };
-}
-
-async function ready(popover: WaPopover) {
-    await vi.dynamicImportSettled();
-    await customElements.whenDefined('wa-popover');
-    await nextTick();
-    await popover.updateComplete;
-}
-
-async function shown(popover: WaPopover, open: boolean) {
-    await expect.poll(() => popover.open).toBe(open);
-    await expect.poll(() => popover.dialog.open).toBe(open);
-    await expect.poll(() => popover.popup.active).toBe(open);
-}
-
-test('preserves presence booleans and numeric offsets before registration, after registration and during updates', async () => {
-    expect(customElements.get('wa-popover')).toBeUndefined();
-    const state = reactive({ enabled: false, offset: 12 });
-    const { popover } = mount({
-        render: () =>
-            h(Popover, {
-                open: state.enabled,
-                withoutArrow: state.enabled,
-                distance: state.offset,
-                skidding: state.offset,
-            }),
-    });
-    const bare = mount(BareBooleanPopover).popover;
-    const kebab = mount({ render: () => h(Popover, { 'without-arrow': state.enabled }) }).popover;
-    const defaults = mount({ render: () => h(Popover) }).popover;
-    expect(popover.hasAttribute('open')).toBe(false);
-    expect(popover.hasAttribute('without-arrow')).toBe(false);
-    expect(bare.hasAttribute('open')).toBe(true);
-    expect(bare.hasAttribute('without-arrow')).toBe(true);
-    expect(defaults.hasAttribute('distance')).toBe(false);
-    await ready(popover);
-    await ready(bare);
-    await ready(kebab);
-    await ready(defaults);
-    expect(bare.open).toBe(true);
-    expect(bare.withoutArrow).toBe(true);
-    expect(defaults.distance).toBe(8);
-    expect(defaults.skidding).toBe(0);
-    const after = mount({
-        render: () =>
-            h(Popover, {
-                'without-arrow': state.enabled,
-                distance: state.offset,
-                skidding: state.offset,
-            }),
-    }).popover;
-    for (const enabled of [true, false]) {
-        state.enabled = enabled;
-        state.offset = enabled ? 0 : -3;
-        await ready(popover);
-        await ready(after);
-        await ready(kebab);
-        for (const element of [popover, after]) {
-            if (element === popover) await shown(element, enabled);
-            expect(element.withoutArrow).toBe(enabled);
-            expect(element.hasAttribute('without-arrow')).toBe(enabled);
-            expect(element.distance).toBe(state.offset);
-            expect(element.skidding).toBe(state.offset);
-            expect(element.hasAttribute('withoutarrow')).toBe(false);
-        }
-        expect(kebab.withoutArrow).toBe(enabled);
-    }
-});
+const mount = webAwesomeFixture('wa-popover');
 
 test('keeps initial open separate from ordinary transitions', async () => {
     const events: Event[] = [];
-    const { popover } = mount({
+    const { element: popover } = mount({
         render: () =>
             h(
                 Popover,
@@ -108,7 +29,7 @@ test('keeps initial open separate from ordinary transitions', async () => {
 
 test('opens from a native button and supports real link navigation, Tab, Escape focus return and outside dismissal', async () => {
     let linkClicks = 0;
-    const { popover, container } = mount({
+    const { element: popover, container } = mount({
         render: () =>
             h('div', [
                 h(
@@ -183,7 +104,7 @@ test('opens from a native button and supports real link navigation, Tab, Escape 
 test('accepts the public Button trigger and preserves autofocus and native close links', async () => {
     let followed = false;
     const state = reactive({ disabled: false, loading: false });
-    const { popover, container } = mount({
+    const { element: popover, container } = mount({
         render: () =>
             h('div', [
                 h(
@@ -248,7 +169,7 @@ test('retains original cancelable native events, callback casing and successful 
         )
             event.preventDefault();
     };
-    const { popover } = mount({
+    const { element: popover } = mount({
         render: () =>
             h('div', [
                 h('button', { id: 'popover-manual', type: 'button' }, 'Manual target'),
@@ -319,7 +240,7 @@ test('retains original cancelable native events, callback casing and successful 
 
 test('retargets existing IDs, leaves missing targets unbound and removes old anchor listeners on unmount', async () => {
     const state = reactive({ target: 'popover-first', visible: true, late: false });
-    const { popover, container } = mount({
+    const { element: popover, container } = mount({
         render: () =>
             h('div', [
                 h('button', { id: 'popover-first', type: 'button' }, 'First anchor'),

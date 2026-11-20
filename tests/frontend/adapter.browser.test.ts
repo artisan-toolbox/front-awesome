@@ -1,14 +1,5 @@
-import { expect, onTestFinished, test, vi } from 'vite-plus/test';
-import {
-    createCommentVNode,
-    createApp,
-    defineComponent,
-    Fragment,
-    h,
-    markRaw,
-    nextTick,
-    reactive,
-} from 'vue';
+import { expect, onTestFinished, test } from 'vite-plus/test';
+import { createCommentVNode, defineComponent, Fragment, h, markRaw, nextTick, reactive } from 'vue';
 import type { Component } from 'vue';
 import type WaCheckbox from '@awesome.me/webawesome/dist/components/checkbox/checkbox.js';
 import type WaSelect from '@awesome.me/webawesome/dist/components/select/select.js';
@@ -23,31 +14,12 @@ import Popup from '@artisan-toolbox/front-awesome/components/WebAwesome/Popup.vu
 import FormatDate from '@artisan-toolbox/front-awesome/components/WebAwesome/FormatDate.vue';
 import { useWebAwesome } from '../../resources/js/WebAwesome/useWebAwesome';
 import { checkboxDefinition } from '../../resources/js/WebAwesome/componentDefinitions';
-
-function mount(component: Component) {
-    const container = document.createElement('div');
-    document.body.append(container);
-    const app = createApp(component);
-    app.mount(container);
-    onTestFinished(() => {
-        app.unmount();
-        container.remove();
-    });
-    return { container, app };
-}
+import { mountVue as mount, readyAfterFrame as ready } from './fixtures/web-awesome';
 
 function find<T extends HTMLElement>(container: HTMLElement, tag: string): T {
     const element = container.querySelector<T>(tag);
     if (!element) throw new Error(`Expected ${tag}.`);
     return element;
-}
-
-async function ready(element: HTMLElement & { updateComplete: Promise<boolean> }) {
-    await vi.dynamicImportSettled();
-    await customElements.whenDefined(element.localName);
-    await nextTick();
-    await new Promise(requestAnimationFrame);
-    await element.updateComplete;
 }
 
 function deferredCheckbox(load: () => Promise<unknown>) {
@@ -66,39 +38,6 @@ function deferredCheckbox(load: () => Promise<unknown>) {
         },
     });
 }
-
-test('initializes native checkbox defaults before registration and respects optional presence booleans', async () => {
-    expect(customElements.get('wa-checkbox')).toBeUndefined();
-    const state = reactive({ enabled: false });
-    const bareAttributes: Record<string, unknown> = { checked: '' };
-    const { container } = mount({
-        render: () =>
-            h('div', [
-                h(Checkbox, { ...bareAttributes, disabled: state.enabled, 'data-kind': 'bare' }),
-                h(Checkbox, { checked: false, required: state.enabled, 'data-kind': 'false' }),
-                h(Checkbox, { 'data-kind': 'absent' }),
-            ]),
-    });
-    const [bare, bound, absent] = [...container.querySelectorAll<WaCheckbox>('wa-checkbox')];
-    if (!bare || !bound || !absent) throw new Error('Expected three checkboxes.');
-    expect(bare.hasAttribute('checked')).toBe(true);
-    expect(bound.hasAttribute('checked')).toBe(false);
-    expect(absent.hasAttribute('checked')).toBe(false);
-    expect(Object.hasOwn(bare, 'checked')).toBe(false);
-    await Promise.all([ready(bare), ready(bound), ready(absent)]);
-    expect(bare.checked).toBe(true);
-    expect(bare.defaultChecked).toBe(true);
-    expect(bound.checked).toBe(false);
-    expect(absent.checked).toBe(false);
-    expect(absent.size).toBe('m');
-    for (const enabled of [true, false]) {
-        state.enabled = enabled;
-        await ready(bare);
-        await ready(bound);
-        expect(bare.disabled).toBe(enabled);
-        expect(bound.required).toBe(enabled);
-    }
-});
 
 for (const loading of ['registered', 'pending']) {
     test(`keeps current checked state separate from explicit reset defaults and preserves interaction on unrelated renders with a ${loading} loader`, async () => {

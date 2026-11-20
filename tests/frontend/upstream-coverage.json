@@ -259,6 +259,10 @@
         },
         {
           "file": "tests/frontend/reset.browser.test.ts",
+          "title": "compares the final shadow-part color after a theme transition"
+        },
+        {
+          "file": "tests/frontend/reset.browser.test.ts",
           "title": "detects the broken open dropdown without the correction and restores its native dimensions"
         },
         {
@@ -351,7 +355,7 @@
       "renderedInExamples": 15,
       "actionTestReferences": [
         {
-          "file": "tests/frontend/adapter.browser.test.ts",
+          "file": "tests/frontend/adapter-registration.browser.test.ts",
           "title": "initializes native checkbox defaults before registration and respects optional presence booleans"
         },
         {
@@ -654,7 +658,7 @@
           "title": "passes numeric head states and exact scope while retaining sorting and pending feedback"
         },
         {
-          "file": "tests/frontend/icon.browser.test.ts",
+          "file": "tests/frontend/icon-registration.browser.test.ts",
           "title": "preserves boolean presence and numeric rotation before registration and through live updates"
         },
         {
@@ -700,7 +704,7 @@
           "title": "preserves Input hint content for boolean failure and restores caller ARIA after messages"
         },
         {
-          "file": "tests/frontend/input.browser.test.ts",
+          "file": "tests/frontend/input-registration.browser.test.ts",
           "title": "preserves false booleans before registration and live bindings, attrs, slots, and native events after upgrade"
         },
         {
@@ -875,7 +879,7 @@
           "title": "cancelled open requests reconcile the model and retain the original cancelable event"
         },
         {
-          "file": "tests/frontend/page.browser.test.ts",
+          "file": "tests/frontend/page-registration.browser.test.ts",
           "title": "preserves booleans and native options before registration, after registration, and through live updates"
         },
         {
@@ -917,7 +921,7 @@
           "title": "refreshes projected parent slots without remounting native child controls"
         },
         {
-          "file": "tests/frontend/popover.browser.test.ts",
+          "file": "tests/frontend/popover-registration.browser.test.ts",
           "title": "preserves presence booleans and numeric offsets before registration, after registration and during updates"
         },
         {
@@ -1318,7 +1322,7 @@
           "title": "allows application utilities to override the shared host correction"
         },
         {
-          "file": "tests/frontend/tag.browser.test.ts",
+          "file": "tests/frontend/tag-registration.browser.test.ts",
           "title": "preserves bare and bound boolean aliases before and after registration and live updates"
         },
         {
@@ -1432,7 +1436,7 @@
       "renderedInExamples": 11,
       "actionTestReferences": [
         {
-          "file": "tests/frontend/tooltip.browser.test.ts",
+          "file": "tests/frontend/tooltip-registration.browser.test.ts",
           "title": "preserves booleans and numeric aliases before registration, after registration and through updates"
         },
         {

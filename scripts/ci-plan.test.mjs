@@ -84,9 +84,10 @@ await test('frontend sources, theme and scrollbar fixtures, and tooling run ever
     }
 });
 
-await test('Composer and CI changes run PHP compatibility and every browser check', () => {
+await test('Composer, Node.js version, and CI changes run PHP compatibility and every browser check', () => {
     for (const file of [
         'composer.lock',
+        '.nvmrc',
         '.github/workflows/tests.yml',
         '.github/actions/setup/action.yml',
         'scripts/ci-plan.mjs',

@@ -1,96 +1,9 @@
-import { expect, onTestFinished, test, vi } from 'vite-plus/test';
-import { createApp, h, nextTick, reactive } from 'vue';
-import type { Component } from 'vue';
-import type WaPage from '@awesome.me/webawesome/dist/components/page/page.js';
+import { expect, test } from 'vite-plus/test';
+import { h } from 'vue';
 import Page from '@artisan-toolbox/front-awesome/components/WebAwesome/Page.vue';
-import BareBooleanPage from './BareBooleanPage.vue';
+import { webAwesomeFixture, ready } from './fixtures/web-awesome';
 
-function mount(component: Component) {
-    const container = document.createElement('div');
-    container.style.width = '390px';
-    document.body.append(container);
-    const app = createApp(component);
-    app.mount(container);
-    onTestFinished(() => {
-        app.unmount();
-        container.remove();
-    });
-    const page = container.querySelector<WaPage>('wa-page');
-    if (!page) throw new Error('Expected the public Page component.');
-    return page;
-}
-
-async function ready(page: WaPage) {
-    await vi.dynamicImportSettled();
-    await customElements.whenDefined('wa-page');
-    await nextTick();
-    await page.updateComplete;
-}
-
-test('preserves booleans and native options before registration, after registration, and through live updates', async () => {
-    expect(customElements.get('wa-page')).toBeUndefined();
-    const state = reactive({
-        open: false,
-        disabled: false,
-        breakpoint: '48rem',
-        placement: 'end' as const,
-    });
-    const page = mount({
-        render: () =>
-            h(
-                Page,
-                {
-                    navOpen: state.open,
-                    disableNavigationToggle: state.disabled,
-                    mobileBreakpoint: state.breakpoint,
-                    navigationPlacement: 'end',
-                },
-                () => h('div', { slot: 'navigation' }, 'Navigation'),
-            ),
-    });
-    const bare = mount(BareBooleanPage);
-    expect(page.hasAttribute('nav-open')).toBe(false);
-    expect(page.hasAttribute('disable-navigation-toggle')).toBe(false);
-    expect(page.getAttribute('mobile-breakpoint')).toBe('48rem');
-    expect(page.getAttribute('navigation-placement')).toBe('end');
-    expect(bare.hasAttribute('nav-open')).toBe(true);
-    expect(bare.hasAttribute('disable-navigation-toggle')).toBe(true);
-    await ready(page);
-    await ready(bare);
-    expect(page.navOpen).toBe(false);
-    expect(page.disableNavigationToggle).toBe(false);
-    expect(page.mobileBreakpoint).toBe('48rem');
-    expect(page.navigationPlacement).toBe('end');
-    expect(bare.navOpen).toBe(false);
-    expect(bare.disableNavigationToggle).toBe(true);
-
-    const after = mount({
-        render: () =>
-            h(
-                Page,
-                {
-                    'nav-open': state.open,
-                    'disable-navigation-toggle': state.disabled,
-                },
-                () => h('div', { slot: 'navigation' }, 'Navigation'),
-            ),
-    });
-    await ready(after);
-    await expect.poll(() => page.view).toBe('mobile');
-    await expect.poll(() => after.view).toBe('mobile');
-    for (const enabled of [true, false]) {
-        state.open = enabled;
-        state.disabled = enabled;
-        state.breakpoint = enabled ? '50em' : '600px';
-        await ready(page);
-        await ready(after);
-        for (const element of [page, after]) {
-            expect(element.navOpen).toBe(enabled);
-            expect(element.disableNavigationToggle).toBe(enabled);
-        }
-        expect(page.mobileBreakpoint).toBe(state.breakpoint);
-    }
-});
+const mount = webAwesomeFixture('wa-page', 'width:390px');
 
 test('assigns all native slots without extra elements and preserves application attributes and listeners', async () => {
     const slots = [
@@ -110,7 +23,7 @@ test('assigns all native slots without extra elements and preserves application 
         'footer',
     ];
     const clicks: MouseEvent[] = [];
-    const page = mount({
+    const { element: page } = mount({
         render: () =>
             h(
                 Page,
@@ -149,7 +62,7 @@ test('assigns all native slots without extra elements and preserves application 
 });
 
 test('uses one navigation tree on desktop and mobile and retains native toggle and drawer methods', async () => {
-    const page = mount({
+    const { element: page } = mount({
         render: () =>
             h(Page, { mobileBreakpoint: '600px', style: { width: '900px' } }, () => [
                 h('header', { slot: 'header' }, [

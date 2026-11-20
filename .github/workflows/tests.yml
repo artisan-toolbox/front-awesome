@@ -47,6 +47,8 @@ jobs:
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup
+        with:
+          composer-validation: strict
       - run: composer ci:check
 
   windows:
@@ -60,8 +62,9 @@ jobs:
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup
-      - run: php vendor/bin/pest
-      - run: npm test
+      - run: composer quality:check -- --tool=pest --tool=vite-plus-test
+        env:
+          MAINTAINER_PEST_PARALLEL: 'false'
       - run: node scripts/check-data-view-types.mjs
 
   compatibility:
@@ -81,8 +84,8 @@ jobs:
       - uses: ./.github/actions/setup
         with:
           composer-mode: ${{ matrix.dependencies == 'lowest' && 'prefer-lowest' || 'prefer-stable' }}
-          frontend: 'false'
-      - run: composer test:unit
+          npm-install: 'false'
+      - run: composer quality:check -- --tool=pest
       - run: composer test:types
 
   browsers:

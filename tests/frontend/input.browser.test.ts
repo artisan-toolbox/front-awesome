@@ -1,138 +1,18 @@
-import { expect, onTestFinished, test, vi } from 'vite-plus/test';
+import { expect, onTestFinished, test } from 'vite-plus/test';
 import { page, userEvent } from 'vitest/browser';
 import { createApp, h, nextTick, reactive } from 'vue';
-import type { Component } from 'vue';
 import type WaInput from '@awesome.me/webawesome/dist/components/input/input.js';
 import { useForm } from '@inertiajs/vue3';
 import Input from '@artisan-toolbox/front-awesome/components/WebAwesome/Input.vue';
 import '@artisan-toolbox/front-awesome/web-awesome.css';
+import { webAwesomeFixture, inputReady as ready } from './fixtures/web-awesome';
 
-function mount(component: Component) {
-    const container = document.createElement('div');
-    document.body.append(container);
-    const app = createApp(component);
-    app.mount(container);
-    onTestFinished(() => {
-        app.unmount();
-        container.remove();
-    });
-    const input = container.querySelector<WaInput>('wa-input');
-    if (!input) throw new Error('Expected the public Input component.');
-    return { container, input };
-}
-
-async function ready(input: WaInput) {
-    await vi.dynamicImportSettled();
-    await customElements.whenDefined('wa-input');
-    await nextTick();
-    await input.updateComplete;
-    await nextTick();
-    await input.updateComplete;
-}
-
-test('preserves false booleans before registration and live bindings, attrs, slots, and native events after upgrade', async () => {
-    expect(customElements.get('wa-input')).toBeUndefined();
-    const state = reactive({ value: 'Ada', enabled: false });
-    const events: Event[] = [];
-    const observedValues: string[] = [];
-    const { input } = mount({
-        render: () =>
-            h(
-                Input,
-                {
-                    modelValue: state.value,
-                    'onUpdate:modelValue': (value: string | null | undefined) =>
-                        (state.value = value ?? ''),
-                    disabled: state.enabled,
-                    required: state.enabled,
-                    readonly: state.enabled,
-                    pill: state.enabled,
-                    autofocus: state.enabled,
-                    withClear: true,
-                    passwordToggle: state.enabled,
-                    passwordVisible: state.enabled,
-                    withoutSpinButtons: state.enabled,
-                    withLabel: state.enabled,
-                    withHint: state.enabled,
-                    spellcheck: state.enabled,
-                    autocorrect: state.enabled,
-                    label: 'Name',
-                    'data-testid': 'name',
-                    'data-purpose': 'profile',
-                    class: 'caller-class',
-                    style: { marginTop: '3px' },
-                    onInput: (event: Event) => {
-                        events.push(event);
-                        observedValues.push(state.value);
-                    },
-                    onChange: (event: Event) => events.push(event),
-                    onWaClear: (event: Event) => events.push(event),
-                },
-                {
-                    start: () => h('span', '+'),
-                    default: () => h('span', { slot: 'end' }, 'end'),
-                    'clear-icon': () => h('span', 'clear'),
-                },
-            ),
-    });
-    for (const key of [
-        'disabled',
-        'required',
-        'readonly',
-        'pill',
-        'autofocus',
-        'password-toggle',
-        'password-visible',
-        'without-spin-buttons',
-        'with-label',
-        'with-hint',
-    ])
-        expect(input.hasAttribute(key)).toBe(false);
-    state.value = 'Latest before import';
-    await ready(input);
-    await expect.poll(() => input.value).toBe('Latest before import');
-    expect(Object.hasOwn(input, 'value')).toBe(false);
-    expect(input.disabled).toBe(false);
-    expect(input.spellcheck).toBe(false);
-    expect(input.autocorrect).toBe(false);
-    expect(input.withClear).toBe(true);
-    expect(input.classList.contains('caller-class')).toBe(true);
-    expect(input.style.marginTop).toBe('3px');
-    expect(input.dataset.purpose).toBe('profile');
-    for (const slot of ['start', 'end', 'clear-icon'])
-        expect(
-            input.shadowRoot
-                ?.querySelector<HTMLSlotElement>(`slot[name="${slot}"]`)
-                ?.assignedElements(),
-        ).toHaveLength(1);
-    await page.getByTestId('name').getByRole('textbox').fill('Grace');
-    await nextTick();
-    expect(state.value).toBe('Grace');
-    expect(events[0]).toBeInstanceOf(InputEvent);
-    expect(observedValues.at(-1)).toBe('Grace');
-    expect(events.filter((event) => event.type === 'input')).toHaveLength(1);
-    const clear = input.shadowRoot?.querySelector<HTMLButtonElement>('[part="clear-button"]');
-    clear?.click();
-    await ready(input);
-    expect(state.value).toBe('');
-    expect(events.filter((event) => event.type === 'wa-clear')).toHaveLength(1);
-    expect(events.filter((event) => event.type === 'input')).toHaveLength(2);
-    expect(events.filter((event) => event.type === 'change')).toHaveLength(1);
-    for (const enabled of [true, false]) {
-        state.enabled = enabled;
-        await ready(input);
-        expect(input.disabled).toBe(enabled);
-        expect(input.required).toBe(enabled);
-        expect(input.passwordToggle).toBe(enabled);
-        expect(input.spellcheck).toBe(enabled);
-        expect(input.autocorrect).toBe(enabled);
-    }
-});
+const mount = webAwesomeFixture('wa-input');
 
 test('keeps nested Inertia fields and server errors reactive and allows the next native submission', async () => {
     const form = useForm({ users: [{ name: 'Ada' }] });
     let submits = 0;
-    const { container, input } = mount({
+    const { container, element: input } = mount({
         render: () =>
             h(
                 'form',
@@ -188,7 +68,7 @@ test('keeps nested Inertia fields and server errors reactive and allows the next
 
 test('preserves the native reset baseline and propagates native resets to the Vue owner', async () => {
     const state = reactive({ value: 'Live', baseline: 'Original' });
-    const { container, input } = mount({
+    const { container, element: input } = mount({
         render: () => [
             h('form', { id: 'native-profile' }),
             h(Input, {
@@ -238,7 +118,7 @@ test.each(['wa-light', 'wa-dark'])(
         const state = reactive({
             appearance: 'filled' as 'filled' | 'outlined' | 'filled-outlined',
         });
-        const { input } = mount({
+        const { element: input } = mount({
             render: () =>
                 h('div', { class: mode }, [
                     h(
@@ -299,7 +179,7 @@ test.each(['wa-light', 'wa-dark'])(
 
 test('preserves bare presence attributes and native required and pattern validity', async () => {
     const { default: BareBooleanInput } = await import('./BareBooleanInput.vue');
-    const bare = mount(BareBooleanInput).input;
+    const bare = mount(BareBooleanInput).element;
     await ready(bare);
     for (const name of [
         'disabled',
@@ -321,7 +201,7 @@ test('preserves bare presence attributes and native required and pattern validit
         spellcheck: undefined as boolean | undefined,
     });
     let invalidEvents = 0;
-    const { input } = mount({
+    const { element: input } = mount({
         render: () =>
             h(Input, {
                 modelValue: state.value,
@@ -392,7 +272,7 @@ test('hydrates existing markup and safely handles immediate unmount', async () =
 
 test('preserves nullable owners and explicit custom validity independently from automatic errors', async () => {
     const state = reactive({ value: null as string | null | undefined, customError: '' });
-    const { input } = mount({
+    const { element: input } = mount({
         render: () =>
             h(Input, {
                 modelValue: state.value,
@@ -430,7 +310,7 @@ test.each(['email', 'password'] as const)(
         const changes: Event[] = [];
         const observed: string[] = [];
         let submitted = '';
-        const { container, input } = mount({
+        const { container, element: input } = mount({
             render: () =>
                 h(
                     'form',
@@ -479,7 +359,7 @@ test('commits change-only fills to v-model and preserves the original host event
     const callerEvents: Event[] = [];
     const hostEvents: Event[] = [];
     const observed: string[] = [];
-    const { input } = mount({
+    const { element: input } = mount({
         render: () =>
             h(
                 Input,
@@ -522,7 +402,7 @@ test('commits change-only fills to v-model and preserves the original host event
 test('does not duplicate model updates on committed typing or clear, and accepts later change-only fills', async () => {
     const state = reactive({ value: 'Original' });
     const updates: (string | null | undefined)[] = [];
-    const { input } = mount({
+    const { element: input } = mount({
         render: () =>
             h(Input, {
                 modelValue: state.value,
@@ -560,7 +440,7 @@ test.each(['noncomposed-input', 'autocomplete', 'restore', 'host-value', 'silent
     async (mode) => {
         const form = useForm({ credential: '' });
         let submitted = '';
-        const { container, input } = mount({
+        const { container, element: input } = mount({
             render: () =>
                 h(
                     'form',
@@ -603,7 +483,7 @@ test.each(['noncomposed-input', 'autocomplete', 'restore', 'host-value', 'silent
     async (mode) => {
         const form = useForm({ credential: '' });
         const state = reactive({ label: 'Password' });
-        const { input } = mount({
+        const { element: input } = mount({
             render: () =>
                 h(Input<{ credential: string }>, {
                     form,
@@ -638,7 +518,7 @@ test.each(['noncomposed-input', 'autocomplete', 'restore', 'host-value', 'silent
 test('reconciles a silent native fill before required validation and native FormData submission', async () => {
     const form = useForm({ credential: '' });
     const submitted: unknown[] = [];
-    const { container, input } = mount({
+    const { container, element: input } = mount({
         render: () =>
             h(
                 'form',
@@ -676,7 +556,7 @@ test('reconciles a silent native fill before required validation and native Form
 test('reconciles an externally associated form and preserves the submitter', async () => {
     const state = reactive({ value: '' });
     const submissions: (string | undefined)[][] = [];
-    const { container, input } = mount({
+    const { container, element: input } = mount({
         render: () => [
             h('form', {
                 id: 'autofill-external',
@@ -709,7 +589,7 @@ test('reconciles an externally associated form and preserves the submitter', asy
 test('reconciles silent credentials before native Enter submission', async () => {
     const form = useForm({ credential: '' });
     const submissions: string[] = [];
-    const { input } = mount({
+    const { element: input } = mount({
         render: () =>
             h(
                 'form',
@@ -744,7 +624,7 @@ test.each(['inertia', 'model'] as const)(
     async (owner) => {
         const form = useForm({ credential: 'Initial' });
         const state = reactive({ value: 'Initial' });
-        const { input } = mount({
+        const { element: input } = mount({
             render: () =>
                 owner === 'inertia'
                     ? h(Input<{ credential: string }>, { form, field: 'credential' })
