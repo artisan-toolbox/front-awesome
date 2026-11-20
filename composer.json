@@ -91,10 +91,8 @@
             "@php vendor/bin/pest --parallel"
         ],
         "test": [
-            "@analyse",
-            "@lint:check",
-            "@test:types",
-            "@test:unit"
+            "@php vendor/bin/maintainer quality:check --no-interaction --strict --tool=phpstan --tool=pint --tool=pest",
+            "@test:types"
         ],
         "quality:check": "@php vendor/bin/maintainer quality:check --no-interaction --strict",
         "ci:check": [

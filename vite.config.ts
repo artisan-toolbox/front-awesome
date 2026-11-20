@@ -64,6 +64,7 @@ export default defineConfig(({ mode }) => ({
                 extends: true,
                 test: {
                     name: 'unit',
+                    maxWorkers: 4,
                     include: [
                         'tests/frontend/**/*.test.ts',
                         ...(process.env.FRONT_AWESOME_PRO ? ['tests/pro/**/*.test.ts'] : []),

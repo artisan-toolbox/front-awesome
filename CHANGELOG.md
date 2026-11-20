@@ -52,6 +52,9 @@ Adds `composer quality:check` and `composer ci:check`, routes type coverage thro
 
 ## Unreleased
 
+- Move the pointer outside the native and Vue fixtures before comparing static browser styles. The Option scenario exercises a pointer left over the native example.
+- Cap the Pest and Vitest unit suites at four workers. Run the PHP validation command through Maintainer and keep Pest serial on Windows.
+
 - Provision Node.js from `.nvmrc` in both PHP compatibility jobs so the translation exporter can verify browser locales without installing npm dependencies. Pest reports the Artisan error when a translation export fails.
 - Use the Maintainer 1.14.2 setup action for Composer and npm and run standard Linux and Windows checks through Maintainer. Run Vue type checking once through `npm run check`, then run PHP type coverage and the consumer build as package-specific gates.
 - Run the localization build, configuration watcher, and exporter lifecycle tests in separate Vitest files. Isolate Web Awesome tests that start before custom element registration so they can run in any order.

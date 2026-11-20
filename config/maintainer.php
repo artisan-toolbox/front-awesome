@@ -48,7 +48,8 @@ return [
             RunsPhpStanCheck::class,
         ],
         'pest' => [
-            'parallel' => env('MAINTAINER_PEST_PARALLEL', true),
+            'parallel' => env('MAINTAINER_PEST_PARALLEL', PHP_OS_FAMILY !== 'Windows'),
+            'processes' => (int) env('MAINTAINER_PEST_PROCESSES', 4),
         ],
         'phpstan' => [
             'memory_limit' => env('MAINTAINER_PHPSTAN_MEMORY_LIMIT', '2G'),

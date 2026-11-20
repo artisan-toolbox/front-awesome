@@ -20,6 +20,17 @@ beforeAll(async () => {
     await page.viewport(1600, 1000);
 });
 
+async function movePointerOutsideExamples() {
+    const corner = document.createElement('div');
+    corner.style.cssText = 'position:fixed;top:0;right:0;width:2px;height:2px;z-index:2147483647';
+    document.body.append(corner);
+    try {
+        await page.elementLocator(corner).hover();
+    } finally {
+        corner.remove();
+    }
+}
+
 async function settle(root: HTMLElement) {
     await vi.dynamicImportSettled();
     await nextTick();
@@ -130,6 +141,16 @@ for (const component of inventory.components) {
                 }
                 const nativeElements = await settle(native);
                 const wrappedElements = await settle(wrapped);
+                if (scenario.id === 'option-1') {
+                    // Reproduce a pointer left over the native option before comparing static styles.
+                    await page
+                        .elementLocator(native)
+                        .getByRole('option', { name: 'Espresso' })
+                        .hover();
+                }
+                if (native.matches(':hover') || wrapped.matches(':hover')) {
+                    await movePointerOutsideExamples();
+                }
                 expect(
                     wrappedElements.map((element) => element.localName),
                     scenario.id,
