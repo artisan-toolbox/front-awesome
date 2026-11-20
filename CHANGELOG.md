@@ -61,7 +61,7 @@ Adds `composer quality:check` and `composer ci:check`, routes type coverage thro
 - Render optional Font Awesome catalog icons alongside group and permission labels when the provider sends an icon family and names.
 - Refresh the Vite translation catalog after edits to nested language files even when Vite misses their notifications.
 - Retry atomic replacement of generated translation files when a Windows reader briefly holds them open.
-- Use the Playwright container user's home so Firefox can start, and trust the mounted Git checkout before Composer runs.
+- Set the Playwright container user's home only for browser commands so Firefox can start and the runner's Docker CLI keeps its own home. Trust the mounted Git checkout before Composer runs.
 - Use the checked-in Composer and npm locks for routine Linux and Windows checks. Run Chromium for runtime changes and all browser checks for frontend source, browser fixture, dependency, and CI changes. Release candidates run the complete matrix. A Markdown-only edit records a lightweight CI result.
 - Run `composer ci:check` to reproduce the locked Linux quality checks and consumer build without repeating frontend checks. PHP type coverage now fails if the report omits a source file that Pest supports.
 - Keep compatibility-run diagnostics on standard error so the translation fixture returns valid JSON with the lowest supported Symfony dependencies.

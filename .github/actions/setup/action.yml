@@ -28,7 +28,7 @@ runs:
         printf 'version=%s\n' "$version" >> "$GITHUB_OUTPUT"
 
     - name: Set up CI dependencies
-      uses: artisan-toolbox/maintainer@498f5f8723cbed3d24af0ba90870ca26010db4df # 1.14.2
+      uses: artisan-toolbox/maintainer@f3ace73a7020f1a76a62fa3c9137b1b541bb8cc8 # 1.14.3
       env:
         NPM_CONFIG_AUDIT: 'false'
         NPM_CONFIG_FUND: 'false'
