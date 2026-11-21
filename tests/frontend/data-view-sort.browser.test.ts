@@ -109,6 +109,26 @@ async function click(label: string, modifiers: MouseEventInit = {}) {
 }
 const term = (field: string, direction = 'asc') => ({ field, direction, sortType: 'natural' });
 
+test('shows accepted priorities beside both directions and keeps a numeral when an icon fails', async () => {
+    serve();
+    const { host, catalog } = mount({ multiSortKey: 'shift' });
+    const ranks = () => [...host.querySelectorAll('thead .sort-priority wa-icon')];
+    await expect.poll(() => catalog.status).toBe('success');
+    await click('Name');
+    await expect.poll(() => catalog.status).toBe('success');
+    expect(ranks()).toHaveLength(0);
+    await click('ID', { shiftKey: true });
+    await expect
+        .poll(() => ranks().map((icon) => icon.getAttribute('name')))
+        .toEqual(['square-1', 'square-2']);
+    expect(ranks()[0].closest('th')?.getAttribute('aria-sort')).toBe('ascending');
+    expect(ranks()[1].closest('button')?.getAttribute('aria-description')).toContain('2');
+    ranks()[1].dispatchEvent(new CustomEvent('wa-error'));
+    await expect.poll(() => ranks()[1].parentElement?.textContent?.trim()).toBe('2');
+    await click('ID');
+    await expect.poll(() => ranks()).toHaveLength(0);
+});
+
 test.each([
     { directions: ['asc'] as const, descending: false },
     { directions: ['asc', 'desc'] as const, descending: true },
@@ -210,14 +230,14 @@ test('renders default Font Awesome icons and changes direction icons through the
     const { catalog, host } = mount();
     await expect.poll(() => catalog.status).toBe('success');
     const icon = () => host.querySelector('th')?.querySelector('wa-icon');
-    await expect.poll(() => icon()?.getAttribute('name')).toBe('sort');
+    await expect.poll(() => icon()?.getAttribute('name')).toBe('up-down');
     expect(icon()?.getAttribute('family')).toBe('classic');
     expect(icon()?.getAttribute('variant')).toBe('solid');
     expect(icon()?.getAttribute('library')).toBe('default');
     await click('Name');
-    await expect.poll(() => icon()?.getAttribute('name')).toBe('sort-up');
+    await expect.poll(() => icon()?.getAttribute('name')).toBe('arrow-down-a-z');
     await click('Name');
-    await expect.poll(() => icon()?.getAttribute('name')).toBe('sort-down');
+    await expect.poll(() => icon()?.getAttribute('name')).toBe('arrow-up-z-a');
 });
 
 test('inherits Font Awesome family and variant while rendering character overrides as text', async () => {
@@ -307,7 +327,7 @@ test('keeps header replacement precedence and its original scope', async () => {
     });
     await expect.poll(() => catalog.status).toBe('success');
     await expect.element(page.getByText('Legacy Name success')).toBeVisible();
-    expect(host.querySelector('th')?.querySelector('wa-button')).toBeNull();
+    expect(host.querySelector('th')?.querySelector('button, wa-button')).toBeNull();
     expect(host.textContent).not.toContain('Hidden head');
 });
 
@@ -324,7 +344,7 @@ test('reports null head direction when cursor paging disallows the advertised so
     await expect
         .element(page.getByRole('columnheader', { name: 'Name:null', exact: true }))
         .toBeVisible();
-    expect(host.querySelector('th')?.querySelector('wa-button')).toBeNull();
+    expect(host.querySelector('th')?.querySelector('button, wa-button')).toBeNull();
 });
 
 test('hydrates the automatic modifier with the server fallback before selecting the Mac modifier', async () => {

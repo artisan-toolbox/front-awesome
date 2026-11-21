@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+- Use Font Awesome `arrow-down-a-z` and `arrow-up-z-a` for the default ascending and descending headers, with `up-down` for an unordered sortable column.
+- Show Font Awesome numbered squares for every active column in a multi-column order. A numeric fallback preserves the priority when an icon is unavailable.
+
+- Keep the visible footer in place when a page changes height. Searches and sorts preserve the header that started the read. A reader who scrolls elsewhere while a request is pending keeps control of the viewport.
+
+- Use Web Awesome Select for the filter criterion, search scope and order field. Keep space between the quick search focus ring and the first row of applied badges.
+- Open **View options** with the filter button beside quick search. A single dialog groups the adapter’s search, filter, sort and pagination controls. The layout switcher stays in the toolbar. Remove an applied criterion from its compact badge below search. Page position appears in the pager. Long sections use the application scrollbar and keep the footer actions visible.
+- Show record status and Web Awesome Pagination in the default footer. Numbered sources show up to two neighbors on each side when space permits. Simple, cursor and infinite sources keep their own navigation. Standalone pagination and views with a hidden or replaced toolbar include a separate page settings button.
+- Distinguish comparison tables, divided lists, and card grids. Sortable headers expose the direction and priority of the accepted order and keep the existing header slots and modifier shortcuts.
+
 ## [1.0.0-beta.8] - 2026-11-21
 
 ### Features

@@ -4,6 +4,12 @@
         <button @click="view = 'table'">Request unavailable layout</button>
         <output data-testid="external-view">{{ view }}</output>
     </template>
+    <DataViewSearch
+        v-if="standaloneSearch"
+        :adapter="catalog"
+        field="title"
+        label="Sidebar title"
+    />
     <DataView
         :adapter="catalog"
         :views="layouts"
@@ -17,10 +23,13 @@
         label="Catalog"
         caption="Products"
         :size="size"
+        :hide-header="hideHeader"
+        :hide-footer="hideFooter"
         data-testid="catalog"
     >
         <template v-if="customToolbar" #toolbar><span>Custom toolbar</span></template>
         <template v-if="customFilters" #filters><span>Custom filters</span></template>
+        <template v-if="customPagination" #pagination><span>Host pagination</span></template>
         <template #cell-name="{ row, adapter, value }"
             ><strong>{{ row.name.toUpperCase() }}</strong
             ><span v-if="adapter !== catalog">Wrong handle</span
@@ -65,6 +74,7 @@ import { shallowRef } from 'vue';
 import { useDataAdapter } from '@artisan-toolbox/dapter';
 import {
     DataView,
+    DataViewSearch,
     type DataViewViews,
     type DataViewLayout,
     type DataViewSize,
@@ -73,6 +83,7 @@ import {
 import { decodeRow } from './data-view-fixtures';
 const props = defineProps<{
     infinite?: boolean;
+    standaloneSearch?: boolean;
     historyId?: string;
     shared?: boolean;
     size?: DataViewSize;
@@ -84,7 +95,10 @@ const props = defineProps<{
     grouped?: boolean;
     joined?: boolean;
     customToolbar?: boolean;
+    customPagination?: boolean;
     customFilters?: boolean;
+    hideHeader?: boolean;
+    hideFooter?: boolean;
     captureScope?: boolean;
 }>();
 const catalog = useDataAdapter('Catalog', {

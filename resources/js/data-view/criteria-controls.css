@@ -1,0 +1,20 @@
+.criteria-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: var(--wa-space-xs);
+    min-inline-size: 0;
+}
+.criteria-controls > * {
+    min-inline-size: 0;
+    max-inline-size: 100%;
+}
+.criteria-controls > :is(wa-input, wa-select) {
+    flex: 1 1 13.5rem;
+}
+.criteria-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    flex: 1 1 11rem;
+    gap: var(--wa-space-xs);
+}

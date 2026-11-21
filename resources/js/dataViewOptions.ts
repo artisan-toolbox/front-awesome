@@ -50,9 +50,9 @@ export function resolveDataViewOptions(options: DataViewOptions = {}): ResolvedD
     return Object.freeze({
         multiSortKey,
         sortIcons: Object.freeze({
-            ascending: icon(icons?.ascending, 'sort-up'),
-            descending: icon(icons?.descending, 'sort-down'),
-            unsorted: icon(icons?.unsorted, 'sort'),
+            ascending: icon(icons?.ascending, 'arrow-down-a-z'),
+            descending: icon(icons?.descending, 'arrow-up-z-a'),
+            unsorted: icon(icons?.unsorted, 'up-down'),
         }),
     });
 }

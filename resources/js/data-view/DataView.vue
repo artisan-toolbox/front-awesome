@@ -1,36 +1,57 @@
 <template>
     <section
+        ref="root"
         v-bind="$attrs"
         class="data-view min-w-0"
         :data-size="size ?? 'm'"
         :aria-label="label ?? t('results')"
     >
-        <slot name="toolbar" v-bind="scope">
+        <header
+            v-if="
+                !hideHeader &&
+                (slots.toolbar ||
+                    slots.filters ||
+                    slots.actions ||
+                    availableViews.length > 1 ||
+                    (!slots.pagination && state.adapter.ready) ||
+                    hasToolbarControls(state.adapter))
+            "
+            tabindex="-1"
+            class="data-view-header"
+        >
             <DataViewToolbar
-                :key="editorGeneration"
                 :adapter="state.adapter"
                 :size="size ?? 'm'"
                 :control-label="controlText"
-            />
-        </slot>
-        <slot name="filters" v-bind="scope" />
-        <slot name="actions" v-bind="scope" />
-        <div
-            v-if="availableViews.length > 1"
-            class="data-view-layouts"
-            role="group"
-            :aria-label="t('layout')"
-        >
-            <button
-                v-for="layout in availableViews"
-                :key="layout"
-                type="button"
-                :aria-pressed="activeView === layout"
-                @click="selectView(layout)"
+                :include-paging="!slots.pagination"
             >
-                {{ views[layout]?.label ?? t(layout) }}
-            </button>
-        </div>
+                <template v-if="slots.toolbar" #controls>
+                    <slot name="toolbar" v-bind="scope" />
+                </template>
+                <template v-if="slots.filters || slots.actions" #trailing>
+                    <slot name="filters" v-bind="scope" />
+                    <slot name="actions" v-bind="scope" />
+                </template>
+                <template v-if="availableViews.length > 1" #layouts>
+                    <div
+                        class="data-view-layouts"
+                        :class="'wa-size-' + (size ?? 'm')"
+                        role="group"
+                        :aria-label="t('layout')"
+                    >
+                        <button
+                            v-for="layout in availableViews"
+                            :key="layout"
+                            type="button"
+                            :aria-pressed="activeView === layout"
+                            @click="selectView(layout)"
+                        >
+                            {{ views[layout]?.label ?? t(layout) }}
+                        </button>
+                    </div>
+                </template>
+            </DataViewToolbar>
+        </header>
         <div v-if="state.adapter.integrationError" role="alert">
             <slot name="integration-error" v-bind="scope"
                 ><Callout variant="warning">{{
@@ -66,9 +87,9 @@
         <div
             v-else-if="state.adapter.status === 'success' && !items.length"
             class="data-view-status"
-            role="status"
+            :role="slots.empty ? 'status' : undefined"
         >
-            <slot name="empty" v-bind="scope">{{ t('empty') }}</slot>
+            <slot name="empty" v-bind="scope"><DataViewStatus :adapter="state.adapter" /></slot>
         </div>
 
         <div
@@ -98,7 +119,14 @@
             >
         </div>
         <div class="data-view-results min-w-0" :aria-busy="state.adapter.paging.loading">
-            <div v-if="activeView === 'table'" v-scrollbar class="data-view-scroll overflow-x-auto">
+            <div
+                v-if="activeView === 'table'"
+                v-scrollbar="{ shadows: true }"
+                class="data-view-scroll overflow-x-auto"
+                tabindex="0"
+                role="region"
+                :aria-label="caption ?? label ?? t('results')"
+            >
                 <table
                     class="data-view-table"
                     :class="{
@@ -106,10 +134,10 @@
                         'data-view-hover': views.table?.hover,
                     }"
                 >
-                    <caption>
+                    <caption :class="{ 'data-view-sr-only': !caption }">
                         {{ caption ?? label ?? t('results') }}
                     </caption>
-                    <thead>
+                    <thead tabindex="-1">
                         <tr>
                             <th v-if="selectionState" scope="col">{{ t('selection') }}</th>
                             <th
@@ -124,10 +152,19 @@
                                     v-bind="scope"
                                     :column="head.column"
                                 >
-                                    <Button
+                                    <button
                                         v-if="head.order"
-                                        appearance="plain"
-                                        :size="size ?? 'm'"
+                                        type="button"
+                                        class="data-view-sort"
+                                        :aria-description="
+                                            head.order.accepted && head.order.acceptedPriority
+                                                ? t(head.order.accepted.direction) +
+                                                  ', ' +
+                                                  t('priority', {
+                                                      priority: head.order.acceptedPriority,
+                                                  })
+                                                : undefined
+                                        "
                                         :title="
                                             head.order.canAdd
                                                 ? t('sortModifier', {
@@ -144,7 +181,10 @@
                                             :sort-direction="head.sortDirection"
                                         >
                                             {{ head.column.label }}
-                                            <span aria-hidden="true">
+                                            <span
+                                                class="data-view-sort-indicator"
+                                                aria-hidden="true"
+                                            >
                                                 <template v-if="typeof head.icon === 'string'">{{
                                                     head.icon
                                                 }}</template>
@@ -153,15 +193,15 @@
                                                     v-bind="head.icon"
                                                     library="default"
                                                 />
-                                                {{
-                                                    state.adapter.global?.multi_order
-                                                        ? head.order.current?.priority
-                                                        : ''
-                                                }}
+                                                <SortPriority
+                                                    v-if="head.order.multiPriority"
+                                                    :key="head.order.multiPriority"
+                                                    :priority="head.order.multiPriority"
+                                                />
                                             </span>
                                         </slot>
                                         <span v-if="head.order.pending"> ({{ t('pending') }})</span>
-                                    </Button>
+                                    </button>
                                     <slot
                                         v-else
                                         :name="`head-${head.id}`"
@@ -240,10 +280,29 @@
             </ul>
         </div>
         <p v-if="sortFeedback.message.value" role="alert">{{ sortFeedback.message.value }}</p>
-        <slot name="pagination" v-bind="scope"
-            ><DataViewPager :key="authority" :adapter="state.adapter" :size="size ?? 'm'"
-        /></slot>
-        <slot name="footer" v-bind="scope" />
+        <footer v-if="!hideFooter" class="data-view-footer" tabindex="-1">
+            <slot name="pagination" v-bind="scope">
+                <DataViewStatus
+                    v-if="
+                        state.adapter.ready && (items.length || state.adapter.status !== 'success')
+                    "
+                    :adapter="state.adapter"
+                />
+                <DataViewNavigation
+                    :with-settings="
+                        !!hideHeader ||
+                        !!slots.toolbar ||
+                        (!state.adapter.ready && state.adapter.status === 'error')
+                    "
+                    :key="authority"
+                    :adapter="state.adapter"
+                    :size="size ?? 'm'"
+                />
+            </slot>
+            <div v-if="slots.footer" class="data-view-footer-extra">
+                <slot name="footer" v-bind="scope" />
+            </div>
+        </footer>
     </section>
 </template>
 <script
@@ -257,7 +316,7 @@
         >
     "
 >
-import { computed, onBeforeUpdate, shallowRef, watch, watchEffect } from 'vue';
+import { computed, onBeforeUpdate, shallowRef, useTemplateRef, watchEffect } from 'vue';
 import { useDataAdapter, type DataAdapterProps } from '@artisan-toolbox/dapter';
 import Button from '../components/WebAwesome/Button.vue';
 import Icon from '../components/WebAwesome/Icon.vue';
@@ -266,8 +325,11 @@ import { useScrollbarDirective } from '../scrollbar';
 import { useSortModifier, sortModifierPressed } from './sortModifier';
 import Spinner from '../components/WebAwesome/Spinner.vue';
 import Callout from '../components/WebAwesome/Callout.vue';
+import SortPriority from './SortPriority.vue';
 import DataViewToolbar from './DataViewToolbar.vue';
-import DataViewPager from './DataViewPager.vue';
+import DataViewNavigation from './DataViewNavigation.vue';
+import DataViewStatus from './DataViewStatus.vue';
+import { hasToolbarControls } from './criteria';
 import {
     columnId,
     columnValue,
@@ -290,9 +352,10 @@ import type {
     DataViewSortDirection,
 } from './types';
 import { orderModel } from './OrderModel';
-import { useControlFeedback, type ControlLabel } from './controlFeedback';
+import { resolveControlLabel, useControlFeedback, type ControlLabel } from './controlFeedback';
 import { useDataViewText } from './messages';
 import { useRowSelection } from './selection';
+import { useDataViewScrollAnchor } from './scrollAnchor';
 import { useDocumentId } from './documentId';
 
 type Row = H['data'][number];
@@ -310,6 +373,8 @@ const props = defineProps<{
     ) => string | undefined;
     view?: DataViewLayout;
     size?: DataViewSize;
+    hideHeader?: boolean;
+    hideFooter?: boolean;
     label?: string;
     caption?: string;
     source?: never;
@@ -332,6 +397,7 @@ const emit = defineEmits<{
     'update:selectedKeys': [value: Key[]];
 }>();
 const state = { adapter: useDataAdapter<H>(props.adapter) };
+useDataViewScrollAnchor(useTemplateRef('root'), state.adapter);
 const t = useDataViewText();
 const options = useDataViewOptions();
 const sortModifier = useSortModifier(options.multiSortKey);
@@ -341,14 +407,6 @@ const modifierLabels = {
     shift: 'sortKeyShift',
     alt: 'sortKeyAlt',
 } as const;
-const editorGeneration = shallowRef(0);
-watch(
-    () => !!state.adapter.definition,
-    (available) => {
-        if (!available) editorGeneration.value++;
-    },
-    { flush: 'sync' },
-);
 const radioName = useDocumentId();
 const table = computed(() => {
     const columns = props.views?.table?.columns ?? [];
@@ -452,18 +510,7 @@ function changeRow(key: Key, event: Event) {
 function valueOf(column: DataViewColumn<Row>, row: Row) {
     return columnValue<Row>(column, row);
 }
-const controlText: ControlLabel = (subject) => {
-    const formatted = props.controlLabel?.(subject);
-    if (formatted !== undefined) return formatted;
-    if (subject.kind === 'field') return subject.field;
-    if (subject.kind === 'filter')
-        return subject.field === null
-            ? subject.filter
-            : `${controlText({ kind: 'field', field: subject.field })} · ${subject.filter}`;
-    return typeof subject.value === 'string'
-        ? JSON.stringify(subject.value)
-        : String(subject.value);
-};
+const controlText: ControlLabel = (subject) => resolveControlLabel(subject, props.controlLabel);
 function rowLabel(item: Occurrence<Row, Key>) {
     const row =
         props.controlLabel?.({ kind: 'row', row: item.row, key: item.key, index: item.index }) ??
@@ -493,9 +540,9 @@ const headers = computed(() => {
         const icon = !order
             ? null
             : options.sortIcons[
-                  sortDirection === 1
+                  order.accepted?.direction === 'asc'
                       ? 'ascending'
-                      : sortDirection === -1
+                      : order.accepted?.direction === 'desc'
                         ? 'descending'
                         : 'unsorted'
               ];
@@ -528,47 +575,108 @@ function clickHeader(column: DataViewColumn<Row>, event: MouseEvent) {
 </script>
 <style scoped>
 .data-view {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    min-width: 0;
-    gap: var(--wa-space-m);
+    container: data-view / inline-size;
+    --dv-tool-font: var(--wa-font-size-m);
+    --dv-inline: var(--wa-space-m);
+    --dv-block: var(--wa-space-s);
+    min-inline-size: 0;
+    border: var(--wa-border-width-s) solid var(--wa-color-surface-border);
+    border-radius: var(--wa-border-radius-l);
+    background: var(--wa-color-surface-default);
     color: var(--wa-color-text-normal);
+    line-height: var(--wa-line-height-normal);
 }
-.data-view-layouts {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--wa-space-xs);
+.data-view[data-size='s'] {
+    --dv-tool-font: var(--wa-font-size-s);
+    --dv-inline: var(--wa-space-s);
+    --dv-block: var(--wa-space-xs);
 }
+.data-view[data-size='l'] {
+    --dv-tool-font: var(--wa-font-size-l);
+    --dv-inline: var(--wa-space-l);
+    --dv-block: var(--wa-space-m);
+}
+.data-view-header,
+.data-view-footer,
 .data-view-selection,
-.data-view-selection label,
 .data-view-status {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
+    flex-wrap: wrap;
     gap: var(--wa-space-s);
-    margin: 0;
+    padding: var(--dv-block) var(--dv-inline);
+    min-inline-size: 0;
+}
+.data-view-header,
+.data-view-selection {
+    border-block-end: var(--wa-border-width-s) solid var(--wa-color-surface-border);
+}
+.data-view-header > *,
+.data-view-footer > * {
+    min-inline-size: 0;
+    max-inline-size: 100%;
+}
+.data-view-header > :deep(.data-view-toolbar) {
+    flex: 1 1 100%;
+}
+.data-view-layouts {
+    display: inline-flex;
+    box-sizing: border-box;
+    max-inline-size: 100%;
+    min-block-size: var(--wa-form-control-height);
+    align-items: stretch;
+    font-size: var(--dv-tool-font);
+    gap: var(--wa-space-3xs);
+    padding: var(--wa-space-3xs);
+    border: var(--wa-border-width-s) solid var(--wa-color-surface-border);
+    border-radius: var(--wa-border-radius-m);
+    background: var(--wa-color-surface-lowered);
+}
+.data-view-layouts button,
+.data-view-sort {
+    appearance: none;
+    border: 0;
+    font: inherit;
+    cursor: pointer;
+    color: inherit;
+    background: transparent;
 }
 .data-view-layouts button {
-    cursor: pointer;
-    max-inline-size: 100%;
     min-inline-size: 0;
+    max-inline-size: 100%;
     white-space: normal;
-    font: inherit;
-    color: inherit;
-    padding: var(--wa-space-xs) var(--wa-space-m);
-    background: var(--wa-color-surface-default);
-    border: var(--wa-border-width-s) solid var(--wa-color-surface-border);
-    border-radius: var(--wa-border-radius-pill);
+    flex: 1 1 auto;
+    block-size: auto;
+    min-block-size: 24px;
+    padding-block: 0;
+    padding-inline: var(--wa-space-s);
+    border-radius: var(--wa-border-radius-s);
     overflow-wrap: anywhere;
+    font-size: var(--wa-font-size-s);
+    font-weight: var(--wa-font-weight-semibold);
+}
+.data-view-layouts button:hover,
+.data-view-sort:hover {
+    background: var(--wa-color-neutral-fill-quiet);
 }
 .data-view-layouts button[aria-pressed='true'] {
-    color: var(--wa-color-brand-on-normal);
     background: var(--wa-color-brand-fill-normal);
-    border-color: var(--wa-color-brand-border-normal);
+    color: var(--wa-color-brand-on-normal);
 }
-.data-view-layouts button:focus-visible {
+.data-view-layouts button:focus-visible,
+.data-view-sort:focus-visible,
+.data-view-scroll:focus-visible {
     outline: var(--wa-focus-ring);
-    outline-offset: var(--wa-focus-ring-offset);
+    outline-offset: calc(-1 * var(--wa-focus-ring-width));
+}
+.data-view-status {
+    margin: 0;
+    color: var(--wa-color-text-quiet);
+}
+.data-view-selection label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--wa-space-xs);
 }
 .data-view [type='checkbox'],
 .data-view [type='radio'] {
@@ -576,68 +684,182 @@ function clickHeader(column: DataViewColumn<Row>, event: MouseEvent) {
     inline-size: 1.1em;
     block-size: 1.1em;
 }
-.data-view-item {
-    overflow-wrap: anywhere;
-}
 .data-view [data-selected] {
+    background: var(--wa-color-brand-fill-quiet);
     box-shadow: inset 0 0 0 var(--wa-border-width-s) var(--wa-color-brand-border-normal);
 }
+.data-view-results,
 .data-view-scroll {
-    min-width: 0;
+    min-inline-size: 0;
+}
+.data-view-scroll {
     overflow-x: auto;
+    border-radius: inherit;
 }
 .data-view-table {
     width: 100%;
     border-collapse: collapse;
+    font-size: var(--wa-font-size-m);
 }
 .data-view-table caption {
     text-align: start;
-    padding-block: var(--wa-space-s);
+    padding: var(--dv-block) var(--dv-inline);
     font-weight: var(--wa-font-weight-semibold);
+}
+.data-view-table caption.data-view-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    padding: 0;
+    white-space: nowrap;
 }
 .data-view-table th,
 .data-view-table td {
-    padding: var(--wa-space-m);
+    padding: var(--dv-block) var(--dv-inline);
     border-block-end: var(--wa-border-width-s) solid var(--wa-color-surface-border);
-}
-.data-view [data-align='start'] {
     text-align: start;
+    overflow-wrap: break-word;
+}
+.data-view-table tbody:last-child tr:last-child > * {
+    border-block-end: 0;
+}
+.data-view-table thead th {
+    font-size: var(--wa-font-size-s);
+    line-height: var(--wa-line-height-condensed);
+    font-weight: var(--wa-font-weight-semibold);
+    color: var(--wa-color-text-quiet);
+    background: var(--wa-color-surface-lowered);
+}
+.data-view-table thead th:has(> .data-view-sort) {
+    padding: 0;
+}
+.data-view-sort {
+    display: flex;
+    align-items: center;
+    gap: var(--wa-space-xs);
+    inline-size: 100%;
+    min-block-size: max(2.5em, 24px);
+    padding: var(--dv-block) var(--dv-inline);
+    text-align: inherit;
+}
+.data-view-sort-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--wa-space-3xs);
+    font-size: 0.9em;
+    font-variant-numeric: tabular-nums;
+}
+.data-view-table thead [aria-sort] {
+    color: var(--wa-color-text-normal);
 }
 .data-view [data-align='center'] {
     text-align: center;
 }
+.data-view [data-align='center'] > .data-view-sort {
+    justify-content: center;
+}
 .data-view [data-align='end'] {
     text-align: end;
+    font-variant-numeric: tabular-nums;
 }
-.data-view[data-size='s'] th,
-.data-view[data-size='s'] td {
-    padding: var(--wa-space-xs) var(--wa-space-s);
+.data-view [data-align='end'] > .data-view-sort {
+    justify-content: flex-end;
 }
-.data-view[data-size='l'] th,
-.data-view[data-size='l'] td {
-    padding: var(--wa-space-l);
-}
-.data-view-striped tbody tr[data-even] {
+.data-view-striped tbody tr[data-even]:not([data-selected]) {
     background: var(--wa-color-surface-lowered);
 }
-.data-view-hover tbody tr:hover {
-    background: var(--wa-color-neutral-fill-quiet);
+@media (hover: hover) {
+    .data-view-hover tbody tr:not([data-selected]):hover {
+        background: var(--wa-color-neutral-fill-quiet);
+    }
 }
 .data-view-grid,
 .data-view-list {
     display: grid;
-    gap: var(--wa-space-m);
     list-style: none;
-    padding: 0;
     margin: 0;
+    padding: 0;
 }
 .data-view-grid {
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 28ch), 1fr));
+    gap: var(--dv-inline);
+    padding: var(--dv-inline);
 }
 .data-view-item {
-    min-width: 0;
-    padding: var(--wa-space-m);
-    border: var(--wa-border-width-s) solid var(--wa-color-surface-border);
+    min-inline-size: 0;
+    overflow-wrap: anywhere;
+    padding: var(--dv-block) var(--dv-inline);
+}
+.data-view-list > li + li {
+    border-block-start: var(--wa-border-width-s) solid var(--wa-color-surface-border);
+}
+.data-view-grid > li {
     border-radius: var(--wa-border-radius-m);
+    border: var(--wa-border-width-s) solid var(--wa-color-surface-border);
+}
+.data-view-grid > li:has(> wa-card:only-child),
+.data-view-grid > li:has(> input:first-child + wa-card:last-child) {
+    border: 0;
+    padding: 0;
+}
+.data-view-footer {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    border-block-start: var(--wa-border-width-s) solid var(--wa-color-surface-border);
+}
+.data-view-footer-extra {
+    grid-column: 1 / -1;
+    flex-basis: 100%;
+}
+.data-view-header:empty,
+.data-view-footer:empty,
+.data-view-footer-extra:empty {
+    display: none;
+}
+@container data-view (max-width: 48rem) {
+    .data-view-table th,
+    .data-view-table td,
+    .data-view-sort {
+        padding-inline: var(--wa-space-s);
+    }
+    .data-view-table thead th:has(> .data-view-sort) {
+        padding: 0;
+    }
+}
+@container data-view (max-width: 22rem) {
+    .data-view-sort {
+        flex-wrap: wrap;
+        block-size: auto;
+        row-gap: var(--wa-space-3xs);
+    }
+}
+@container data-view (max-width: 39.999rem) {
+    .data-view-layouts {
+        flex: 1 0 100%;
+    }
+}
+@container data-view (min-width: 40rem) {
+    .data-view-layouts {
+        margin-inline-start: auto;
+    }
+    .data-view-footer {
+        display: flex;
+        justify-content: space-between;
+    }
+}
+@media (pointer: coarse) {
+    .data-view-layouts,
+    .data-view-sort {
+        min-block-size: max(44px, var(--wa-form-control-height));
+    }
+}
+@media (forced-colors: active) {
+    .data-view-layouts button[aria-pressed='true'],
+    .data-view [data-selected] {
+        outline: 2px solid Highlight;
+        outline-offset: -2px;
+    }
 }
 </style>

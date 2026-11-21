@@ -1,183 +1,331 @@
 <template>
-    <div ref="toolbar" tabindex="-1" class="data-view-toolbar" @keydown.esc="closeDisclosure">
-        <CriteriaSearch
-            v-if="adapter.global?.search"
-            :key="editSession"
-            :adapter="adapter"
-            :size="size"
-            :label="t('searchResults')"
-        />
-        <Select
-            v-if="preset"
-            :label="t('orderPreset')"
-            :size="size"
-            :model-value="preset.current?.id ?? ''"
-            :failed="presetFeedback.message.value || undefined"
-            @update:model-value="submitOrder"
-        >
-            <Option value="">{{ t('noPreset') }}</Option>
-            <Option v-for="item in preset.available.presets" :key="item.id" :value="item.id">{{
-                item.label
-            }}</Option>
-        </Select>
-        <div v-if="hasCriteria" class="disclosure" :class="{ expanded: criteriaOpen }">
-            <button
-                type="button"
-                class="disclosure-toggle"
-                :aria-expanded="criteriaOpen"
-                :aria-controls="criteriaId"
-                @click="criteriaOpen = !criteriaOpen"
-            >
-                {{ t('criteria') }}
-            </button>
-            <div v-show="criteriaOpen" :id="criteriaId" class="editors">
-                <Select
-                    v-if="adapter.setSearchMatch"
-                    :label="t('searchMatch')"
-                    :size="size"
-                    :model-value="adapter.requested?.searchMatch ?? ''"
-                    :failed="matchFeedback.message.value || undefined"
-                    @update:model-value="submitMatch"
-                >
-                    <Option
-                        v-for="match in adapter.global?.searchMatch.allowed"
-                        :key="match"
-                        :value="match"
-                        >{{ t(match) }}</Option
-                    >
-                </Select>
-                <template
-                    v-for="[field, item] in fields"
-                    :key="JSON.stringify([field, editSession])"
-                >
+    <div
+        v-if="slots.controls || slots.trailing || slots.layouts || sections.length"
+        ref="toolbar"
+        tabindex="-1"
+        class="data-view-toolbar"
+    >
+        <slot name="controls">
+            <div v-if="sections.length" class="query-stack">
+                <div class="query-tools">
                     <CriteriaSearch
-                        v-if="item?.search"
+                        v-if="adapter.global?.search"
+                        :key="`global-search-${editSession}`"
+                        class="toolbar-search"
                         :adapter="adapter"
                         :size="size"
-                        :field="field"
-                        :label="t('searchField', { field: controlLabel({ kind: 'field', field }) })"
                     />
-                </template>
-                <CriteriaFilter
-                    v-for="entry in filters"
-                    :key="JSON.stringify([entry, editSession])"
-                    :adapter="adapter"
-                    :size="size"
-                    v-bind="entry"
-                    :control-label="controlLabel"
-                />
-            </div>
-        </div>
-        <div v-if="ordered.length || preset" class="disclosure" :class="{ expanded: orderingOpen }">
-            <button
-                type="button"
-                class="disclosure-toggle"
-                :aria-expanded="orderingOpen"
-                :aria-controls="orderingId"
-                @click="orderingOpen = !orderingOpen"
-            >
-                {{ t('ordering') }}
-            </button>
-            <div v-show="orderingOpen" :id="orderingId" class="editors">
-                <section v-if="accepted" :aria-label="t('acceptedOrder')" class="applied-order">
-                    <strong>{{ t('acceptedOrder') }}</strong>
-                    <span v-if="accepted.kind === 'source'">{{ t('sourceOrder') }}</span>
-                    <span v-else-if="accepted.kind === 'preset'">{{
-                        t('presetOrder', { preset: acceptedPreset })
-                    }}</span>
-                    <ol v-else>
-                        <li v-for="(term, index) in accepted.terms" :key="index">
-                            {{ controlLabel({ kind: 'field', field: term.field }) }} ·
-                            {{ t(term.direction) }} · {{ t(term.sortType) }}
-                            <span v-if="term.role"
-                                >({{
-                                    t(term.role === 'prefix' ? 'prefixOrder' : 'tieOrder')
-                                }})</span
+                    <ControlPanel
+                        ref="panel"
+                        icon="filter"
+                        icon-only
+                        :label="t('viewOptions')"
+                        :size="size"
+                    >
+                        <div class="options-workspace">
+                            <nav class="options-nav" :aria-label="t('viewOptions')">
+                                <button
+                                    v-for="section in sections"
+                                    :key="section.label"
+                                    type="button"
+                                    :aria-pressed="section.label === active"
+                                    @click="selected = section.label"
+                                >
+                                    <Icon
+                                        :name="section.icon"
+                                        library="system"
+                                        aria-hidden="true"
+                                    />{{ t(section.label) }}
+                                </button>
+                            </nav>
+                            <section v-if="active" class="options-content" :aria-label="t(active)">
+                                <h3>{{ t(active) }}</h3>
+                                <template v-if="active === 'filters'">
+                                    <Select
+                                        v-if="filters.length > 1"
+                                        :label="t('criterion')"
+                                        :size="size"
+                                        :model-value="filterKey"
+                                        @update:model-value="filterKey = $event ?? ''"
+                                    >
+                                        <Option
+                                            v-for="entry in filters"
+                                            :key="entry.key"
+                                            :value="entry.key"
+                                        >
+                                            {{ entry.label }}
+                                        </Option>
+                                    </Select>
+                                    <CriteriaFilter
+                                        v-if="filter?.kind === 'filter'"
+                                        :key="JSON.stringify([filter.key, editSession])"
+                                        :adapter="adapter"
+                                        :size="size"
+                                        :field="filter.field"
+                                        :filter="filter.filter"
+                                        :control-label="controlLabel"
+                                    />
+                                </template>
+                                <template v-else-if="active === 'search'">
+                                    <Select
+                                        v-if="searches.length > 1"
+                                        :label="t('searchScope')"
+                                        :size="size"
+                                        :model-value="searchKey"
+                                        @update:model-value="searchKey = $event ?? ''"
+                                    >
+                                        <Option
+                                            v-for="entry in searches"
+                                            :key="entry.key"
+                                            :value="entry.key"
+                                        >
+                                            {{ entry.label }}
+                                        </Option>
+                                    </Select>
+                                    <CriteriaSearch
+                                        v-if="search"
+                                        :key="JSON.stringify([search.key, editSession])"
+                                        :adapter="adapter"
+                                        :size="size"
+                                        :field="search.field ?? undefined"
+                                        :label="search.label"
+                                    />
+                                    <Select
+                                        v-if="adapter.setSearchMatch"
+                                        :label="t('searchMatch')"
+                                        :size="size"
+                                        :model-value="adapter.requested?.searchMatch ?? ''"
+                                        :failed="matchFeedback.message.value || undefined"
+                                        @update:model-value="submitMatch"
+                                    >
+                                        <Option
+                                            v-for="match in adapter.global?.searchMatch.allowed"
+                                            :key="match"
+                                            :value="match"
+                                            >{{ t(match) }}</Option
+                                        >
+                                    </Select>
+                                </template>
+                                <template v-else-if="active === 'sort'">
+                                    <section
+                                        v-if="accepted"
+                                        :aria-label="t('acceptedOrder')"
+                                        class="applied-order"
+                                    >
+                                        <strong>{{ t('acceptedOrder') }}</strong>
+                                        <span v-if="accepted.kind === 'source'">{{
+                                            t('sourceOrder')
+                                        }}</span>
+                                        <span v-else-if="accepted.kind === 'preset'">{{
+                                            t('presetOrder', { preset: acceptedPreset })
+                                        }}</span>
+                                        <ol v-else>
+                                            <li
+                                                v-for="(term, index) in accepted.terms"
+                                                :key="index"
+                                            >
+                                                {{
+                                                    controlLabel({
+                                                        kind: 'field',
+                                                        field: term.field,
+                                                    })
+                                                }}
+                                                · {{ t(term.direction) }} · {{ t(term.sortType) }}
+                                                <span v-if="term.role"
+                                                    >({{
+                                                        t(
+                                                            term.role === 'prefix'
+                                                                ? 'prefixOrder'
+                                                                : 'tieOrder',
+                                                        )
+                                                    }})</span
+                                                >
+                                            </li>
+                                        </ol>
+                                    </section>
+                                    <Select
+                                        v-if="preset"
+                                        :label="t('orderPreset')"
+                                        :size="size"
+                                        :model-value="preset.current?.id ?? ''"
+                                        :failed="presetFeedback.message.value || undefined"
+                                        @update:model-value="submitOrder"
+                                    >
+                                        <Option value="">{{ t('noPreset') }}</Option>
+                                        <Option
+                                            v-for="item in preset.available.presets"
+                                            :key="item.id"
+                                            :value="item.id"
+                                            >{{ item.label }}</Option
+                                        >
+                                    </Select>
+                                    <Select
+                                        v-if="ordered.length > 1"
+                                        :label="t('orderField')"
+                                        :size="size"
+                                        :model-value="orderField"
+                                        @update:model-value="orderField = $event ?? ''"
+                                    >
+                                        <Option
+                                            v-for="field in ordered"
+                                            :key="field"
+                                            :value="field"
+                                        >
+                                            {{ controlLabel({ kind: 'field', field }) }}
+                                        </Option>
+                                    </Select>
+                                    <OrderField
+                                        v-if="orderField"
+                                        :key="JSON.stringify([orderField, editSession])"
+                                        :adapter="adapter"
+                                        :size="size"
+                                        :field="orderField"
+                                        :label="controlLabel({ kind: 'field', field: orderField })"
+                                    />
+                                </template>
+                                <DataViewPageSettings
+                                    v-else-if="active === 'pageSettings'"
+                                    :adapter="adapter"
+                                    :size="size"
+                                />
+                                <span v-if="resetFeedback.message.value" role="alert">{{
+                                    resetFeedback.message.value
+                                }}</span>
+                            </section>
+                        </div>
+                        <template
+                            v-if="adapter.requested?.version === 2 || hasResettableState(adapter)"
+                            #actions
+                        >
+                            <Button
+                                type="button"
+                                appearance="outlined"
+                                :size="size"
+                                @click="reset"
+                                >{{ t('resetDefaults') }}</Button
                             >
-                        </li>
-                    </ol>
-                </section>
-                <OrderField
-                    v-for="field in ordered"
-                    :key="JSON.stringify([field, editSession])"
-                    :adapter="adapter"
-                    :size="size"
-                    :field="field"
-                    :label="controlLabel({ kind: 'field', field })"
-                />
+                        </template>
+                    </ControlPanel>
+                </div>
+                <AppliedCriteria :adapter="adapter" :size="size" :control-label="controlLabel" />
             </div>
-        </div>
-        <Button
-            v-if="adapter.requested?.version === 2 || adapter.error?.code === 'invalid_state'"
-            :size="size"
-            @click="reset"
-            >{{ t('resetDefaults') }}</Button
-        >
-        <span v-if="resetFeedback.message.value" role="alert">{{
-            resetFeedback.message.value
-        }}</span>
+        </slot>
+        <slot name="trailing" />
+        <slot name="layouts" />
     </div>
 </template>
 <script setup lang="ts">
-import { computed, onBeforeUpdate, onUpdated, ref, useId, watch, useTemplateRef } from 'vue';
+import { computed, onBeforeUpdate, onUpdated, ref, useTemplateRef, watch } from 'vue';
+import Icon from '../components/WebAwesome/Icon.vue';
+import AppliedCriteria from './AppliedCriteria.vue';
+import DataViewPageSettings from './DataViewPageSettings.vue';
 import Button from '../components/WebAwesome/Button.vue';
 import Select from '../components/WebAwesome/Select.vue';
 import Option from '../components/WebAwesome/Option.vue';
+import ControlPanel from './ControlPanel.vue';
 import CriteriaSearch from './CriteriaSearch.vue';
 import CriteriaFilter from './CriteriaFilter.vue';
 import OrderField from './OrderField.vue';
+import { criteriaFor, hasResettableState, type Criterion } from './criteria';
 import { orderModel, orderMode } from './OrderModel';
 import { useControlFeedback, type ControlLabel } from './controlFeedback';
 import { useDataViewText } from './messages';
-import { useDocumentId } from './documentId';
 import type { DataViewHandle, DataViewSize } from './types';
 const props = defineProps<{
     adapter: DataViewHandle;
     size: DataViewSize;
+    includePaging: boolean;
     controlLabel: ControlLabel;
 }>();
+const slots = defineSlots<{
+    controls?: () => unknown;
+    trailing?: () => unknown;
+    layouts?: () => unknown;
+}>();
 const t = useDataViewText();
-const criteriaOpen = ref(false),
-    orderingOpen = ref(false);
-const criteriaId = useDocumentId(useId()),
-    orderingId = useDocumentId(useId());
+const panel = useTemplateRef('panel');
+const toolbar = useTemplateRef('toolbar');
 const editSession = ref(0);
-const fields = computed(() => Object.entries(props.adapter.fields ?? {}));
-const filters = computed(() => [
-    ...Object.keys(props.adapter.global?.filters ?? {}).map((filter) => ({ field: null, filter })),
-    ...fields.value.flatMap(([field, item]) =>
-        Object.keys(item?.filters ?? {}).map((filter) => ({ field, filter })),
-    ),
-]);
-const ordered = computed(() =>
-    fields.value.filter(([field]) => orderModel(props.adapter, field)).map(([field]) => field),
-);
-const hasCriteria = computed(
-    () =>
-        !!props.adapter.setSearchMatch ||
-        fields.value.some(([, item]) => item?.search) ||
-        filters.value.length > 0,
-);
 watch(
-    hasCriteria,
+    () => !!props.adapter.definition,
     (available) => {
-        if (!available) criteriaOpen.value = false;
+        if (available) return;
+        editSession.value++;
+        panel.value?.dismiss();
     },
     { flush: 'sync' },
 );
+function label(entry: Criterion) {
+    if (entry.kind === 'filter') return props.controlLabel(entry);
+    return entry.field === null
+        ? t('searchResults')
+        : t('searchField', { field: props.controlLabel({ kind: 'field', field: entry.field }) });
+}
+const criteria = computed(() =>
+    [
+        ...(props.adapter.global?.search ? [{ kind: 'search', field: null } as const] : []),
+        ...criteriaFor(props.adapter),
+    ].map((entry) => ({
+        ...entry,
+        key: JSON.stringify(entry),
+        label: label(entry),
+    })),
+);
+const filters = computed(() => criteria.value.filter((entry) => entry.kind === 'filter'));
+const searches = computed(() => criteria.value.filter((entry) => entry.kind === 'search'));
+const filterKey = ref('');
+const searchKey = ref('');
+const filter = computed(
+    () => filters.value.find((entry) => entry.key === filterKey.value) ?? filters.value[0],
+);
+const search = computed(
+    () => searches.value.find((entry) => entry.key === searchKey.value) ?? searches.value[0],
+);
 watch(
-    () => ordered.value.length,
-    (count) => {
-        if (!count) orderingOpen.value = false;
+    filter,
+    (next, previous) => {
+        if (
+            previous &&
+            !filters.value.some((entry) => entry.key === previous.key) &&
+            active.value === 'filters'
+        )
+            panel.value?.dismiss();
+        filterKey.value = next?.key ?? '';
     },
-    { flush: 'sync' },
+    { immediate: true },
+);
+watch(
+    search,
+    (next, previous) => {
+        if (
+            previous &&
+            !searches.value.some((entry) => entry.key === previous.key) &&
+            active.value === 'search'
+        )
+            panel.value?.dismiss();
+        searchKey.value = next?.key ?? '';
+    },
+    { immediate: true },
+);
+const ordered = computed(() =>
+    Object.keys(props.adapter.fields ?? {}).filter((field) => orderModel(props.adapter, field)),
+);
+const orderField = ref('');
+watch(
+    ordered,
+    (fields) => {
+        if (fields.includes(orderField.value)) return;
+        if (orderField.value && active.value === 'sort') panel.value?.dismiss();
+        orderField.value = fields[0] ?? '';
+    },
+    { immediate: true },
 );
 const preset = computed(() =>
     orderMode(props.adapter) === 'offset' ? props.adapter.global?.order : null,
 );
 const accepted = computed(() => {
     const state = props.adapter.accepted;
-    return props.adapter.requested?.version === 2 && state && 'order' in state ? state.order : null;
+    return state && 'order' in state ? state.order : null;
 });
 const acceptedPreset = computed(() => {
     const order = accepted.value;
@@ -185,6 +333,25 @@ const acceptedPreset = computed(() => {
         ? (preset.value?.available.presets.find((item) => item.id === order.id)?.label ?? order.id)
         : '';
 });
+type Section = 'filters' | 'search' | 'sort' | 'pageSettings' | 'resetDefaults';
+const selected = ref<Section>();
+const sections = computed(() => {
+    const items: { label: Section; icon: string }[] = [];
+    if (filters.value.length) items.push({ label: 'filters', icon: 'filter' });
+    if (searches.value.length || props.adapter.setSearchMatch)
+        items.push({ label: 'search', icon: 'magnifying-glass' });
+    if (ordered.value.length || preset.value) items.push({ label: 'sort', icon: 'up-down' });
+    if (props.includePaging && props.adapter.ready)
+        items.push({ label: 'pageSettings', icon: 'forward-step' });
+    if (!items.length && hasResettableState(props.adapter))
+        items.push({ label: 'resetDefaults', icon: 'gear' });
+    return items;
+});
+const active = computed(
+    () =>
+        sections.value.find((section) => section.label === selected.value)?.label ??
+        sections.value[0]?.label,
+);
 const presetFeedback = useControlFeedback(
     () => props.adapter,
     () => JSON.stringify([preset.value?.available, preset.value?.current]),
@@ -210,9 +377,9 @@ function submitOrder(value: unknown) {
         void presetFeedback.run(() => live.call({ id: value }));
 }
 function submitMatch(value: unknown) {
-    const live = props.adapter.setSearchMatch;
     const match = props.adapter.global?.searchMatch.allowed.find((choice) => choice === value);
-    if (live && match) void matchFeedback.run(() => live(match));
+    const set = props.adapter.setSearchMatch;
+    if (set && match) void matchFeedback.run(() => set(match));
 }
 function reset() {
     editSession.value++;
@@ -220,75 +387,154 @@ function reset() {
     presetFeedback.invalidate();
     void resetFeedback.run(() => props.adapter.resetState());
 }
-const toolbar = useTemplateRef('toolbar');
-function closeDisclosure(event: KeyboardEvent) {
-    const section = event.target instanceof Element ? event.target.closest('.disclosure') : null;
-    const toggle = section?.querySelector<HTMLButtonElement>('.disclosure-toggle');
-    if (!toggle || toggle.getAttribute('aria-expanded') !== 'true') return;
-    if (toggle.getAttribute('aria-controls') === criteriaId.value) criteriaOpen.value = false;
-    else orderingOpen.value = false;
-    toggle.focus();
-}
 let focused: Element | null = null;
-let disclosure: Element | null = null;
 onBeforeUpdate(() => {
-    focused = toolbar.value?.contains(document.activeElement) ? document.activeElement : null;
-    disclosure = focused?.closest('.disclosure') ?? null;
+    const element = document.activeElement;
+    focused =
+        toolbar.value?.contains(element) && !element?.closest('.applied-criteria') ? element : null;
 });
 onUpdated(() => {
     if (!focused || focused.isConnected || document.activeElement !== document.body) return;
-    const region = disclosure?.isConnected ? disclosure : toolbar.value;
-    const next = region?.querySelector<HTMLButtonElement>('.disclosure-toggle') ?? toolbar.value;
-    next?.focus();
+    (toolbar.value?.querySelector<HTMLButtonElement>('.panel-trigger') ?? toolbar.value)?.focus();
 });
 </script>
 <style scoped>
-.data-view-toolbar,
-.editors,
-.data-view-toolbar :deep(.criteria-controls) {
+.data-view-toolbar {
     display: flex;
     flex-wrap: wrap;
-    align-items: end;
+    align-items: start;
     gap: var(--wa-space-s);
     min-inline-size: 0;
 }
-.data-view-toolbar > *,
-.editors > *,
-.data-view-toolbar :deep(.criteria-controls > *) {
+.query-stack {
+    display: grid;
+    row-gap: calc(var(--wa-focus-ring-width) + var(--wa-focus-ring-offset) + var(--wa-space-xs));
+    flex: 1 1 17rem;
+    min-inline-size: 0;
+}
+.query-tools {
+    display: flex;
+    align-items: start;
+    gap: var(--wa-space-xs);
     min-inline-size: 0;
     max-inline-size: 100%;
-    box-sizing: border-box;
+}
+.query-tools:has(.toolbar-search) {
+    max-inline-size: min(100%, 30rem);
+}
+.toolbar-search {
+    flex: 1;
+    min-inline-size: 0;
+}
+.toolbar-search :deep(wa-input::part(form-control-label)) {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+.options-workspace {
+    display: grid;
+    min-inline-size: 0;
+}
+.options-nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: start;
+    gap: var(--wa-space-2xs);
+    padding: var(--wa-space-s);
+    background: var(--wa-color-surface-lowered);
+    border-block-end: var(--wa-border-width-s) solid var(--wa-color-surface-border);
+}
+.options-nav button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: start;
+    gap: var(--wa-space-xs);
+    padding: var(--wa-space-xs) var(--wa-space-s);
+    min-block-size: 2.25rem;
+    border: 1px solid transparent;
+    border-radius: var(--wa-border-radius-m);
+    background: transparent;
+    font: inherit;
+    font-size: var(--wa-font-size-s);
+    color: var(--wa-color-text-normal);
+    text-align: start;
+    cursor: pointer;
+}
+.options-nav button:hover {
+    background: var(--wa-color-neutral-fill-quiet);
+}
+.options-nav button[aria-pressed='true'] {
+    background: var(--wa-color-brand-fill-quiet);
+    color: var(--wa-color-brand-on-quiet);
+    border-color: var(--wa-color-brand-border-quiet);
+    font-weight: var(--wa-font-weight-semibold);
+}
+.options-nav button:focus-visible {
+    outline: var(--wa-focus-ring);
+    outline-offset: var(--wa-focus-ring-offset);
+}
+.options-content {
+    display: grid;
+    align-content: start;
+    gap: var(--wa-space-m);
+    min-inline-size: 0;
+    padding: var(--wa-space-m);
+}
+.options-content h3 {
+    margin: 0;
+    font-size: var(--wa-font-size-l);
+    font-weight: var(--wa-font-weight-semibold);
+    line-height: var(--wa-line-height-condensed);
+}
+.options-content :deep(.criteria-controls) {
+    display: grid;
+    gap: var(--wa-space-s);
 }
 .applied-order {
     display: grid;
     gap: var(--wa-space-xs);
-    overflow-wrap: anywhere;
+    min-inline-size: 0;
+}
+.applied-order {
+    background: var(--wa-color-surface-lowered);
+    border-inline-start: 3px solid var(--wa-color-brand-border-normal);
+    padding: var(--wa-space-s);
+    border-radius: var(--wa-border-radius-s);
+    font-size: var(--wa-font-size-s);
 }
 .applied-order ol {
-    margin-block: 0;
+    margin: 0;
     padding-inline-start: var(--wa-space-l);
 }
-.disclosure.expanded {
-    flex-basis: 100%;
+@container options-dialog (min-width:36rem) {
+    .options-workspace {
+        grid-template-columns: 10.5rem minmax(0, 1fr);
+        min-block-size: 17rem;
+    }
+    .options-nav {
+        display: grid;
+        border-block-end: 0;
+        border-inline-end: var(--wa-border-width-s) solid var(--wa-color-surface-border);
+    }
+    .options-content {
+        padding: var(--wa-space-l);
+    }
 }
-.disclosure-toggle {
-    max-inline-size: 100%;
-    background: var(--wa-color-neutral-fill-quiet);
-    color: inherit;
-    font: inherit;
-    border: var(--wa-border-width-s) solid var(--wa-color-surface-border);
-    border-radius: var(--wa-border-radius-m);
-    padding: var(--wa-space-xs) var(--wa-space-s);
-    cursor: pointer;
-    overflow-wrap: anywhere;
+@container data-view (max-width: 39.999rem) {
+    .query-stack {
+        flex-basis: 100%;
+    }
+    .query-tools:has(.toolbar-search) {
+        max-inline-size: 100%;
+    }
 }
-.disclosure-toggle:focus-visible {
-    outline: var(--wa-focus-ring);
-    outline-offset: var(--wa-focus-ring-offset);
-}
-.editors {
-    align-items: stretch;
-    flex-direction: column;
-    margin-block-start: var(--wa-space-s);
+@media (pointer: coarse) {
+    .toolbar-search :deep(wa-input::part(base)),
+    .options-nav button {
+        min-block-size: max(44px, var(--wa-form-control-height));
+    }
 }
 </style>

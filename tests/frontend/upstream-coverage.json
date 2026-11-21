@@ -246,14 +246,6 @@
           "title": "preserves boolean bindings before and after Web Awesome registers the button"
         },
         {
-          "file": "tests/frontend/data-view-sort.browser.test.ts",
-          "title": "keeps header replacement precedence and its original scope"
-        },
-        {
-          "file": "tests/frontend/data-view-sort.browser.test.ts",
-          "title": "reports null head direction when cursor paging disallows the advertised sort type"
-        },
-        {
           "file": "tests/frontend/popover.browser.test.ts",
           "title": "accepts the public Button trigger and preserves autofocus and native close links"
         },
@@ -692,6 +684,10 @@
           "title": "Input preserves a synchronous Vue parent update before an already queued native render"
         },
         {
+          "file": "tests/frontend/data-view.browser.test.ts",
+          "title": "renders grid alone without columns or a selector"
+        },
+        {
           "file": "tests/frontend/form-validation.browser.test.ts",
           "title": "preserves Input hint content for boolean failure and restores caller ARIA after messages"
         },
@@ -887,6 +883,14 @@
       "ownReferenceExamples": 19,
       "renderedInExamples": 19,
       "actionTestReferences": [
+        {
+          "file": "tests/frontend/data-view.browser.test.ts",
+          "title": "orders through the advertised alias and keeps accepted aria-sort while a request is pending"
+        },
+        {
+          "file": "tests/frontend/data-view.browser.test.ts",
+          "title": "renders a standalone status and cursor navigation from one owner across a source reset"
+        },
         {
           "file": "tests/frontend/models.browser.test.ts",
           "title": "${item.name} synchronizes its public value domain without altering native event identity"

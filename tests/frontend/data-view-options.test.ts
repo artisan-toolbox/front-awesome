@@ -40,9 +40,9 @@ test('provides SSR-safe defaults with or without installing the plugin', async (
     expect(installed.options).toEqual({
         multiSortKey: 'auto',
         sortIcons: {
-            ascending: { name: 'sort-up', family: 'classic', variant: 'solid' },
-            descending: { name: 'sort-down', family: 'classic', variant: 'solid' },
-            unsorted: { name: 'sort', family: 'classic', variant: 'solid' },
+            ascending: { name: 'arrow-down-a-z', family: 'classic', variant: 'solid' },
+            descending: { name: 'arrow-up-z-a', family: 'classic', variant: 'solid' },
+            unsorted: { name: 'up-down', family: 'classic', variant: 'solid' },
         },
     });
 });
@@ -68,7 +68,7 @@ test('resolves icon inheritance once and isolates independent applications', asy
         unsorted: '',
     });
     expect(second.options?.sortIcons.ascending).toEqual({
-        name: 'sort-up',
+        name: 'arrow-down-a-z',
         family: 'classic',
         variant: 'solid',
     });

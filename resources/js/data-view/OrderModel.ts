@@ -51,6 +51,7 @@ export function orderModel(adapter: DataViewHandle, field: string | undefined) {
         current,
         accepted,
         acceptedPriority,
+        multiPriority: acceptedTerms.length > 1 ? acceptedPriority : null,
         pending,
         canAdd,
         cycle,

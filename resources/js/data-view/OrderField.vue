@@ -26,22 +26,44 @@
                 t(value)
             }}</Option>
         </Select>
-        <Button
-            :size="size"
-            :aria-describedby="message ? messageId : undefined"
-            @click="apply(false)"
-            >{{ t('replaceOrder') }}</Button
-        >
-        <Button v-if="model.canAdd" :size="size" @click="apply(true)">{{
-            t(model.current ? 'updateOrder' : 'addOrder')
-        }}</Button>
-        <Button v-if="model.current" :size="size" @click="remove">{{ t('removeOrder') }}</Button>
+        <div class="order-actions">
+            <Button
+                type="button"
+                :size="size"
+                :aria-describedby="message ? messageId : undefined"
+                @click="apply(false)"
+                ><Icon slot="start" name="check" library="system" aria-hidden="true" />{{
+                    t('replaceOrder')
+                }}</Button
+            >
+            <Button
+                type="button"
+                appearance="outlined"
+                v-if="model.canAdd"
+                :size="size"
+                @click="apply(true)"
+                ><Icon slot="start" name="plus" library="system" aria-hidden="true" />{{
+                    t(model.current ? 'updateOrder' : 'addOrder')
+                }}</Button
+            >
+            <Button
+                type="button"
+                appearance="outlined"
+                v-if="model.current"
+                :size="size"
+                @click="remove"
+                ><Icon slot="start" name="minus" library="system" aria-hidden="true" />{{
+                    t('removeOrder')
+                }}</Button
+            >
+        </div>
         <span v-if="message" :id="messageId" role="alert">{{ message }}</span>
     </fieldset>
 </template>
 <script setup lang="ts">
 import { computed, ref, useId, watch } from 'vue';
 import type { OrderSelection } from '@artisan-toolbox/dapter';
+import Icon from '../components/WebAwesome/Icon.vue';
 import Button from '../components/WebAwesome/Button.vue';
 import Select from '../components/WebAwesome/Select.vue';
 import Option from '../components/WebAwesome/Option.vue';
@@ -108,9 +130,20 @@ function remove() {
 </script>
 <style scoped>
 fieldset {
+    display: grid;
+    min-inline-size: 0;
+    gap: var(--wa-space-s);
     border: var(--wa-border-width-s) solid var(--wa-color-surface-border);
     border-radius: var(--wa-border-radius-m);
     padding: var(--wa-space-s);
+}
+.order-actions {
+    display: grid;
+    gap: var(--wa-space-xs);
+    margin-block-start: var(--wa-space-2xs);
+}
+.order-actions > wa-button {
+    inline-size: 100%;
 }
 legend {
     display: flex;

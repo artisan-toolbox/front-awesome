@@ -1,4 +1,8 @@
 <template>
+    <DataViewSearch :adapter="catalog" field="name" />
+    <DataViewFilter :adapter="catalog" field="status" filter="selected" label="Status" />
+    <DataViewStatus :adapter="catalog" />
+    <DataViewPagination :adapter="catalog" size="s" />
     <DataView
         :adapter="catalog"
         :views="views"
@@ -74,6 +78,10 @@ import {
 import { shallowRef } from 'vue';
 import {
     DataView,
+    DataViewSearch,
+    DataViewFilter,
+    DataViewStatus,
+    DataViewPagination,
     type DataViewViews,
     type DataViewRowKey,
     type DataViewScope,
