@@ -5,6 +5,23 @@
 ### Features
 
 - **Unify Data View options and improve pagination** (`f3e6aae`)
+  Adds a responsive View Options dialog beside quick search for filters, search scope, sorting, and page settings, while keeping layout switching directly in the toolbar. Localized, removable badges show accepted searches, individual filter values, non-default matching options and page size, and active sorts or a sort preset. Removing one filter value keeps the other selections. Clearing criteria requests that non-infinite offset views keep their current page, and restoring the default page size clamps the page to the last valid one in version 2 offset views when the filtered count is known. Failed requests restore search and filter drafts to their last accepted values, and removing a focused badge moves focus to a remaining badge or the options trigger. The default footer pairs localized record or match status with responsive numbered controls for offset paging, Previous and Next for simple or cursor paging, or Load more, Retry, and an end-of-results announcement for infinite views. Page settings offer validated page jumps, page-size selection when there is a choice, reload, and First and Last navigation where supported. After a failed request, users can retry the failed target or continue from the page still on screen. Status messages distinguish an empty source from no matches and are localized in English, Spanish, and Brazilian Portuguese. Tables gain a named, keyboard-focusable scroll region with overflow indicators, and sort buttons display the accepted direction and multi-sort priority while retaining pending feedback. The developer guide documents the standalone DataViewSearch, DataViewFilter, DataViewStatus, and DataViewPagination exports, custom layouts, and how to retain Shift-click multi-sort through configuration. For custom layouts, hide-header and hide-footer hide their sections and slots; #toolbar replaces only the built-in toolbar controls, leaving filters, actions, and layout switching alongside it and page settings available in the default footer. The #pagination slot replaces the default footer status and navigation and suppresses the built-in header paging controls. DataViewPager still accepts the adapter and now defaults to size 'm', but delegates rendering to DataViewNavigation. Custom CSS that targets the previous Data View or pager markup may need updated selectors.
+
+### Tests
+
+- **Keep the pointer outside host reset examples** (`208be81`)
+  Adjusts the frontend test setup so the pointer stays outside the host reset examples. This keeps pointer hover from influencing the examples during the test and does not change runtime behavior.
+
+### Maintenance
+
+- **Prepare the 1.0.0-beta.9 release** (`0444efe`)
+  Bumps the @artisan-toolbox/front-awesome package version and README release badge from 1.0.0-beta.8 to 1.0.0-beta.9 and records the release in CHANGELOG.md. These release metadata and documentation updates do not change runtime behavior or require migration.
+
+## [1.0.0-beta.9] - 2026-11-21
+
+### Features
+
+- **Unify Data View options and improve pagination** (`f3e6aae`)
   Keep quick search and the layout switcher in the toolbar, and open a single View Options dialog beside search to edit filters, search scope, sorting, and page settings. The dialog uses Web Awesome selects, keeps its actions visible while long sections scroll, and restores focus to its trigger on close. Removable badges show accepted searches, individual filter values, non-default search matching, field sorts and sort presets, and non-default page sizes. Removing one filter value preserves the others. In offset pagination, removing criteria requests that the current page be preserved; restoring the default page size clamps it to the last valid page when the filtered count is known. Search and filter editors restore the last accepted values after request errors.
 
 The default footer pairs localized record status with responsive pagination: numbered pages for offset paging, Previous and Next for simple or cursor paging, and Load more, Retry, and an end-of-results announcement for infinite views. Page settings provide validated page jumps, page-size selection, reload, and first and last navigation where available. After a failed page request, navigation can retry or proceed relative to the page still on display. Status announcements distinguish an empty source from a search with no matches and report record or match ranges and totals when known. New labels and messages are available in English, Spanish, and Brazilian Portuguese.
