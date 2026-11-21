@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.0-beta.8] - 2026-11-21
+
+### Features
+
+- **Add opt-in scrollbar edge fades and clickable permission and role rows** (`5fb43d3`)
+  Use `v-scrollbar="{ shadows: true }"` to show a fade on any horizontal or vertical edge of a bounded scroll region where more content remains. Fades work in LTR and RTL, update as the region scrolls or its viewport or content changes, and do not intercept pointer events. Customize them with `--fa-scrollbar-shadow-color` (defaults to the surface color or `Canvas`) and `--fa-scrollbar-shadow-size` (defaults to `2rem`). Existing scrollbars are unchanged unless you opt in. Turning fades off removes the overlay without resetting the scroll position; restoring native scrollbars also removes the overlay and its listeners. Fades are hidden during scrollbar measurement and when printing, and the directive leaves server-rendered markup unchanged.
+
+Click anywhere on an editable permission or role row, or focus it and press Space, to toggle its draft value. Changes are submitted only when you select **Save changes**. Read-only rows remain noninteractive. Editable permission rows now use native checkboxes with visible row-level focus, assistive-technology links to descriptions and validation errors, and an invalid state when a permission is rejected. Allowed rows use brand colors and a check icon; denied rows use neutral colors and a cross icon, with text labels retained for both. The `focusAbility` API is unchanged, but custom selectors targeting `wa-checkbox` or the old row markup may need updating.
+
+Updated the development guide to document both features. Added browser and SSR coverage for edge fades, including RTL, content changes, and runtime removal. Updated permission editor browser tests to use accessible roles and names and cover full-row toggling on mobile, keyboard focus, validation, and Save disabling when the draft returns to its original state. Removed two scenario entries from the upstream coverage manifest without deleting the tests themselves.
+
 ## [1.0.0-beta.7] - 2026-11-20
 
 ### Tests
