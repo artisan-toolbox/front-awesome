@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.0.0-beta.9] - 2026-11-21
+
+### Features
+
+- **Unify Data View options and improve pagination** (`f3e6aae`)
+  Keep quick search and the layout switcher in the toolbar, and open a single View Options dialog beside search to edit filters, search scope, sorting, and page settings. The dialog uses Web Awesome selects, keeps its actions visible while long sections scroll, and restores focus to its trigger on close. Removable badges show accepted searches, individual filter values, non-default search matching, field sorts and sort presets, and non-default page sizes. Removing one filter value preserves the others. In offset pagination, removing criteria requests that the current page be preserved; restoring the default page size clamps it to the last valid page when the filtered count is known. Search and filter editors restore the last accepted values after request errors.
+
+The default footer pairs localized record status with responsive pagination: numbered pages for offset paging, Previous and Next for simple or cursor paging, and Load more, Retry, and an end-of-results announcement for infinite views. Page settings provide validated page jumps, page-size selection, reload, and first and last navigation where available. After a failed page request, navigation can retry or proceed relative to the page still on display. Status announcements distinguish an empty source from a search with no matches and report record or match ranges and totals when known. New labels and messages are available in English, Spanish, and Brazilian Portuguese.
+
+Sortable table headers use native buttons and distinct indicators for ascending, descending, and unordered states. They expose the accepted sort direction and multi-column priority while retaining existing slots and modifier shortcuts. The table scroll region is labeled and keyboard-focusable, and the fallback caption remains available to assistive technology. Page-height changes keep the visible footer in place, searches and sorts preserve the initiating header, and pending requests respect manual scrolling.
+
+Custom layouts can reuse the same adapter with standalone DataViewSearch, DataViewFilter, DataViewStatus, and DataViewPagination components and opt out of the built-in header or footer with `hide-header` and `hide-footer`. The `toolbar` slot replaces the default controls, while a custom `pagination` slot suppresses the default footer status and navigation as well as the header paging controls. Hiding the header or footer also hides the slots it contains. Direct DataViewToolbar consumers must now pass `includePaging`. DataViewPager delegates to the shared navigation component and defaults to size `m`; custom CSS and tests that target the previous toolbar or pager markup may need updates. The development guide documents the new composition and paging options separately from beta.8 behavior, including how to restore Shift-click multi-sort with `dataView.multiSortKey`.
+
 ## Unreleased
 
 - Use Font Awesome `arrow-down-a-z` and `arrow-up-z-a` for the default ascending and descending headers, with `up-down` for an unordered sortable column.

@@ -5,7 +5,7 @@
 </div>
 
 <p id="maintainer-badges" align="center">
-<a href="https://github.com/artisan-toolbox/front-awesome/releases"><img src="https://img.shields.io/badge/version-1.0.0--beta.8-blue?style=flat-square" alt="version"></a>
+<a href="https://github.com/artisan-toolbox/front-awesome/releases"><img src="https://img.shields.io/badge/version-1.0.0--beta.9-blue?style=flat-square" alt="version"></a>
 <a href="https://packagist.org/packages/artisan-toolbox/front-awesome"><img src="https://img.shields.io/badge/Packagist-F28D1A?style=flat-square&amp;logo=packagist&amp;logoColor=white" alt="Packagist"></a>
 <a href="https://atb.dev.br/packages/front-awesome/"><img src="https://img.shields.io/badge/PHP-%5E8.5-777BB4?style=flat-square" alt="PHP"></a>
 <a href="https://atb.dev.br/packages/front-awesome/"><img src="https://img.shields.io/badge/Laravel-%5E13.36-FF2D20?style=flat-square" alt="Laravel"></a>
