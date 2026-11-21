@@ -103,6 +103,64 @@
         --os-handle-interactive-area-offset: 4px;
     }
 
+    .fa-scrollbar-shadows {
+        --fa-shadow-size: var(--fa-scrollbar-shadow-size, 2rem);
+        --fa-shadow-color: var(
+            --fa-scrollbar-shadow-color,
+            var(--wa-color-surface-default, Canvas)
+        );
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background:
+            linear-gradient(
+                    to right,
+                    color-mix(
+                        in oklab,
+                        var(--fa-shadow-color) calc(var(--fa-shadow-left) * 100%),
+                        transparent
+                    ),
+                    transparent
+                )
+                left / var(--fa-shadow-size) 100% no-repeat,
+            linear-gradient(
+                    to left,
+                    color-mix(
+                        in oklab,
+                        var(--fa-shadow-color) calc(var(--fa-shadow-right) * 100%),
+                        transparent
+                    ),
+                    transparent
+                )
+                right / var(--fa-shadow-size) 100% no-repeat,
+            linear-gradient(
+                    to bottom,
+                    color-mix(
+                        in oklab,
+                        var(--fa-shadow-color) calc(var(--fa-shadow-top) * 100%),
+                        transparent
+                    ),
+                    transparent
+                )
+                top / 100% var(--fa-shadow-size) no-repeat,
+            linear-gradient(
+                    to top,
+                    color-mix(
+                        in oklab,
+                        var(--fa-shadow-color) calc(var(--fa-shadow-bottom) * 100%),
+                        transparent
+                    ),
+                    transparent
+                )
+                bottom / 100% var(--fa-shadow-size) no-repeat;
+    }
+
+    /* Exclude the translated layer from OverlayScrollbars' viewport measurements. */
+    [data-overlayscrollbars-viewport~='noScrollbars'] > .fa-scrollbar-shadows,
+    [data-overlayscrollbars-viewport~='measuring'] > .fa-scrollbar-shadows {
+        display: none;
+    }
+
     @media (prefers-reduced-motion: reduce) {
         .fa-scrollbar-overlay,
         .fa-scrollbar-overlay .os-scrollbar-track,
@@ -112,7 +170,8 @@
     }
 
     @media print {
-        .fa-scrollbar-overlay {
+        .fa-scrollbar-overlay,
+        .fa-scrollbar-shadows {
             display: none;
         }
     }

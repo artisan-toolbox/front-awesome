@@ -128,3 +128,64 @@ test('keeps the overlay after Vue replaces the scroll content and preserves nati
     await expect.poll(visibleRail).not.toBeNull();
     expect(region.scrollTop).toBe(80);
 });
+
+test('shows edge shadows only where more content can scroll into view', async () => {
+    mountFixture();
+
+    const region = page.getByRole('region', { name: 'Shadowed notifications' }).element();
+    const toggle = page.getByRole('button', { name: 'Toggle edge shadows' });
+    const resize = page.getByRole('button', { name: 'Resize shadowed content' });
+    const layer = () => region.querySelector('.fa-scrollbar-shadows');
+    const edges = () => {
+        const shadow = layer();
+        if (!shadow) return null;
+        const style = getComputedStyle(shadow);
+        return ['top', 'right', 'bottom', 'left'].map((edge) =>
+            Number(style.getPropertyValue(`--fa-shadow-${edge}`)),
+        );
+    };
+
+    expect(layer()).toBeNull();
+    await toggle.click();
+    await expect.poll(edges).toEqual([0, 1, 1, 0]);
+    const shadow = layer();
+    if (!shadow) throw new Error('Expected an edge shadow layer');
+    expect(getComputedStyle(shadow).backgroundImage).toContain('linear-gradient');
+    expect(getComputedStyle(shadow).pointerEvents).toBe('none');
+    expect(shadow.getAttribute('aria-hidden')).toBe('true');
+
+    region.scrollTo(100, 100);
+    await expect.poll(edges).toEqual([1, 1, 1, 1]);
+    const viewport = region.getBoundingClientRect();
+    expect(shadow.getBoundingClientRect().top).toBeCloseTo(viewport.top);
+    expect(shadow.getBoundingClientRect().left).toBeCloseTo(viewport.left);
+
+    region.scrollTo(region.scrollWidth, region.scrollHeight);
+    await expect.poll(edges).toEqual([1, 0, 0, 1]);
+
+    await resize.click();
+    await expect.poll(edges).toEqual([0, 0, 0, 0]);
+    expect(region.scrollHeight).toBe(region.clientHeight);
+    expect(region.scrollWidth).toBe(region.clientWidth);
+
+    await page.getByRole('button', { name: 'Change text direction' }).click();
+    await resize.click();
+    await expect.poll(edges).toEqual([0, 0, 1, 1]);
+    region.scrollTo(-region.scrollWidth, 0);
+    await expect.poll(edges).toEqual([0, 1, 1, 0]);
+    expect(shadow.getBoundingClientRect().left).toBeCloseTo(region.getBoundingClientRect().left);
+
+    const content = region.firstElementChild;
+    if (!(content instanceof HTMLElement)) throw new Error('Expected scroll content');
+    content.style.width = 'auto';
+    content.style.height = 'auto';
+    await expect.poll(edges).toEqual([0, 0, 0, 0]);
+
+    content.removeAttribute('style');
+    await expect.poll(edges).toEqual([0, 0, 1, 1]);
+    region.scrollTo(-100, 0);
+    await expect.poll(edges).toEqual([0, 1, 1, 1]);
+    await toggle.click();
+    expect(layer()).toBeNull();
+    expect(region.scrollLeft).toBeLessThan(0);
+});

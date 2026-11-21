@@ -409,14 +409,6 @@
         {
           "file": "tests/frontend/upstream-interactions.browser.test.ts",
           "title": "keeps grouped checkbox and switch choices independently submittable"
-        },
-        {
-          "file": "tests/frontend/user-permission-editor.browser.test.ts",
-          "title": "preserves the reported order and sends every boolean after an offscreen edit"
-        },
-        {
-          "file": "tests/frontend/user-permission-editor.browser.test.ts",
-          "title": "searches an accented group and reaches permissions beyond the progressive limit"
         }
       ]
     },

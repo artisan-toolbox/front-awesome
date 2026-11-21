@@ -52,6 +52,10 @@ test('uses each app default for a bare directive and lets explicit modifiers ove
     expect(results).toEqual(['brand', 'danger', 'neutral', 'neutral'].map(expectedMarkup));
 });
 
+test('renders the original scroll target when edge shadows are enabled during SSR', async () => {
+    expect(await renderScrollbar('scrollbar', { shadows: true })).toBe(expectedMarkup('neutral'));
+});
+
 test.each([
     [undefined, 'neutral'],
     ['brand', 'brand'],

@@ -18,6 +18,9 @@
         <button type="button" @click="horizontal = !horizontal">Change scroll axis</button>
         <button type="button" @click="alternative = !alternative">Replace scroll content</button>
         <button type="button" @click="toggleVisibility">Change scrollbar visibility</button>
+        <button type="button" @click="shadows = !shadows">Toggle edge shadows</button>
+        <button type="button" @click="rtl = !rtl">Change text direction</button>
+        <button type="button" @click="large = !large">Resize shadowed content</button>
         <section
             v-fa-scrollbar="variant"
             :class="
@@ -56,6 +59,16 @@
             tabindex="0"
             v-html="alternative ? nextMarkup : initialMarkup"
         />
+        <section
+            v-scrollbar="{ shadows }"
+            aria-label="Shadowed notifications"
+            class="h-28 w-48 overflow-auto"
+            :dir="rtl ? 'rtl' : 'ltr'"
+            tabindex="0"
+        >
+            <div v-if="large" class="h-[560px] w-[640px]">More notifications</div>
+            <div v-else>One notification</div>
+        </section>
     </div>
 </template>
 
@@ -68,6 +81,9 @@ const variants = ['neutral', 'brand', 'success', 'warning', 'danger'] satisfies 
 const dark = ref(false);
 const horizontal = ref(false);
 const alternative = ref(false);
+const shadows = ref(false);
+const rtl = ref(false);
+const large = ref(true);
 const initialMarkup = '<p>Original content</p>'.repeat(12);
 const nextMarkup = '<p>Replacement content</p>'.repeat(12);
 const scrollbars: NonNullable<ScrollbarOptions['scrollbars']> = reactive({});

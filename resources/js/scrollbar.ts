@@ -9,7 +9,10 @@ import { inject, type DirectiveModifiers, type InjectionKey, type ObjectDirectiv
 const variants = ['neutral', 'brand', 'success', 'warning', 'danger'] as const;
 
 export type ScrollbarVariant = (typeof variants)[number];
-export type ScrollbarOptions = PartialOptions;
+export type ScrollbarOptions = PartialOptions & {
+    /** Show a fade at each edge where more content can be scrolled into view. */
+    shadows?: boolean;
+};
 
 export interface ScrollbarPluginOptions {
     defaultVariant?: ScrollbarVariant;
@@ -27,11 +30,21 @@ export const scrollbarDirectiveKey: InjectionKey<ScrollbarDirective> =
 type ScrollbarState =
     | { kind: 'native' }
     | { kind: 'loading' }
-    | { kind: 'overlay'; instance: OverlayScrollbars; autoHide: ScrollbarsAutoHideBehavior }
+    | {
+          kind: 'overlay';
+          instance: OverlayScrollbars;
+          autoHide: ScrollbarsAutoHideBehavior;
+          shadows?: ScrollShadows;
+      }
     | { kind: 'unavailable' };
 
 interface ScrollbarLifecycle {
     update: (options?: ScrollbarOptions) => void;
+    dispose: () => void;
+}
+
+interface ScrollShadows {
+    update: () => void;
     dispose: () => void;
 }
 
@@ -76,6 +89,90 @@ function readOverflow(element: HTMLElement, view: Window): ScrollbarOverflow | u
     if (x === 'scroll' || y === 'scroll') return { x, y };
 }
 
+function shadowOpacity(distance: number, range: number): string {
+    return range > 0 && distance > 0.5 ? String(Math.min(1, distance / (range * 0.05))) : '0';
+}
+
+function mountScrollShadows(
+    element: HTMLElement,
+    instance: OverlayScrollbars,
+    view: Window & typeof globalThis,
+): ScrollShadows {
+    const layer = element.ownerDocument.createElement('span');
+    layer.className = 'fa-scrollbar-shadows';
+    layer.setAttribute('aria-hidden', 'true');
+    let viewport = instance.state();
+
+    function paint(): void {
+        const { overflowStyle, scrollCoordinates } = viewport;
+        const { start, end } = scrollCoordinates;
+        const left = Math.min(start.x, end.x);
+        const right = Math.max(start.x, end.x);
+        const top = Math.min(start.y, end.y);
+        const bottom = Math.max(start.y, end.y);
+        const x = Math.min(right, Math.max(left, element.scrollLeft));
+        const y = Math.min(bottom, Math.max(top, element.scrollTop));
+        const width = overflowStyle.x === 'scroll' ? right - left : 0;
+        const height = overflowStyle.y === 'scroll' ? bottom - top : 0;
+
+        layer.style.translate = `${x}px ${y}px`;
+        layer.style.setProperty('--fa-shadow-left', shadowOpacity(x - left, width));
+        layer.style.setProperty('--fa-shadow-right', shadowOpacity(right - x, width));
+        layer.style.setProperty('--fa-shadow-top', shadowOpacity(y - top, height));
+        layer.style.setProperty('--fa-shadow-bottom', shadowOpacity(bottom - y, height));
+    }
+
+    const unsubscribe = instance.on({
+        scroll: paint,
+        updated() {
+            viewport = instance.state();
+            paint();
+        },
+    });
+    const { scrollbarHorizontal, scrollbarVertical } = instance.elements();
+    const decorations: Node[] = [layer, scrollbarHorizontal.scrollbar, scrollbarVertical.scrollbar];
+    const refresh = () => instance.update(true);
+    const observer = new view.MutationObserver((records) => {
+        const changed = records.some((record) => {
+            if (
+                record.target instanceof view.Element &&
+                record.target.closest('.fa-scrollbar-shadows, .os-scrollbar')
+            ) {
+                return false;
+            }
+            if (record.type !== 'childList') return true;
+            return [...record.addedNodes, ...record.removedNodes].some(
+                (node) => !decorations.includes(node),
+            );
+        });
+        // The translated layer can keep the old scroll extent until measurement hides it.
+        if (changed) refresh();
+    });
+    observer.observe(element, {
+        subtree: true,
+        childList: true,
+        characterData: true,
+        attributes: true,
+        attributeFilter: ['class', 'dir', 'hidden', 'open', 'style'],
+    });
+    element.addEventListener('load', refresh, true);
+
+    return {
+        update() {
+            if (layer.parentNode !== element) {
+                element.insertBefore(layer, scrollbarHorizontal.scrollbar);
+            }
+            paint();
+        },
+        dispose() {
+            observer.disconnect();
+            element.removeEventListener('load', refresh, true);
+            unsubscribe();
+            layer.remove();
+        },
+    };
+}
+
 function mountScrollbar(element: HTMLElement, options?: ScrollbarOptions): void {
     if (activeScrollbars.has(element)) return;
 
@@ -95,13 +192,14 @@ function mountScrollbar(element: HTMLElement, options?: ScrollbarOptions): void 
     function overlayOptions(
         overflow: ScrollbarOverflow,
         autoHide: ScrollbarsAutoHideBehavior,
-    ): ScrollbarOptions {
-        const overrides = requestedOptions?.scrollbars;
+    ): PartialOptions {
+        const { shadows: _shadows, ...overlay } = requestedOptions ?? {};
+        const overrides = overlay.scrollbars;
         return {
-            ...requestedOptions,
+            ...overlay,
             overflow: {
-                x: requestedOptions?.overflow?.x ?? overflow.x,
-                y: requestedOptions?.overflow?.y ?? overflow.y,
+                x: overlay.overflow?.x ?? overflow.x,
+                y: overlay.overflow?.y ?? overflow.y,
             },
             scrollbars: {
                 ...overrides,
@@ -115,6 +213,7 @@ function mountScrollbar(element: HTMLElement, options?: ScrollbarOptions): void 
 
     function restoreNativeScrollbar(): void {
         if (state.kind === 'overlay') {
+            state.shadows?.dispose();
             const tabIndex = element.getAttribute('tabindex');
             state.instance.destroy();
             // The library restores its initial snapshot even when the caller changed tabindex.
@@ -126,6 +225,18 @@ function mountScrollbar(element: HTMLElement, options?: ScrollbarOptions): void 
         }
         state = { kind: 'native' };
     }
+
+    const synchronizeShadows = (): void => {
+        if (state.kind !== 'overlay') return;
+
+        if (requestedOptions?.shadows) {
+            state.shadows ??= mountScrollShadows(element, state.instance, view);
+            state.shadows.update();
+        } else if (state.shadows) {
+            state.shadows.dispose();
+            delete state.shadows;
+        }
+    };
 
     const synchronize = (): void => {
         if (state.kind === 'unavailable') return;
@@ -143,6 +254,7 @@ function mountScrollbar(element: HTMLElement, options?: ScrollbarOptions): void 
                 if (scrollbar.parentNode !== element) element.append(scrollbar);
             }
             state.instance.options(overlayOptions(overflow, state.autoHide), true);
+            synchronizeShadows();
             return;
         }
 
@@ -175,6 +287,7 @@ function mountScrollbar(element: HTMLElement, options?: ScrollbarOptions): void 
                     overlayOptions(currentOverflow, autoHide),
                 );
                 state = { kind: 'overlay', instance, autoHide };
+                synchronizeShadows();
             })
             .catch(() => {
                 if (state === loading) state = { kind: 'unavailable' };

@@ -83,64 +83,77 @@
 
                                 <ul class="abilities">
                                     <li
-                                        v-for="ability in section.abilities.slice(
+                                        v-for="(ability, abilityIndex) in section.abilities.slice(
                                             0,
                                             limit(section.key),
                                         )"
                                         :key="ability.key"
-                                        class="ability"
-                                        :class="{ 'is-allowed': allowed(ability.key) }"
                                     >
-                                        <Checkbox
-                                            v-if="canUpdate"
-                                            :data-ability="ability.key"
-                                            :model-value="allowed(ability.key)"
-                                            :disabled="busy"
-                                            :hint="ability.description"
-                                            :failed="errorFor(ability.key)"
-                                            @update:model-value="
-                                                emit('change', ability.key, $event)
-                                            "
+                                        <component
+                                            :is="canUpdate ? 'label' : 'div'"
+                                            class="ability"
+                                            :class="{ 'is-allowed': allowed(ability.key) }"
                                         >
-                                            <strong class="ability-name">
-                                                <Icon
-                                                    v-if="ability.icon && iconFamily"
-                                                    :name="ability.icon"
-                                                    :family="iconFamily"
-                                                    aria-hidden="true"
-                                                />
-                                                {{ ability.name }}
-                                            </strong>
-                                        </Checkbox>
-                                        <div v-else>
-                                            <strong class="ability-name">
-                                                <Icon
-                                                    v-if="ability.icon && iconFamily"
-                                                    :name="ability.icon"
-                                                    :family="iconFamily"
-                                                    aria-hidden="true"
-                                                />
-                                                {{ ability.name }}
-                                            </strong>
-                                            <p
-                                                v-if="ability.description"
-                                                class="ability-description"
+                                            <input
+                                                v-if="canUpdate"
+                                                type="checkbox"
+                                                class="wa-visually-hidden-force"
+                                                :data-ability="ability.key"
+                                                :checked="allowed(ability.key)"
+                                                :disabled="busy"
+                                                :aria-label="ability.name"
+                                                :aria-describedby="`${sectionId(section.key)}-hint-${abilityIndex}`"
+                                                :aria-invalid="
+                                                    errorFor(ability.key) ? true : undefined
+                                                "
+                                                @change="changeAbility(ability.key, $event)"
+                                            />
+                                            <Icon
+                                                v-if="ability.icon && iconFamily"
+                                                class="ability-icon"
+                                                :name="ability.icon"
+                                                :family="iconFamily"
+                                                aria-hidden="true"
+                                            />
+                                            <span class="ability-copy">
+                                                <strong class="ability-name">{{
+                                                    ability.name
+                                                }}</strong>
+                                                <span
+                                                    :id="`${sectionId(section.key)}-hint-${abilityIndex}`"
+                                                >
+                                                    <span
+                                                        v-if="ability.description"
+                                                        class="ability-description"
+                                                    >
+                                                        {{ ability.description }}
+                                                    </span>
+                                                    <span
+                                                        v-if="errorFor(ability.key)"
+                                                        class="ability-error"
+                                                    >
+                                                        {{ errorFor(ability.key) }}
+                                                    </span>
+                                                </span>
+                                            </span>
+                                            <span
+                                                class="ability-value"
+                                                :aria-hidden="canUpdate || undefined"
                                             >
-                                                {{ ability.description }}
-                                            </p>
-                                        </div>
-                                        <span
-                                            class="ability-value"
-                                            :aria-hidden="canUpdate || undefined"
-                                        >
-                                            {{
-                                                text(
-                                                    allowed(ability.key)
-                                                        ? category.on
-                                                        : category.off,
-                                                )
-                                            }}
-                                        </span>
+                                                <Icon
+                                                    library="system"
+                                                    :name="allowed(ability.key) ? 'check' : 'xmark'"
+                                                    aria-hidden="true"
+                                                />
+                                                {{
+                                                    text(
+                                                        allowed(ability.key)
+                                                            ? category.on
+                                                            : category.off,
+                                                    )
+                                                }}
+                                            </span>
+                                        </component>
                                     </li>
                                 </ul>
 
@@ -174,7 +187,6 @@ import { computed, nextTick, shallowRef, useId, useTemplateRef, watch } from 'vu
 import Accordion from '../components/WebAwesome/Accordion.vue';
 import AccordionItem from '../components/WebAwesome/AccordionItem.vue';
 import Button from '../components/WebAwesome/Button.vue';
-import Checkbox from '../components/WebAwesome/Checkbox.vue';
 import Icon from '../components/WebAwesome/Icon.vue';
 import Input from '../components/WebAwesome/Input.vue';
 import { useScrollbarDirective } from '../scrollbar';
@@ -289,6 +301,12 @@ function setQuery(value: unknown) {
 
 function allowed(key: string) {
     return props.changes.get(key) ?? props.values[key] === true;
+}
+
+function changeAbility(key: string, event: Event): void {
+    if (event.currentTarget instanceof HTMLInputElement) {
+        emit('change', key, event.currentTarget.checked);
+    }
 }
 
 function setExpanded(key: string, open: boolean) {
@@ -485,8 +503,7 @@ defineExpose({ focusAbility });
 .ability-name {
     color: var(--wa-color-text-normal);
 }
-.section-name wa-icon,
-.ability-name wa-icon {
+.section-name wa-icon {
     margin-inline-end: var(--wa-space-2xs);
     color: var(--wa-color-text-quiet);
 }
@@ -513,34 +530,75 @@ defineExpose({ focusAbility });
     gap: var(--wa-space-2xs);
 }
 .ability {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: start;
-    gap: var(--wa-space-xs);
-    padding: var(--wa-space-xs) var(--wa-space-s);
-    border-radius: var(--wa-border-radius-s);
-    background: var(--wa-color-surface-lowered);
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--wa-space-s);
+    min-block-size: 2.75rem;
+    padding: var(--wa-space-s);
+    border: var(--wa-border-width-s) solid var(--wa-color-surface-border);
+    border-radius: var(--wa-border-radius-m);
+    background: var(--wa-color-surface-default);
+}
+label.ability {
+    cursor: pointer;
+}
+label.ability:hover {
+    border-color: var(--wa-color-neutral-border-normal);
 }
 .ability.is-allowed {
-    background: var(--wa-color-success-fill-quiet);
+    border-color: var(--wa-color-brand-border-normal);
+    background: var(--wa-color-brand-fill-quiet);
+}
+label.ability.is-allowed:hover {
+    border-color: var(--wa-color-brand-border-loud);
+}
+.ability:has(input:focus-visible) {
+    outline: var(--wa-focus-ring);
+    outline-offset: var(--wa-focus-ring-offset);
+}
+.ability:has(input:disabled) {
+    cursor: default;
+    opacity: 0.5;
+}
+.ability-icon {
+    flex: none;
+    color: var(--wa-color-text-quiet);
+    font-size: var(--wa-font-size-l);
+}
+.is-allowed .ability-icon,
+.is-allowed .ability-name {
+    color: var(--wa-color-brand-on-quiet);
+}
+.ability-copy {
+    flex: 1;
+    min-inline-size: 0;
+}
+.ability-description,
+.ability-error {
+    display: block;
+    margin-block-start: var(--wa-space-3xs);
+    font-size: var(--wa-font-size-s);
+}
+.ability-error {
+    color: var(--wa-color-danger-on-quiet);
 }
 .ability-value {
-    align-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--wa-space-2xs);
+    max-inline-size: 45%;
     padding: var(--wa-space-3xs) var(--wa-space-xs);
-    border: var(--wa-border-width-s) solid var(--wa-color-surface-border);
     border-radius: var(--wa-border-radius-pill);
-    background: var(--wa-color-surface-default);
-    color: var(--wa-color-text-normal);
+    background: var(--wa-color-neutral-fill-quiet);
+    color: var(--wa-color-neutral-on-quiet);
     font-size: var(--wa-font-size-xs);
     font-weight: var(--wa-font-weight-semibold);
     line-height: 1.5;
 }
 .is-allowed .ability-value {
-    border-color: var(--wa-color-success-border-quiet);
-    color: var(--wa-color-success-on-quiet);
-}
-.ability-description {
-    margin-block-start: var(--wa-space-2xs);
+    background: var(--wa-color-brand-fill-loud);
+    color: var(--wa-color-brand-on-loud);
 }
 .catalog-more {
     margin-block-start: var(--wa-space-xs);

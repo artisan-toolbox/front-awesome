@@ -216,6 +216,9 @@ Compatibility/migration needs:
 
 ## [Unreleased]
 
+- Opt in to Scroller-style edge fades with `v-scrollbar="{ shadows: true }"`. The fades follow the current scroll position on either axis.
+- Toggle a permission or role by clicking its row. Active rows use the brand palette and a check badge. Inactive rows use neutral colors and a cross badge. Keyboard users can focus an editable row and press Space.
+
 - Test PHP 8.5 and 8.6 in CI with the Maintainer 1.14.4 setup action.
 - Generate the same localization titlecase exceptions on PHP 8.5 and 8.6 by using mbstring for both sides of the comparison.
 

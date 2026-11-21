@@ -278,6 +278,8 @@ To use the scrollbar directive, load the shared theme and install `createFrontAw
 
 Pass optional OverlayScrollbars settings with `v-scrollbar.brand="{ scrollbars: { autoHide: 'leave' } }"`. Import `ScrollbarOptions` for a typed binding. The original element receives native scroll events and keeps its scroll position when options change. The fallback uses the browser scrollbar for server rendering, native form controls, and forced colors. Use `fa-scrollbar` or a variant class such as `fa-scrollbar-brand` for CSS-only styling. See the [scrollbar guide](https://atb.dev.br/docs/front-awesome/scrollbar/).
 
+In the current source preview, pass `v-scrollbar="{ shadows: true }"` on a bounded scroll region to fade the edges with more content. Set `--fa-scrollbar-shadow-color` or `--fa-scrollbar-shadow-size` on the region to override the local surface color or `2rem` fade size.
+
 The published template includes complete commented ramps for neutral, success, warning, and danger customization through the physical `gray`, `green`, `yellow`, and `red` Tailwind palettes. Uncomment and replace all eleven stops of a ramp. These changes also affect utilities and other components that use that physical palette. Tailwind's native `neutral` palette remains separate from the gray-backed Web Awesome neutral role. Existing application-owned branding files are preserved when republishing. Compare the updated package template with your file and copy the desired examples without using `--force`.
 
 For optional PrimeVue 4 styled mode, install `primevue` and `@primeuix/themes`, import `frontAwesomePrimeVueTheme` from `@artisan-toolbox/front-awesome/primevue`, and pass it as PrimeVue's `theme` option. Keep its named CSS layer and `.wa-dark` selector. Removing this import removes the optional adapter.
@@ -511,3 +513,5 @@ To show decorative Font Awesome icons, return `iconFamily: 'classic'` on the GET
 Closing the editor or selecting another subject with unsaved changes opens a discard confirmation. Keep editing or press Escape to return to the current draft.
 
 Return a catalog and editable boolean values on GET, keyed by the subject's `user` query parameter. Accept a complete boolean map and its revision on PUT. Return `204` when saved and `409` for a stale revision. The editor loads current values before offering another save if the outcome is uncertain. It uses the application localization service with the `front-awesome::user-permission-editor` catalog and an English fallback. See the [permission editor guide](https://atb.dev.br/docs/front-awesome/user-permission-editor).
+
+In the current source preview, click an editable row or focus it and press Space to change its draft value. Select **Save changes** to submit the draft.

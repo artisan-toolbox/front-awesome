@@ -133,10 +133,10 @@ test('preserves the reported order and sends every boolean after an offscreen ed
         .element(page.getByRole('dialog', { name: /User permissions.*Jordan Lee/ }))
         .toBeVisible();
     await expect.element(readPermission()).toBeVisible();
-    const labels = Array.from(document.querySelectorAll('wa-checkbox'), (item) =>
-        item.textContent?.trim(),
-    );
-    expect(labels).toEqual(['Review invoices', 'Approve submissions']);
+    const rows = page.getByRole('checkbox').all();
+    expect(rows).toHaveLength(2);
+    await expect.element(rows[0]).toHaveAccessibleName('Review invoices');
+    await expect.element(rows[1]).toHaveAccessibleName('Approve submissions');
     await toggleReadPermission();
     await find().fill('confirm a deposit');
     await expect.element(readPermission()).not.toBeInTheDocument();
@@ -159,18 +159,66 @@ test('preserves the reported order and sends every boolean after an offscreen ed
     await expect.element(save()).toBeDisabled();
 });
 
+test('toggles the draft from the row text, status badge, or keyboard', async () => {
+    await page.viewport(390, 840);
+    const snapshot = permissions();
+    const description = 'Open the billing ledger and read invoices from every branch.';
+    const first = snapshot.sections[0].abilities[0];
+    Object.assign(first, { description, icon: 'file' });
+    transport.mockResolvedValueOnce(reply(200, { ...snapshot, iconFamily: 'classic' }));
+    mount();
+    await open();
+    const row = page.getByRole('listitem').filter({ hasText: first.name });
+    const control = row.getByRole('checkbox', { name: first.name, exact: true });
+    const denied = row.getByText('Denied', { exact: true });
+    const allowed = row.getByText('Allowed', { exact: true });
+    await expect.element(control).toHaveAccessibleDescription(description);
+    await expect.element(control).not.toBeChecked();
+    const leadingIcon = row.element().querySelector('wa-icon[name="file"]');
+    const offIcon = denied.element().querySelector('wa-icon[name="xmark"]');
+    expect(offIcon?.getAttribute('aria-hidden')).toBe('true');
+
+    const iconBox = leadingIcon!.getBoundingClientRect();
+    const titleBox = row.getByText(first.name, { exact: true }).element().getBoundingClientRect();
+    const badgeBox = denied.element().getBoundingClientRect();
+    const hintBox = row.getByText(description).element().getBoundingClientRect();
+    expect(iconBox.right).toBeLessThan(titleBox.left);
+    expect(titleBox.bottom).toBeLessThanOrEqual(hintBox.top);
+    expect(hintBox.right).toBeLessThan(badgeBox.left);
+    expect(
+        Math.abs(iconBox.top + iconBox.height / 2 - (badgeBox.top + badgeBox.height / 2)),
+    ).toBeLessThan(1);
+
+    await denied.click();
+    await expect.element(control).toBeChecked();
+    expect(
+        allowed.element().querySelector('wa-icon[name="check"]')?.getAttribute('aria-hidden'),
+    ).toBe('true');
+    await row.getByText(description).click();
+    await expect.element(control).not.toBeChecked();
+    await row.click({ position: { x: 8, y: 8 } });
+    await expect.element(control).toBeChecked();
+    await userEvent.keyboard('{Tab}{Shift>}{Tab}{/Shift}');
+    await expect.element(control).toHaveFocus();
+    expect(getComputedStyle(control.element().closest('label')!).outlineStyle).toBe('solid');
+    expect(getComputedStyle(control.element()).clipPath).toBe('inset(50%)');
+    await userEvent.keyboard(' ');
+    await expect.element(control).not.toBeChecked();
+    await expect.element(save()).toBeDisabled();
+});
+
 test('searches an accented group and reaches permissions beyond the progressive limit', async () => {
     await page.viewport(390, 840);
     transport.mockResolvedValueOnce(reply(200, permissions({ many: 1200 })));
     mount();
     await open();
     await expect.element(readPermission()).toBeVisible();
-    expect(document.querySelectorAll('wa-checkbox').length).toBe(40);
+    expect(page.getByRole('checkbox').all().length).toBe(40);
     await find().fill('ordenes');
     await expect.element(readPermission()).toBeVisible();
     await find().fill('permission 1199');
     await expect.element(page.getByRole('checkbox', { name: 'Permission 1199' })).toBeVisible();
-    expect(document.querySelectorAll('wa-checkbox').length).toBe(1);
+    expect(page.getByRole('checkbox').all().length).toBe(1);
     const modal = page.getByRole('dialog').element().getBoundingClientRect();
     expect(modal.left).toBeGreaterThanOrEqual(0);
     expect(modal.right).toBeLessThanOrEqual(390);
@@ -324,13 +372,11 @@ test('reveals and focuses a rejected field hidden by the current search', async 
     );
     await save().click();
     await page.getByRole('button', { name: 'Review invoices', exact: true }).click();
+    await expect.element(readPermission()).toHaveFocus();
+    await expect.element(readPermission()).toHaveAttribute('aria-invalid', 'true');
     await expect
-        .poll(() => {
-            const control = readPermission().element();
-            const root = control.getRootNode();
-            return root instanceof ShadowRoot && root.activeElement === control;
-        })
-        .toBe(true);
+        .element(readPermission())
+        .toHaveAccessibleDescription('Open the billing ledger. This is restricted.');
     await expect.element(readPermission()).toBeChecked();
     await expect.element(page.getByText('This is restricted.')).toBeVisible();
 });
@@ -491,7 +537,9 @@ test('navigates between permission groups and roles while keeping the draft and 
     await toggleReadPermission();
     await expect.element(group.getByText('1 of 42 allowed')).toBeVisible();
     const changed = group.getByRole('listitem').filter({ hasText: 'Review invoices' });
-    await expect.element(changed.getByText('Allowed', { exact: true })).toBeVisible();
+    const allowed = changed.getByText('Allowed', { exact: true });
+    await expect.element(allowed).toBeVisible();
+    expect(getComputedStyle(allowed.element()).backgroundColor).toBe('rgb(216, 237, 67)');
 
     await group.getByRole('button', { name: /Billing.*0 of 1 allowed/ }).click();
     await expect.element(readPermission()).toBeVisible();
