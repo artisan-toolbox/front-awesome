@@ -1,6 +1,7 @@
 /// <reference types="vite/client" />
 import { beforeAll, expect, test, vi } from 'vite-plus/test';
 import { page } from 'vitest/browser';
+import { movePointerOutsideExamples } from './fixtures/movePointerOutsideExamples';
 import { scenarioScripts } from './upstream-scripts';
 import { createApp, h, nextTick } from 'vue';
 import type { Component } from 'vue';
@@ -19,17 +20,6 @@ const byTag = new Map(definitions.map((definition) => [definition.tag, definitio
 beforeAll(async () => {
     await page.viewport(1600, 1000);
 });
-
-async function movePointerOutsideExamples() {
-    const corner = document.createElement('div');
-    corner.style.cssText = 'position:fixed;top:0;right:0;width:2px;height:2px;z-index:2147483647';
-    document.body.append(corner);
-    try {
-        await page.elementLocator(corner).hover();
-    } finally {
-        corner.remove();
-    }
-}
 
 async function settle(root: HTMLElement) {
     await vi.dynamicImportSettled();

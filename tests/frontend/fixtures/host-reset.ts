@@ -1,5 +1,7 @@
 /// <reference types="vite/client" />
 import { beforeAll, expect, test, vi } from 'vite-plus/test';
+import { page } from 'vite-plus/test/browser';
+import { movePointerOutsideExamples } from './movePointerOutsideExamples';
 import '#front-awesome-webawesome/styles/themes/default.css';
 import preflight from 'tailwindcss/preflight.css?raw';
 import coreHostReset from '../../../resources/js/theme/core-host-reset.css?raw';
@@ -129,6 +131,9 @@ function resetSnapshot(root: HTMLElement) {
 export function testHostResetExamples(mode: ThemeMode) {
     beforeAll(registerNativeComponents);
     test(`restores native host and shadow-part styles in every Core upstream example in ${mode}`, async () => {
+        await page.viewport(1600, 1000);
+        // Keep the pointer outside the 720px examples before any stylesheet can shift a control.
+        await movePointerOutsideExamples();
         const checked = new Set<string>();
         for (const scenario of inventory.scenarios) {
             const style = stylesheet(scenario.styles.join('\n'));
