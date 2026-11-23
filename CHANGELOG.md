@@ -32,6 +32,8 @@ Custom layouts can reuse the same adapter with standalone DataViewSearch, DataVi
 
 ## Unreleased
 
+- Table loading, empty-source, and no-match messages now occupy one row beneath the column headings. Set `state-layout="replace"` to show the message in place of the table. The table-only `#skeleton` slot keeps headings visible in either layout. Use `skeletonRows` for the placeholder count and `preserveSkeletonRows` to match the last accepted page length.
+
 - Use Font Awesome `arrow-down-a-z` and `arrow-up-z-a` for the default ascending and descending headers, with `up-down` for an unordered sortable column.
 - Show Font Awesome numbered squares for every active column in a multi-column order. A numeric fallback preserves the priority when an icon is unavailable.
 

@@ -23,6 +23,8 @@ return [
     'totalCount' => ':number en total',
     'emptySource' => 'Aún no hay registros',
     'emptyMatches' => 'Ningún registro coincide',
+    'emptyPage' => 'No hay registros en esta página',
+    'adjustCriteria' => 'Prueba otra búsqueda o ajusta los filtros.',
     'first' => 'Primera',
     'previous' => 'Anterior',
     'next' => 'Siguiente',

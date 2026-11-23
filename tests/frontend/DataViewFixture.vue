@@ -25,8 +25,19 @@
         :size="size"
         :hide-header="hideHeader"
         :hide-footer="hideFooter"
+        :state-layout="stateLayout"
+        :skeleton-rows="skeletonRows"
+        :preserve-skeleton-rows="preserveSkeletonRows"
         data-testid="catalog"
     >
+        <template v-if="customStates" #loading="{ view }"><span>Reading {{ view }}</span></template>
+        <template v-if="customStates" #empty="{ view }"><span>Empty {{ view }}</span></template>
+        <template v-if="skeleton" #skeleton="{ index, columns, adapter, view, selection }">
+            <td v-for="column in columns" :key="column.label" data-placeholder>
+                {{ index }} {{ column.label }} {{ adapter === catalog && view === 'table' }}
+                {{ selection?.mode }}
+            </td>
+        </template>
         <template v-if="customToolbar" #toolbar><span>Custom toolbar</span></template>
         <template v-if="customFilters" #filters><span>Custom filters</span></template>
         <template v-if="customPagination" #pagination><span>Host pagination</span></template>
@@ -99,6 +110,11 @@ const props = defineProps<{
     customFilters?: boolean;
     hideHeader?: boolean;
     hideFooter?: boolean;
+    stateLayout?: 'row' | 'replace';
+    skeletonRows?: number;
+    preserveSkeletonRows?: boolean;
+    skeleton?: boolean;
+    customStates?: boolean;
     captureScope?: boolean;
 }>();
 const catalog = useDataAdapter('Catalog', {

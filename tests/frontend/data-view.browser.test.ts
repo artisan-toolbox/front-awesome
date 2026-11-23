@@ -934,13 +934,19 @@ test('retains authorized rows on recoverable failure and removes them after acce
 test('appends Dapter accumulated rows and retries a paused infinite request', async () => {
     const first = intent({ mode: 'cursor', cursor: null, per_page: 2 });
     request.mockResolvedValueOnce(respond(response(first)));
-    mount({ infinite: true });
+    mount({ infinite: true, stateLayout: 'replace', skeleton: true });
     await expect.element(page.getByText('ALPHA', { exact: true })).toBeVisible();
     await expect.element(page.getByText('2 records in view')).toBeVisible();
     request.mockRejectedValueOnce(new HttpNetworkError('Offline'));
     await page.getByRole('button', { name: 'Load more', exact: true }).click();
     await expect.element(page.getByRole('button', { name: 'Retry loading more' })).toBeVisible();
-    request.mockResolvedValueOnce(
+    const append = deferred<HttpResponse>();
+    request.mockReturnValueOnce(append.promise);
+    await page.getByRole('button', { name: 'Retry loading more' }).click();
+    await expect.poll(() => request.mock.calls.length).toBe(3);
+    await expect.element(page.getByText('ALPHA', { exact: true })).toBeVisible();
+    expect(page.getByRole('table').element().querySelector('[data-placeholder]')).toBeNull();
+    append.resolve(
         respond(
             response(intent({ mode: 'cursor', cursor: 'next-token', per_page: 2 }), {
                 rows: [{ id: 3, name: 'Gamma' }],
@@ -948,7 +954,6 @@ test('appends Dapter accumulated rows and retries a paused infinite request', as
             }),
         ),
     );
-    await page.getByRole('button', { name: 'Retry loading more' }).click();
     await expect.element(page.getByText('GAMMA', { exact: true })).toBeVisible();
     await expect.element(page.getByText('ALPHA', { exact: true })).toBeVisible();
     await expect
@@ -1120,13 +1125,7 @@ test('reports an exhausted repeated cursor even when the last page advertises a 
 });
 
 test('announces updating an accepted empty result outside the busy results region', async () => {
-    const empty = response(intent(), { rows: [] });
-    request.mockResolvedValueOnce(
-        respond({
-            ...empty,
-            paging: { ...empty.paging, total: 0, filtered: 0, pages: 1, has_next: false },
-        }),
-    );
+    request.mockResolvedValueOnce(emptyResponse(0));
     mount();
     await expect.element(page.getByText('No records yet')).toBeVisible();
     const pending = deferred<HttpResponse>();
@@ -1142,6 +1141,245 @@ test('announces updating an accepted empty result outside the busy results regio
     expect(status?.element().closest('[aria-busy="true"]')).toBeNull();
     pending.resolve(respond(response()));
 });
+
+function emptyResponse(total: number) {
+    const empty = response(intent(), { rows: [] });
+    return respond({
+        ...empty,
+        paging: { ...empty.paging, total, filtered: 0, pages: 1, has_next: false },
+    });
+}
+
+test.each([
+    { layout: 'default', total: 0, message: 'No records yet' },
+    { layout: 'replace', total: 8, message: 'No matching records' },
+])(
+    'renders loading and "$message" with the $layout table state',
+    async ({ layout, total, message }) => {
+        const first = deferred<HttpResponse>();
+        request.mockReturnValueOnce(first.promise);
+        const owner = mount({
+            stateLayout: layout === 'default' ? undefined : 'replace',
+            selection: 'multiple',
+            hideFooter: true,
+        });
+        const catalog = page.getByTestId('catalog');
+        const table = catalog.getByRole('table', { name: 'Products' });
+        async function checkState(label: string) {
+            const status = catalog.getByRole('status').filter({ hasText: label });
+            await expect.element(status).toBeVisible();
+            expect(status.element().closest('[aria-busy="true"]')).toBeNull();
+            if (layout === 'replace') {
+                await expect.element(table).not.toBeInTheDocument();
+            } else {
+                await expect
+                    .element(table.getByRole('columnheader', { name: 'Name' }))
+                    .toBeVisible();
+                const cell = table.getByRole('cell').element();
+                expect(cell).toHaveTextContent(label);
+                expect(cell).toHaveAttribute('colspan', '5');
+                expect(table.element().querySelectorAll('tbody tr')).toHaveLength(1);
+            }
+        }
+        await checkState('Loading results…');
+        first.resolve(respond(response()));
+        await expect.element(table.getByRole('cell', { name: 'Product 1' })).toBeVisible();
+        const reload = deferred<HttpResponse>();
+        request.mockReturnValueOnce(reload.promise);
+        void owner.catalog.paging.reload();
+        await checkState('Updating results…');
+        expect(catalog.getByText('Product 1').query()).toBeNull();
+        reload.resolve(emptyResponse(total));
+        await checkState(message);
+    },
+);
+
+test.each(['row', 'replace'] as const)(
+    'centers custom loading and empty content with room on all sides in %s mode',
+    async (stateLayout) => {
+        const first = deferred<HttpResponse>();
+        request.mockReturnValueOnce(first.promise);
+        mount({ stateLayout, customStates: true, hideHeader: true, hideFooter: true });
+        const catalog = page.getByTestId('catalog').element();
+        for (const message of ['Reading table', 'Empty table']) {
+            if (message === 'Empty table') first.resolve(emptyResponse(0));
+            const label = page.getByText(message, { exact: true });
+            await expect.element(label).toBeVisible();
+            const status = page.getByRole('status').filter({ hasText: message });
+            expect(status.element().closest('[aria-busy="true"]')).toBeNull();
+            for (const width of [840, 320]) {
+                catalog.style.width = width + 'px';
+                const bounds = catalog.getBoundingClientRect();
+                const range = document.createRange();
+                range.selectNodeContents(label.element());
+                const text = range.getBoundingClientRect();
+                const area = label.element().closest('td') ?? catalog;
+                const block = area.getBoundingClientRect();
+                expect(
+                    Math.abs(text.left - bounds.left - (bounds.right - text.right)),
+                ).toBeLessThan(3);
+                expect(text.top - block.top).toBeGreaterThanOrEqual(16);
+                expect(block.bottom - text.bottom).toBeGreaterThanOrEqual(16);
+                expect(Math.abs(text.top - block.top - (block.bottom - text.bottom))).toBeLessThan(
+                    3,
+                );
+            }
+        }
+    },
+);
+
+test.each([
+    { stateLayout: 'row' as const, skeletonRows: undefined, preserveSkeletonRows: false },
+    { stateLayout: 'replace' as const, skeletonRows: 3, preserveSkeletonRows: true },
+])(
+    'renders skeleton cells on first load, page reload and after an empty response in $stateLayout mode',
+    async ({ stateLayout, skeletonRows, preserveSkeletonRows }) => {
+        const first = deferred<HttpResponse>();
+        request.mockReturnValueOnce(first.promise);
+        const selection = preserveSkeletonRows ? 'multiple' : undefined;
+        const owner = mount({
+            stateLayout,
+            skeletonRows,
+            preserveSkeletonRows,
+            selection,
+            skeleton: true,
+            customStates: true,
+        });
+        const catalog = page.getByTestId('catalog');
+        const table = catalog.getByRole('table', { name: 'Products' });
+        async function checkPlaceholders(count: number, label: string) {
+            await expect.element(table.getByRole('columnheader', { name: 'Name' })).toBeVisible();
+            const status = catalog.getByRole('status').filter({ hasText: label });
+            await expect.element(status).toBeInTheDocument();
+            expect(status.element().closest('[aria-busy="true"]')).toBeNull();
+            await expect
+                .poll(() => table.element().querySelectorAll('tbody tr').length)
+                .toBe(count);
+            const rows = [...table.element().querySelectorAll('tbody tr')];
+            for (const [index, row] of rows.entries()) {
+                const labels = ['ID', 'Name', 'Computed', 'Actions'];
+                expect(row.children).toHaveLength(labels.length + Number(!!selection));
+                const cells = [...row.querySelectorAll(':scope > td[data-placeholder]')];
+                expect(cells.map((cell) => cell.textContent?.trim())).toEqual(
+                    labels.map((column) =>
+                        [index, column, 'true', selection]
+                            .filter((item) => item !== undefined)
+                            .join(' '),
+                    ),
+                );
+            }
+            expect(table.getByRole('cell').all()).toHaveLength(0);
+            expect(catalog.getByText('Reading table').query()).toBeNull();
+        }
+        const configured = skeletonRows ?? 5;
+        await checkPlaceholders(configured, 'Loading results');
+        first.resolve(respond(response()));
+        await expect.element(table.getByRole('cell', { name: 'Product 2' })).toBeVisible();
+        const reload = deferred<HttpResponse>();
+        request.mockReturnValueOnce(reload.promise);
+        void owner.catalog.paging.reload();
+        await checkPlaceholders(preserveSkeletonRows ? 2 : configured, 'Updating results');
+        reload.resolve(emptyResponse(0));
+        await expect.element(catalog.getByText('Empty table')).toBeVisible();
+        const afterEmpty = deferred<HttpResponse>();
+        request.mockReturnValueOnce(afterEmpty.promise);
+        void owner.catalog.paging.reload();
+        await checkPlaceholders(configured, 'Updating results');
+        afterEmpty.resolve(respond(response()));
+        await expect.element(table.getByRole('cell', { name: 'Product 1' })).toBeVisible();
+        expect(table.element().querySelector('[data-placeholder]')).toBeNull();
+        const newContext = deferred<HttpResponse>();
+        request.mockReturnValueOnce(newContext.promise);
+        void owner.catalog.resetContext();
+        await checkPlaceholders(configured, 'Loading results');
+        newContext.resolve(respond(response()));
+    },
+);
+
+test.each(['list', 'grid'] as const)(
+    'retains accepted %s items while a table skeleton is configured',
+    async (layout) => {
+        request.mockResolvedValueOnce(respond(response()));
+        const owner = mount({ stateLayout: 'replace', skeleton: true, customStates: true });
+        await chooseLayout(layout === 'list' ? 'List' : 'Grid');
+        const item = page.getByText(layout === 'list' ? 'Alpha list' : 'Alpha card');
+        await expect.element(item).toBeVisible();
+        const reload = deferred<HttpResponse>();
+        request.mockReturnValueOnce(reload.promise);
+        void owner.catalog.paging.reload();
+        await expect
+            .element(page.getByRole('status').filter({ hasText: 'Reading ' + layout }))
+            .toBeVisible();
+        await expect.element(item).toBeVisible();
+        expect(page.getByRole('table').query()).toBeNull();
+        reload.resolve(respond(response()));
+    },
+);
+
+test.each([
+    { cursor: null, criteria: {}, message: 'No results.' },
+    { cursor: null, criteria: { search: { value: 'Notebook' } }, message: 'No matching records' },
+    {
+        cursor: 'next-token',
+        criteria: { search: { value: 'Notebook' } },
+        message: 'No records on this page',
+    },
+])(
+    'reports "$message" on an exhausted cursor read with unknown counts',
+    async ({ cursor, criteria, message }) => {
+        const state = {
+            ...intent({ mode: 'cursor', cursor, per_page: 2 }),
+            global: criteria,
+        };
+        if (cursor !== null)
+            request.mockResolvedValueOnce(
+                respond(
+                    response({ ...state, paging: { mode: 'cursor', cursor: null, per_page: 2 } }),
+                ),
+            );
+        const empty = response(state, { rows: [], next: false });
+        request.mockResolvedValueOnce(
+            respond({
+                ...empty,
+                paging: { ...empty.paging, has_previous: false, previous_cursor: null },
+            }),
+        );
+        mount();
+        if (cursor !== null) await page.getByRole('button', { name: 'Next', exact: true }).click();
+        await expect
+            .element(page.getByRole('cell').getByText(message, { exact: true }))
+            .toBeVisible();
+    },
+);
+
+test.each([false, true])(
+    'restores keyboard focus after replacing the sorted table unless focus moved (moved=%s)',
+    async (moveFocus) => {
+        request.mockResolvedValueOnce(respond(response()));
+        mount({ stateLayout: 'replace' });
+        const sort = page.getByRole('button', { name: 'Name', exact: true });
+        await expect.element(sort).toBeVisible();
+        const pending = deferred<HttpResponse>();
+        request.mockReturnValueOnce(pending.promise);
+        sort.element().focus();
+        await userEvent.keyboard('{Enter}');
+        await expect.element(page.getByRole('table')).not.toBeInTheDocument();
+        const currentLayout = page.getByRole('button', { name: 'Table', exact: true });
+        if (moveFocus) currentLayout.element().focus();
+        const state = JSON.parse(String(request.mock.calls[1]?.[0].data)).state;
+        pending.resolve(respond(response(state)));
+        await expect
+            .element(page.getByRole('columnheader', { name: /Name/ }))
+            .toHaveAttribute('aria-sort', 'ascending');
+        await expect
+            .element(
+                moveFocus
+                    ? currentLayout
+                    : page.getByRole('columnheader', { name: /Name/ }).getByRole('button'),
+            )
+            .toHaveFocus();
+    },
+);
 
 test('groups consecutive occurrences, keeps typed keys across layouts and selects without transport', async () => {
     const rows = ['Apple', 'Apricot', 'Berry', 'Avocado'].map((name) => ({ id: 1, name }));

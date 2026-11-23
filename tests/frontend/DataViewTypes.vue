@@ -14,6 +14,12 @@
                 subject.kind === 'row' ? subject.row.name + subject.key.toFixed() : undefined
         "
     >
+        <template #skeleton="{ index, columns, adapter, view, selection }">
+            <td v-for="column in columns" :key="column.label">
+                {{ index.toFixed() }} {{ column.label.toUpperCase() }} {{ view }}
+                {{ adapter.data[0]?.name.toUpperCase() }} {{ selection?.keys[0]?.toFixed() }}
+            </td>
+        </template>
         <template #head-name="{ name, sortDirection, adapter, column, selection }">
             {{ name.toUpperCase() }} {{ column.label }}
             {{ sortDirection === null ? 'Unavailable' : sortDirection.toFixed() }}
@@ -142,6 +148,7 @@ const head: DataViewHeadScope<H> = {
 const direction: DataViewSortDirection = head.sortDirection;
 void direction;
 const slots: DataViewSlots<H> = {
+    skeleton: ({ columns, index, adapter }) => columns[index]?.label ?? adapter.data[0]?.name,
     'cell-name': ({ row }) => row.name,
     'head-name': ({ name, sortDirection }) => name + sortDirection,
 };

@@ -122,6 +122,10 @@ type Slots<H extends DataViewHandle, Scope, ItemScope> = {
             | 'integration-error'
     ]?: (scope: Scope) => unknown;
 } & {
+    skeleton?: (
+        scope: Scope & { index: number; columns: readonly DataViewColumn<H['data'][number]>[] },
+    ) => unknown;
+} & {
     [Name in 'grid-item' | 'list-item']?: (scope: ItemScope) => unknown;
 } & {
     [Name in `cell-${string}`]?: (scope: ItemScope & Cell<H>) => unknown;

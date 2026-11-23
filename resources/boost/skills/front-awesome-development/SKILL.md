@@ -502,6 +502,8 @@ Keep prefilled keys scoped to the current owner or tenant. The component prunes 
 
 Use the optional localization service with the exported Laravel `front-awesome::data-view` messages. Without that service the controls use English. Return a label from `controlLabel(subject)` for a field, filter, typed option, or selectable row. Return `undefined` to use the standard label.
 
+In the development checkout, tables show loading, empty-source, and no-match messages in one full-width row below the headings. Set `state-layout="replace"` to hide the table while displaying a message. To show loading placeholders, use `#skeleton="{ columns, index }"` and supply one `<td>` for each configured data column. DataView creates the row and the selection cell, and keeps the headings in both layouts. The slot index starts at zero. Set `:skeleton-rows="3"` to change the default of five. Enable `preserve-skeleton-rows` to match the last accepted page length during a read. A first load or a read after an empty page uses the configured count. [Show loading and empty table states](https://atb.dev.br/docs/front-awesome/data-view/layouts#table-feedback)
+
 The `#pagination`, `#loading`, `#empty`, `#error`, and `#integration-error` slots replace their own regions. Use `#actions` and `#footer` for application-specific controls. Dapter owns URL restoration, live and polling configuration, and infinite loading. DataView reports available counts, offers a cursor restart when needed, and exposes explicit retry on a paused infinite window. [DataView guides](https://atb.dev.br/docs/front-awesome/data-view)
 
 ## User permission editor

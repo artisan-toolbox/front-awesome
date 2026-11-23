@@ -76,21 +76,36 @@
                 </Callout>
             </slot>
         </div>
-        <div v-if="state.adapter.status === 'loading'" class="data-view-status" role="status">
-            <slot name="loading" v-bind="scope"
-                ><Spinner />{{ t(state.adapter.ready ? 'updating' : 'loading') }}</slot
-            >
-        </div>
-        <p v-else-if="state.adapter.status === 'idle'" class="data-view-status" role="status">
+        <p class="data-view-sr-only" role="status">
+            {{ tablePresentation() === 'skeleton' || appending ? loadingAnnouncement : '' }}
+        </p>
+        <p v-if="state.adapter.status === 'idle'" class="data-view-feedback" role="status">
             {{ t('idle') }}
         </p>
-        <div
-            v-else-if="state.adapter.status === 'success' && !items.length"
-            class="data-view-status"
-            :role="slots.empty ? 'status' : undefined"
-        >
-            <slot name="empty" v-bind="scope"><DataViewStatus :adapter="state.adapter" /></slot>
-        </div>
+        <DefineFeedback>
+            <div class="data-view-feedback" role="status">
+                <slot v-if="feedback === 'loading'" name="loading" v-bind="scope">
+                    <Spinner aria-hidden="true" />
+                    <span>{{ loadingAnnouncement }}</span>
+                </slot>
+                <slot v-else name="empty" v-bind="scope">
+                    <span class="data-view-feedback-symbol" aria-hidden="true">
+                        <Icon
+                            :name="
+                                emptyMessage === 'emptyMatches'
+                                    ? 'magnifying-glass'
+                                    : 'table-columns'
+                            "
+                            library="system"
+                        />
+                    </span>
+                    <span>{{ t(emptyMessage) }}</span>
+                    <span v-if="emptyMessage === 'emptyMatches'" class="data-view-feedback-hint">{{
+                        t('adjustCriteria')
+                    }}</span>
+                </slot>
+            </div>
+        </DefineFeedback>
 
         <div
             v-if="selectionState"
@@ -104,7 +119,7 @@
                     form=""
                     :checked="selectionState.allLoaded"
                     :indeterminate.prop="selectionState.someLoaded"
-                    :disabled="!items.length"
+                    :disabled="(activeView === 'table' && !!feedback) || !items.length"
                     @change="changeAll($event)"
                 />
                 {{ t('selectAll') }}
@@ -118,9 +133,14 @@
                 >{{ t('clearSelection') }}</Button
             >
         </div>
-        <div class="data-view-results min-w-0" :aria-busy="state.adapter.paging.loading">
+        <RenderFeedback v-if="feedback && tablePresentation() === 'hidden'" />
+        <!-- Keep the live status row outside the busy headers while the table refreshes. -->
+        <div
+            class="data-view-results min-w-0"
+            :aria-busy="state.adapter.paging.loading && tablePresentation() !== 'row'"
+        >
             <div
-                v-if="activeView === 'table'"
+                v-if="tablePresentation() !== 'hidden'"
                 v-scrollbar="{ shadows: true }"
                 class="data-view-scroll overflow-x-auto"
                 tabindex="0"
@@ -137,7 +157,10 @@
                     <caption :class="{ 'data-view-sr-only': !caption }">
                         {{ caption ?? label ?? t('results') }}
                     </caption>
-                    <thead tabindex="-1">
+                    <thead
+                        tabindex="-1"
+                        :aria-busy="feedback === 'loading' && tablePresentation() === 'row'"
+                    >
                         <tr>
                             <th v-if="selectionState" scope="col">{{ t('selection') }}</th>
                             <th
@@ -156,6 +179,7 @@
                                         v-if="head.order"
                                         type="button"
                                         class="data-view-sort"
+                                        :data-sort-column="head.id"
                                         :aria-description="
                                             head.order.accepted && head.order.acceptedPriority
                                                 ? t(head.order.accepted.direction) +
@@ -214,7 +238,28 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody v-for="run in groups" :key="run.key">
+                    <tbody v-if="tablePresentation() === 'skeleton'" aria-hidden="true" inert>
+                        <tr v-for="row in skeletonCount" :key="row">
+                            <td v-if="selectionState" />
+                            <slot
+                                name="skeleton"
+                                v-bind="scope"
+                                :index="row - 1"
+                                :columns="columns"
+                            />
+                        </tr>
+                    </tbody>
+                    <tbody v-else-if="feedback">
+                        <tr>
+                            <td
+                                class="data-view-feedback-cell"
+                                :colspan="columns.length + (selectionState ? 1 : 0)"
+                            >
+                                <RenderFeedback />
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody v-for="run in groups" :key="run.key" class="data-view-data-rows">
                         <tr
                             v-for="(item, position) in run.rows"
                             :key="item.key"
@@ -253,7 +298,7 @@
                 </table>
             </div>
             <ul
-                v-else
+                v-if="activeView !== 'table'"
                 :class="activeView === 'grid' ? 'data-view-grid' : 'data-view-list'"
                 :aria-label="caption ?? label ?? t('results')"
             >
@@ -283,9 +328,7 @@
         <footer v-if="!hideFooter" class="data-view-footer" tabindex="-1">
             <slot name="pagination" v-bind="scope">
                 <DataViewStatus
-                    v-if="
-                        state.adapter.ready && (items.length || state.adapter.status !== 'success')
-                    "
+                    v-if="state.adapter.ready && (items.length || !feedback)"
                     :adapter="state.adapter"
                 />
                 <DataViewNavigation
@@ -316,7 +359,8 @@
         >
     "
 >
-import { computed, onBeforeUpdate, shallowRef, useTemplateRef, watchEffect } from 'vue';
+import { computed, nextTick, onBeforeUpdate, shallowRef, useTemplateRef, watchEffect } from 'vue';
+import { createReusableTemplate } from '@vueuse/core';
 import { useDataAdapter, type DataAdapterProps } from '@artisan-toolbox/dapter';
 import Button from '../components/WebAwesome/Button.vue';
 import Icon from '../components/WebAwesome/Icon.vue';
@@ -329,7 +373,7 @@ import SortPriority from './SortPriority.vue';
 import DataViewToolbar from './DataViewToolbar.vue';
 import DataViewNavigation from './DataViewNavigation.vue';
 import DataViewStatus from './DataViewStatus.vue';
-import { hasToolbarControls } from './criteria';
+import { hasToolbarControls, useAcceptedCriteria } from './criteria';
 import {
     columnId,
     columnValue,
@@ -373,6 +417,9 @@ const props = defineProps<{
     ) => string | undefined;
     view?: DataViewLayout;
     size?: DataViewSize;
+    stateLayout?: 'row' | 'replace';
+    skeletonRows?: number;
+    preserveSkeletonRows?: boolean;
     hideHeader?: boolean;
     hideFooter?: boolean;
     label?: string;
@@ -391,13 +438,15 @@ const props = defineProps<{
     scrollContainer?: never;
     infinite?: never;
 }>();
+const [DefineFeedback, RenderFeedback] = createReusableTemplate();
 const slots = defineSlots<CurrentSlots<H, Key>>();
 const emit = defineEmits<{
     'update:view': [value: DataViewLayout];
     'update:selectedKeys': [value: Key[]];
 }>();
 const state = { adapter: useDataAdapter<H>(props.adapter) };
-useDataViewScrollAnchor(useTemplateRef('root'), state.adapter);
+const root = useTemplateRef<HTMLElement>('root');
+useDataViewScrollAnchor(root, state.adapter);
 const t = useDataViewText();
 const options = useDataViewOptions();
 const sortModifier = useSortModifier(options.multiSortKey);
@@ -461,7 +510,63 @@ const columns = computed(() => table.value.columns);
 const grouped = computed(() => table.value.grouped);
 const data = computed<readonly Row[]>(() => state.adapter.data);
 const items = computed(() => occurrences<Row, K>(data.value, props.rowKey));
-const groups = computed(() => groupRows(items.value, grouped.value));
+const appending = computed(
+    () =>
+        state.adapter.status === 'loading' &&
+        state.adapter.infinite?.status === 'loading' &&
+        data.value.length > 0,
+);
+const feedback = computed(() => {
+    const { status } = state.adapter;
+    if (status === 'loading' && !appending.value) return 'loading';
+    if (status === 'success' && !data.value.length) return 'empty';
+    return null;
+});
+const loadingAnnouncement = computed(() =>
+    state.adapter.status === 'loading' ? t(state.adapter.ready ? 'updating' : 'loading') : '',
+);
+const acceptedCriteria = useAcceptedCriteria(() => state.adapter);
+const emptyMessage = computed(() => {
+    const { paging } = state.adapter;
+    if (paging.total === 0) return 'emptySource';
+    if (paging.filtered === 0) return 'emptyMatches';
+    const accepted = state.adapter.accepted?.paging;
+    const first = accepted?.mode === 'cursor' ? accepted.cursor === null : accepted?.current === 1;
+    if (!first || paging.has_previous || paging.has_next || paging.filtered !== null)
+        return 'emptyPage';
+    const criteria = acceptedCriteria.value;
+    if (
+        criteria &&
+        (criteria.global.search ||
+            Object.keys(criteria.global.filters ?? {}).length ||
+            Object.values(criteria.fields).some(
+                (field) => field.search || Object.keys(field.filters ?? {}).length,
+            ))
+    )
+        return 'emptyMatches';
+    return 'empty';
+});
+function tablePresentation() {
+    if (activeView.value !== 'table') return 'hidden';
+    if (!feedback.value) return 'items';
+    if (feedback.value === 'loading' && slots.skeleton) return 'skeleton';
+    return props.stateLayout === 'replace' ? 'hidden' : 'row';
+}
+const previousCount = shallowRef(0);
+watchEffect(
+    () => {
+        const { ready, status } = state.adapter;
+        if (ready && status === 'success') previousCount.value = data.value.length;
+        if (!ready && (status === 'idle' || status === 'error')) previousCount.value = 0;
+    },
+    { flush: 'sync' },
+);
+const skeletonCount = computed(() => {
+    if (props.preserveSkeletonRows && previousCount.value) return previousCount.value;
+    const count = props.skeletonRows ?? 5;
+    return Number.isSafeInteger(count) && count > 0 ? count : 5;
+});
+const groups = computed(() => (feedback.value ? [] : groupRows(items.value, grouped.value)));
 const { authority, selection: selectionState } = useRowSelection<Row, Key>(
     state.adapter,
     items,
@@ -563,14 +668,22 @@ const sortFeedback = useControlFeedback(
             ]),
         ]),
 );
-function clickHeader(column: DataViewColumn<Row>, event: MouseEvent) {
+async function clickHeader(column: DataViewColumn<Row>, event: MouseEvent) {
     const order = orderModel(state.adapter, column.orderBy);
-    if (order)
-        void sortFeedback.run(
-            () =>
-                order.cycle(sortModifierPressed(sortModifier.value, event)) ??
-                Promise.resolve({ status: 'superseded' }),
-        );
+    if (!order) return;
+    const button = event.currentTarget;
+    const restoreFocus = props.stateLayout === 'replace' && document.activeElement === button;
+    await sortFeedback.run(
+        () =>
+            order.cycle(sortModifierPressed(sortModifier.value, event)) ??
+            Promise.resolve({ status: 'superseded' }),
+    );
+    if (!restoreFocus || !(button instanceof HTMLElement) || button.isConnected) return;
+    await nextTick();
+    if (document.activeElement === document.body)
+        root.value
+            ?.querySelector<HTMLElement>(`[data-sort-column="${CSS.escape(columnId(column))}"]`)
+            ?.focus({ preventScroll: true });
 }
 </script>
 <style scoped>
@@ -598,8 +711,7 @@ function clickHeader(column: DataViewColumn<Row>, event: MouseEvent) {
 }
 .data-view-header,
 .data-view-footer,
-.data-view-selection,
-.data-view-status {
+.data-view-selection {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
@@ -669,9 +781,48 @@ function clickHeader(column: DataViewColumn<Row>, event: MouseEvent) {
     outline: var(--wa-focus-ring);
     outline-offset: calc(-1 * var(--wa-focus-ring-width));
 }
-.data-view-status {
+.data-view-feedback {
+    box-sizing: border-box;
+    display: grid;
+    justify-items: center;
+    align-content: center;
+    gap: var(--wa-space-s);
+    padding: clamp(2.5rem, 9cqi, 5rem) var(--wa-space-s);
     margin: 0;
+    text-align: center;
+    overflow-wrap: anywhere;
+    color: var(--wa-color-text-normal);
+    font-size: var(--wa-font-size-l);
+    font-weight: var(--wa-font-weight-semibold);
+    line-height: var(--wa-line-height-condensed);
+}
+.data-view-feedback-symbol {
+    display: grid;
+    place-items: center;
+    width: 2.5em;
+    height: 2.5em;
+    border-radius: var(--wa-border-radius-circle);
+    background: var(--wa-color-surface-lowered);
     color: var(--wa-color-text-quiet);
+}
+.data-view-feedback-hint {
+    max-inline-size: 40ch;
+    color: var(--wa-color-text-quiet);
+    font-size: var(--wa-font-size-s);
+    font-weight: var(--wa-font-weight-normal);
+    line-height: var(--wa-line-height-normal);
+}
+.data-view-feedback wa-spinner {
+    font-size: var(--wa-font-size-2xl);
+    --indicator-color: var(--wa-color-brand-fill-loud);
+}
+.data-view-table td.data-view-feedback-cell {
+    padding: 0;
+}
+.data-view-feedback-cell > .data-view-feedback {
+    position: sticky;
+    inset-inline-start: 0;
+    inline-size: min(100%, 100cqi);
 }
 .data-view-selection label {
     display: inline-flex;
@@ -706,7 +857,8 @@ function clickHeader(column: DataViewColumn<Row>, event: MouseEvent) {
     padding: var(--dv-block) var(--dv-inline);
     font-weight: var(--wa-font-weight-semibold);
 }
-.data-view-table caption.data-view-sr-only {
+.data-view-table caption.data-view-sr-only,
+.data-view-sr-only {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -716,13 +868,15 @@ function clickHeader(column: DataViewColumn<Row>, event: MouseEvent) {
     white-space: nowrap;
 }
 .data-view-table th,
-.data-view-table td {
+.data-view-table td,
+.data-view-table :slotted(td) {
     padding: var(--dv-block) var(--dv-inline);
     border-block-end: var(--wa-border-width-s) solid var(--wa-color-surface-border);
     text-align: start;
     overflow-wrap: break-word;
 }
-.data-view-table tbody:last-child tr:last-child > * {
+.data-view-table tbody:last-child tr:last-child > *,
+.data-view-table tbody:last-child tr:last-child > :slotted(td) {
     border-block-end: 0;
 }
 .data-view-table thead th {
@@ -771,7 +925,7 @@ function clickHeader(column: DataViewColumn<Row>, event: MouseEvent) {
     background: var(--wa-color-surface-lowered);
 }
 @media (hover: hover) {
-    .data-view-hover tbody tr:not([data-selected]):hover {
+    .data-view-hover .data-view-data-rows tr:not([data-selected]):hover {
         background: var(--wa-color-neutral-fill-quiet);
     }
 }
@@ -821,6 +975,7 @@ function clickHeader(column: DataViewColumn<Row>, event: MouseEvent) {
 @container data-view (max-width: 48rem) {
     .data-view-table th,
     .data-view-table td,
+    .data-view-table :slotted(td),
     .data-view-sort {
         padding-inline: var(--wa-space-s);
     }
