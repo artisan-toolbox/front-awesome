@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.0-beta.10] - 2026-11-24
+
+### Features
+
+- **Keep DataView table headers visible during loading and add skeleton rows** (`29c1960`)
+  DataView tables now show loading and empty feedback in a single full-width row beneath the column headings. Set `state-layout="replace"` to restore the previous behavior of hiding the table and showing feedback in its place. Custom `#loading` and `#empty` slots still work, but their placement and wrappers have changed; review any styles that depend on the old markup. Empty feedback now distinguishes an empty data source, a search or filter with no matches, and an empty current page, with generic wording when the cause is unknown. The empty-page message and the hint to adjust search or filters are available in English, Spanish, and Brazilian Portuguese.
+
+The typed, table-only `#skeleton` slot takes precedence over standard loading feedback and keeps column headings visible in either layout. It exposes a zero-based `index` and readonly `columns` alongside the standard slot scope. Supply one `<td>` per configured data column; DataView creates the row and adds the selection cell when needed. `skeleton-rows` defaults to five and falls back to five for invalid values. Enable `preserve-skeleton-rows` to match the last accepted non-empty page length, using the configured count on first load or after an empty page. Table reloads hide existing rows, but infinite-scroll appends and retries keep accumulated rows visible without skeletons. List and grid views retain their items on reload.
+
+DataView announces skeleton loading and infinite-scroll appends to screen readers, keeps status announcements outside `aria-busy` regions, and disables select-all while table feedback is shown. After a refresh in replacement mode, it restores focus to the sort button only if the user has not moved focus elsewhere. The development guide documents the new options and slot contract. Browser and type tests cover both layouts, custom slot rendering and typing, skeleton counts and fallbacks, reloads and retries, empty-page messaging, and keyboard focus.
+
 ## [1.0.0-beta.9] - 2026-11-21
 
 ### Features
@@ -31,8 +42,6 @@ Sortable table headers use native buttons and distinct indicators for ascending,
 Custom layouts can reuse the same adapter with standalone DataViewSearch, DataViewFilter, DataViewStatus, and DataViewPagination components and opt out of the built-in header or footer with `hide-header` and `hide-footer`. The `toolbar` slot replaces the default controls, while a custom `pagination` slot suppresses the default footer status and navigation as well as the header paging controls. Hiding the header or footer also hides the slots it contains. Direct DataViewToolbar consumers must now pass `includePaging`. DataViewPager delegates to the shared navigation component and defaults to size `m`; custom CSS and tests that target the previous toolbar or pager markup may need updates. The development guide documents the new composition and paging options separately from beta.8 behavior, including how to restore Shift-click multi-sort with `dataView.multiSortKey`.
 
 ## Unreleased
-
-- Table loading, empty-source, and no-match messages now occupy one row beneath the column headings. Set `state-layout="replace"` to show the message in place of the table. The table-only `#skeleton` slot keeps headings visible in either layout. Use `skeletonRows` for the placeholder count and `preserveSkeletonRows` to match the last accepted page length.
 
 - Use Font Awesome `arrow-down-a-z` and `arrow-up-z-a` for the default ascending and descending headers, with `up-down` for an unordered sortable column.
 - Show Font Awesome numbered squares for every active column in a multi-column order. A numeric fallback preserves the priority when an icon is unavailable.
