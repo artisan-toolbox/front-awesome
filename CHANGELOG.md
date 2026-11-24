@@ -1,8 +1,10 @@
 # Changelog
 
-## Unreleased
+## [1.0.0-beta.11] - 2026-11-23
 
-- Show a compact role requirement badge with an information icon below a permission's description when the editor catalog supplies `roleRequirements`. The badge explains which roles the selected user needs to use the permission. The editor still lets the operator assign it.
+- Show a compact information badge below a permission's description when the editor catalog supplies `roleRequirements`. The badge uses the operator's locale and is included in the checkbox's accessible description.
+- List alternative roles with “or” and combine required groups with “and.” Represent hidden names as a restricted role. Operators can still assign the permission.
+- Document the released DataView controls and table feedback options in the bundled Boost skill.
 
 ## [1.0.0-beta.10] - 2026-11-24
 
