@@ -19,6 +19,8 @@ return [
     'showMore' => 'Mostrar mais',
     'allowed' => 'Permitido',
     'denied' => 'Negado',
+    'requiresRoles' => 'Requer :roles',
+    'restrictedRole' => 'um papel restrito',
     'readOnly' => 'Somente leitura. Você pode consultar estas permissões.',
     'loading' => 'Carregando permissões…',
     'reloading' => 'Consultando as permissões atuais…',

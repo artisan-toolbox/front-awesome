@@ -19,7 +19,11 @@ export interface Ability {
     name: string;
     description: string;
     icon?: string;
+    roleRequirements?: RoleRequirements;
 }
+
+type RoleLabel = string | null;
+export type RoleRequirements = readonly [RoleLabel, ...RoleLabel[]][];
 
 export interface Section {
     kind: 'permissions' | 'roles';
@@ -69,6 +73,21 @@ function iconName(value: unknown): string | undefined {
     return typeof value === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value)
         ? value
         : undefined;
+}
+
+function roleRequirements(value: unknown): RoleRequirements | undefined {
+    if (
+        Array.isArray(value) &&
+        value.length > 0 &&
+        value.every(
+            (clause): clause is [RoleLabel, ...RoleLabel[]] =>
+                Array.isArray(clause) &&
+                clause.length > 0 &&
+                clause.every((role) => role === null || text(role)),
+        )
+    ) {
+        return value;
+    }
 }
 
 export function normalizeSubject({
@@ -165,6 +184,7 @@ export function readSnapshot(input: string, subject: Subject): Snapshot | undefi
         abilities: section.abilities.map((ability) => ({
             ...ability,
             icon: iconFamily ? iconName(ability.icon) : undefined,
+            roleRequirements: roleRequirements(ability.roleRequirements),
         })),
     }));
     const groups = new Set<string>();

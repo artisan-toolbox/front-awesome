@@ -520,4 +520,6 @@ Closing the editor or selecting another subject with unsaved changes opens a dis
 
 Return a catalog and editable boolean values on GET, keyed by the subject's `user` query parameter. Accept a complete boolean map and its revision on PUT. Return `204` when saved and `409` for a stale revision. The editor loads current values before offering another save if the outcome is uncertain. It uses the application localization service with the `front-awesome::user-permission-editor` catalog and an English fallback. See the [permission editor guide](https://atb.dev.br/docs/front-awesome/user-permission-editor).
 
+With Front Awesome `1.0.0-beta.11` or later, a permission can include `roleRequirements: [["Admin", "Developer"], ["Reviewer"]]` in the GET catalog. The editor shows a “Requires (Admin or Developer) and Reviewer” badge and keeps the assignment editable. Send translated role names and use `null` for a name the operator cannot view. The provider still enforces the requirements when the user tries the action.
+
 Starting in Front Awesome beta.8, click an editable row or focus it and press Space to change its draft value. Select **Save changes** to submit the draft.

@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Show a compact role requirement badge with an information icon below a permission's description when the editor catalog supplies `roleRequirements`. The badge explains which roles the selected user needs to use the permission. The editor still lets the operator assign it.
+
 ## [1.0.0-beta.10] - 2026-11-24
 
 ### Features

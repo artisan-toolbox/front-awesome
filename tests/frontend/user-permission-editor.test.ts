@@ -118,6 +118,33 @@ test('reads optional catalog icons without treating malformed presentation as in
     expect(disabled?.values).toEqual(snapshot.values);
 });
 
+test('reads role requirements as presentation and ignores malformed clauses', () => {
+    const snapshot = response();
+    const [orders, roles] = snapshot.sections;
+    const input = {
+        ...snapshot,
+        sections: [
+            {
+                ...orders,
+                abilities: [
+                    {
+                        ...orders.abilities[0],
+                        roleRequirements: [['Administrator', 'Developer'], [null]],
+                    },
+                    { ...orders.abilities[1], roleRequirements: [['Reviewer'], []] },
+                ],
+            },
+            roles,
+        ],
+    };
+    const parsed = readSnapshot(JSON.stringify(input), { id: '001' });
+    expect(parsed?.sections[0].abilities.map(({ roleRequirements }) => roleRequirements)).toEqual([
+        [['Administrator', 'Developer'], [null]],
+        undefined,
+    ]);
+    expect(parsed?.values).toEqual(snapshot.values);
+});
+
 test.each([
     { subject: '1' },
     { canUpdate: 'true' },

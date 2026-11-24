@@ -202,7 +202,12 @@
       "edition": "core",
       "ownReferenceExamples": 10,
       "renderedInExamples": 18,
-      "actionTestReferences": []
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/user-permission-editor.browser.test.ts",
+          "title": "shows a role requirement badge and keeps its assignment editable"
+        }
+      ]
     },
     {
       "name": "Breadcrumb",

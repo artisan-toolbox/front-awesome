@@ -128,6 +128,45 @@
                                                     >
                                                         {{ ability.description }}
                                                     </span>
+                                                    <Badge
+                                                        v-if="requirements.has(ability.key)"
+                                                        class="ability-requirements"
+                                                        appearance="accent"
+                                                        variant="brand"
+                                                        pill
+                                                    >
+                                                        <span>
+                                                            <svg
+                                                                width="0.9em"
+                                                                height="0.9em"
+                                                                viewBox="0 0 16 16"
+                                                                fill="none"
+                                                                aria-hidden="true"
+                                                                focusable="false"
+                                                            >
+                                                                <circle
+                                                                    cx="8"
+                                                                    cy="8"
+                                                                    r="6.5"
+                                                                    stroke="currentColor"
+                                                                    stroke-width="1.5"
+                                                                />
+                                                                <circle
+                                                                    cx="8"
+                                                                    cy="5"
+                                                                    r="0.85"
+                                                                    fill="currentColor"
+                                                                />
+                                                                <path
+                                                                    d="M8 7.5v3.75"
+                                                                    stroke="currentColor"
+                                                                    stroke-width="1.5"
+                                                                    stroke-linecap="round"
+                                                                />
+                                                            </svg>
+                                                            {{ requirements.get(ability.key) }}
+                                                        </span>
+                                                    </Badge>
                                                     <span
                                                         v-if="errorFor(ability.key)"
                                                         class="ability-error"
@@ -183,12 +222,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, shallowRef, useId, useTemplateRef, watch } from 'vue';
+import { computed, inject, nextTick, shallowRef, useId, useTemplateRef, watch } from 'vue';
 import Accordion from '../components/WebAwesome/Accordion.vue';
 import AccordionItem from '../components/WebAwesome/AccordionItem.vue';
+import Badge from '../components/WebAwesome/Badge.vue';
 import Button from '../components/WebAwesome/Button.vue';
 import Icon from '../components/WebAwesome/Icon.vue';
 import Input from '../components/WebAwesome/Input.vue';
+import { localizationKey } from '../localization/context';
 import { useScrollbarDirective } from '../scrollbar';
 import { useEditorText } from './messages';
 import { sectionKey } from './protocol';
@@ -206,6 +247,7 @@ const props = defineProps<{
 const emit = defineEmits<{ change: [key: string, allowed: boolean] }>();
 const vScrollbar = useScrollbarDirective();
 const text = useEditorText();
+const localization = inject(localizationKey, undefined);
 const query = shallowRef('');
 const needle = computed(() => normalize(query.value.trim()));
 const selected = shallowRef('');
@@ -246,6 +288,27 @@ const index = computed(() =>
         })),
     })),
 );
+
+const requirements = computed(() => {
+    const locale = localization?.locale.value ?? 'en';
+    const all = new Intl.ListFormat(locale, { type: 'conjunction' });
+    const any = new Intl.ListFormat(locale, { type: 'disjunction' });
+    const hints = new Map<string, string>();
+    for (const section of props.sections) {
+        for (const { key, roleRequirements } of section.abilities) {
+            if (!roleRequirements) continue;
+            const clauses = roleRequirements.map((clause) => {
+                const labels = clause.map((role) => role ?? text('restrictedRole'));
+                const alternatives = any.format(labels);
+                return labels.length > 1 && roleRequirements.length > 1
+                    ? `(${alternatives})`
+                    : alternatives;
+            });
+            hints.set(key, text('requiresRoles', { roles: all.format(clauses) }));
+        }
+    }
+    return hints;
+});
 
 const visibleSections = computed(() =>
     index.value.flatMap(({ key, section, name, abilities }) => {
@@ -579,6 +642,22 @@ label.ability.is-allowed:hover {
     display: block;
     margin-block-start: var(--wa-space-3xs);
     font-size: var(--wa-font-size-s);
+}
+.ability-requirements {
+    margin-block-start: var(--wa-space-3xs);
+    max-inline-size: 100%;
+    padding: 0.16em 0.4em;
+    background-color: light-dark(var(--wa-color-blue-30), var(--wa-color-blue-70));
+    color: light-dark(var(--wa-color-blue-95), var(--wa-color-blue-10));
+    font-size: var(--wa-font-size-2xs);
+    line-height: 1.2;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+.ability-requirements svg {
+    display: inline-block;
+    margin-inline-end: 0.15em;
+    vertical-align: -0.125em;
 }
 .ability-error {
     color: var(--wa-color-danger-on-quiet);

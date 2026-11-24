@@ -19,6 +19,8 @@ export const english = {
     showMore: 'Show more',
     allowed: 'Allowed',
     denied: 'Denied',
+    requiresRoles: 'Requires :roles',
+    restrictedRole: 'a restricted role',
     readOnly: 'Read only. You can view these permissions.',
     loading: 'Loading permissions…',
     reloading: 'Checking the latest permissions…',
@@ -62,7 +64,7 @@ type Message = keyof typeof english;
 
 export function useEditorText() {
     const localization = inject(localizationKey, undefined);
-    return (key: Message, values?: number | Record<string, number>): string => {
+    return (key: Message, values?: number | Record<string, string | number>): string => {
         const name = `front-awesome::user-permission-editor.${key}`;
         const count = typeof values === 'number' ? values : undefined;
         const params = typeof values === 'number' ? { count: values } : (values ?? {});

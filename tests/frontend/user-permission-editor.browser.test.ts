@@ -125,6 +125,52 @@ const save = () => page.getByRole('button', { name: 'Save changes', exact: true 
 const open = async (button = 'Show Jordan') =>
     page.getByRole('button', { name: button, exact: true }).click();
 
+test('shows a role requirement badge and keeps its assignment editable', async () => {
+    const snapshot = permissions();
+    const [reports, roles] = snapshot.sections;
+    transport
+        .mockResolvedValueOnce(
+            reply(200, {
+                ...snapshot,
+                sections: [
+                    {
+                        ...reports,
+                        abilities: [
+                            {
+                                ...reports.abilities[0],
+                                roleRequirements: [['Administrator', 'Developer'], [null]],
+                            },
+                            ...reports.abilities.slice(1),
+                        ],
+                    },
+                    roles,
+                ],
+            }),
+        )
+        .mockResolvedValueOnce(reply(204));
+    mount();
+    await open();
+    const requirement = page.getByText(
+        'Requires (Administrator or Developer) and a restricted role',
+    );
+    await expect.element(requirement).toBeVisible();
+    const badge = requirement.element().closest('wa-badge');
+    expect(badge?.getAttribute('appearance')).toBe('accent');
+    expect(badge?.getAttribute('variant')).toBe('brand');
+    expect(badge?.querySelector('svg[aria-hidden="true"][focusable="false"]')).toBeTruthy();
+    await expect
+        .element(readPermission())
+        .toHaveAccessibleDescription(
+            /Requires \(Administrator or Developer\) and a restricted role/,
+        );
+    await toggleReadPermission();
+    await save().click();
+    expect(JSON.parse(String(transport.mock.calls[1][0].data))).toEqual({
+        revision: snapshot.revision,
+        values: { ...snapshot.values, 'reports::read': true },
+    });
+});
+
 test('preserves the reported order and sends every boolean after an offscreen edit', async () => {
     transport.mockResolvedValueOnce(reply(200, permissions()));
     mount();
