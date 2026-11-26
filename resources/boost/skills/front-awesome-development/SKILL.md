@@ -73,6 +73,8 @@ On a Front Awesome checkout with the MaskedInput preview, import `@artisan-toolb
 
 Import `useMaskTemplate` from `@artisan-toolbox/front-awesome` to use the built-in templates. Pass `:mask="useMaskTemplate().Brazilian.cpf()"` to display CPF punctuation and commit the digits as a string. The catalog also provides Brazilian CEP, both CNPJ formats, telephone variants, IP addresses, hexadecimal colors, UUIDs, and MAC addresses. Use a dedicated phone template when you know the expected type.
 
+After registering `app.use(createFrontAwesome())`, use `:mask="$maskTemplates.Brazilian.cpf()"` in a Vue template. Access the same catalog as `this.$maskTemplates` in Options API methods and computed properties.
+
 To define your own template, pass an object typed as `MaskTemplate`. Set its `mask` to a pattern, candidate array, or synchronous resolver. Add options such as `tokens`, `inputMode`, or `valueMode` when the field needs them. Set an `isComplete(raw, formatted)` predicate to check a fully matched value. The predicate affects completion. Use the component's `incomplete-message` prop to report an invalid partial or complete-shaped value during submission. Direct component props take precedence over template defaults. Validate document check digits or allocation on the server when the application requires it.
 
 In string patterns, `#` accepts an ASCII digit, `A` accepts a Unicode letter, and `*` accepts a Unicode letter or number. Use brackets for optional groups and a backslash for a literal pattern character. Define additional per-character regular expressions with `tokens`, or use a `parts` array of literals, regular expressions, and optional groups. Pass an ordered mask array or a synchronous callback for fields with multiple formats.

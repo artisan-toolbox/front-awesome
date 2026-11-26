@@ -1,8 +1,18 @@
-import { MaskedInput } from '@artisan-toolbox/front-awesome';
+import { createFrontAwesome, MaskedInput, useMaskTemplate } from '@artisan-toolbox/front-awesome';
 import MaskedInputSubpath from '@artisan-toolbox/front-awesome/components/MaskedInput.vue';
 import { createSSRApp, h } from 'vue';
 import { renderToString } from 'vue/server-renderer';
 import { expect, test } from 'vite-plus/test';
+import MaskTemplatesGlobal from './MaskTemplatesGlobal.vue';
+
+test('makes the same mask catalog available to Options API and templates', async () => {
+    const app = createSSRApp(MaskTemplatesGlobal).use(createFrontAwesome());
+
+    expect(app.config.globalProperties.$maskTemplates).toBe(useMaskTemplate());
+    const html = await renderToString(app);
+    expect(html).toMatch(/<wa-input(?=[^>]*label="CPF")(?=[^>]*value="012\.345\.678-90")[^>]*>/);
+    expect(html).toMatch(/<wa-input(?=[^>]*label="Postal code")(?=[^>]*value="01310-100")[^>]*>/);
+});
 
 test('renders one labeled Web Awesome field with the initial formatted value during SSR', async () => {
     expect(MaskedInputSubpath).toBe(MaskedInput);

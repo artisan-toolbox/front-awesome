@@ -17,6 +17,7 @@ import { toastKey, toastService } from './WebAwesome/toast';
 import type { ToastService } from './WebAwesome/toast';
 import { initializeAppearance } from './preferences/appearance';
 import type { PreferencesService } from './preferences/types';
+import { useMaskTemplate, useMaskTemplates } from './masked-input/templates';
 import {
     createScrollbarDirective,
     legacyScrollbarDirective,
@@ -64,7 +65,7 @@ export type {
 } from './WebAwesome/useFormBridge';
 export type { InputAttributes, InputProps } from './WebAwesome/inputProps';
 export { default as MaskedInput } from './masked-input/MaskedInput.vue';
-export { useMaskTemplate, useMaskTemplates } from './masked-input/templates';
+export { useMaskTemplate, useMaskTemplates };
 export type {
     Mask,
     MaskCell,
@@ -101,6 +102,7 @@ export interface FrontAwesomePrinting {
 declare module 'vue' {
     interface ComponentCustomProperties {
         $frontAwesome: FrontAwesomeServices;
+        $maskTemplates: ReturnType<typeof useMaskTemplate>;
     }
 
     interface GlobalDirectives {
@@ -147,6 +149,7 @@ export function createFrontAwesome({
                 toast: toastService,
                 dataView: dataViewOptions,
             };
+            app.config.globalProperties.$maskTemplates = useMaskTemplate();
             if (preferences) preferences.install(app);
             if (localization) localization.install(app);
             if (printing) printing.install(app);
