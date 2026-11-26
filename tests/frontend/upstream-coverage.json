@@ -729,6 +729,10 @@
           "title": "reconciles silent credentials before native Enter submission"
         },
         {
+          "file": "tests/frontend/masked-input.browser.test.ts",
+          "title": "hydrates a formatted v-model and applies late model assignments without emitting edits"
+        },
+        {
           "file": "tests/frontend/native-slot-updates.browser.test.ts",
           "title": "Input refreshes projected parent slot closures while preserving the native host and edited model"
         },

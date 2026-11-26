@@ -1,6 +1,6 @@
 ---
 name: front-awesome-development
-description: Use Front Awesome Vue and Inertia form controls, layouts, icons, Laravel-source translations, backend display and currency preferences, optional Dapter DataView, QZ printing, and theme integrations in Laravel applications.
+description: Use Front Awesome Vue and Inertia form controls, masked text fields, layouts, icons, Laravel-source translations, backend display and currency preferences, optional Dapter DataView, QZ printing, and theme integrations in Laravel applications.
 ---
 
 # Front Awesome development
@@ -66,6 +66,28 @@ Reload the page after changing each selector and confirm persistence. See the gr
 ## Web Awesome component imports
 
 The Web Awesome wrappers live under `components/WebAwesome`. The beta includes wrappers for all 73 Web Awesome Core 3.14 components. Confirm the installed revision before use. Import components such as `Checkbox`, `Select`, `Option`, `Dialog`, `Card`, `Button`, `ButtonGroup`, `Input`, `Page`, and `Icon`, and their prop types from `@artisan-toolbox/front-awesome/components/WebAwesome`, or import an individual wrapper such as `@artisan-toolbox/front-awesome/components/WebAwesome/Input.vue`. Existing `components` named imports and direct `.vue` imports remain available. `Appearance` stays in `@artisan-toolbox/front-awesome/components` because it controls the application appearance.
+
+## Masked text fields
+
+On a Front Awesome checkout with the MaskedInput preview, import `@artisan-toolbox/front-awesome/components/MaskedInput.vue`. Use `<MaskedInput v-model="postalCode" mask="#####-###" label="Brazilian postal code" hint="Enter eight digits." inputmode="numeric" />` with `const postalCode = ref('')`. Typing `01310100` shows `01310-100` and stores `01310100` in the model.
+
+Import `useMaskTemplate` from `@artisan-toolbox/front-awesome` to use the built-in templates. Pass `:mask="useMaskTemplate().Brazilian.cpf()"` to display CPF punctuation and commit the digits as a string. The catalog also provides Brazilian CEP, both CNPJ formats, telephone variants, IP addresses, hexadecimal colors, UUIDs, and MAC addresses. Use a dedicated phone template when you know the expected type.
+
+To define your own template, pass an object typed as `MaskTemplate`. Set its `mask` to a pattern, candidate array, or synchronous resolver. Add options such as `tokens`, `inputMode`, or `valueMode` when the field needs them. Set an `isComplete(raw, formatted)` predicate to check a fully matched value. The predicate affects completion. Use the component's `incomplete-message` prop to report an invalid partial or complete-shaped value during submission. Direct component props take precedence over template defaults. Validate document check digits or allocation on the server when the application requires it.
+
+In string patterns, `#` accepts an ASCII digit, `A` accepts a Unicode letter, and `*` accepts a Unicode letter or number. Use brackets for optional groups and a backslash for a literal pattern character. Define additional per-character regular expressions with `tokens`, or use a `parts` array of literals, regular expressions, and optional groups. Pass an ordered mask array or a synchronous callback for fields with multiple formats.
+
+Use a token object with `accept` and `transform` to normalize a character before matching it. For example, `{ accept: /[0-9A-Z]/, transform: (character) => character.toUpperCase() }` accepts uppercase alphanumeric values and normalizes lowercase typing. Return one code point from the transform.
+
+The default model contains the raw string. Use `value-mode="formatted"` to include formatting and fixed `prefix` and `suffix` strings. An Inertia form can bind with `:form` and `field`. A named field in a native form submits the same value mode. Use `guide="focus"` or `guide="always"` to show empty positions and `guide-char` to change the underscore. Enable `overwrite` to replace characters when moving back into the field.
+
+Assign a saved string to the same model ref during setup or after a request. For raw mode, `postalCode.value = '01310100'` displays `01310-100`. In formatted mode, pass the saved punctuation. It selects the matching pattern when multiple masks accept the same editable characters. Model assignments update the field without emitting a user edit.
+
+Initialize Inertia fields with strings that match the selected value mode. Raw mode keeps editable characters, including leading zeros, CNPJ letters, and country-code digits defined as editable positions. Fixed affixes remain part of formatted values.
+
+Use `default-value` to initialize an unbound field or set the native form reset value. A bound field displays its model at startup. Listen to `mask-change` for the raw and formatted strings and completion state after a user edit.
+
+Set `clear-incomplete-on-blur` to clear a partial entry when the user leaves the field. Use `incomplete-message` to prevent native form submission with a partial value. Give each field a label and describe its accepted format. Keep domain validation on the server. See the [MaskedInput guide](https://atb.dev.br/docs/front-awesome/web-awesome/components/forms/masked-input) for optional groups, dynamic phone formats, and CPF and alphanumeric CNPJ.
 
 ## Page layouts
 

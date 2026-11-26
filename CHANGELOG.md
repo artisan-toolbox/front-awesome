@@ -49,6 +49,10 @@ Custom layouts can reuse the same adapter with standalone DataViewSearch, DataVi
 
 ## Unreleased
 
+- Add MaskedInput for editable text patterns. Define per-character rules, optional groups, format selection, guides, overwrite behavior, and fixed affixes. Clear incomplete values on blur when enabled. Bind the raw or formatted string to Vue, Inertia, or a native form.
+- Use the bound value in MaskedInput's server-rendered markup. Keep punctuation when hydrating or assigning a formatted value that matches one of several masks.
+- Pass a reusable MaskTemplate to MaskedInput. Use `useMaskTemplate()` for Brazilian tax IDs, postal codes, telephone numbers, IP addresses, hexadecimal colors, UUIDs, and MAC addresses.
+
 - Use Font Awesome `arrow-down-a-z` and `arrow-up-z-a` for the default ascending and descending headers, with `up-down` for an unordered sortable column.
 - Show Font Awesome numbered squares for every active column in a multi-column order. A numeric fallback preserves the priority when an icon is unavailable.
 

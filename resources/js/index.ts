@@ -63,6 +63,19 @@ export type {
     TextFieldName,
 } from './WebAwesome/useFormBridge';
 export type { InputAttributes, InputProps } from './WebAwesome/inputProps';
+export { default as MaskedInput } from './masked-input/MaskedInput.vue';
+export { useMaskTemplate, useMaskTemplates } from './masked-input/templates';
+export type {
+    Mask,
+    MaskCell,
+    MaskChoices,
+    MaskContext,
+    MaskInputMode,
+    MaskOptions,
+    MaskPattern,
+    MaskTemplate,
+    MaskToken,
+} from './masked-input/mask';
 export type { IconProps } from './WebAwesome/iconProps';
 export type { TagProps } from './WebAwesome/tagProps';
 export type { TooltipProps } from './WebAwesome/tooltipProps';

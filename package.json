@@ -227,6 +227,7 @@
     "./printing": "./resources/js/printing/index.ts",
     "./printing/PrintDrawer.vue": "./resources/js/printing/PrintDrawer.vue",
     "./localization": "./resources/js/localization/index.ts",
+    "./components/MaskedInput.vue": "./resources/js/masked-input/MaskedInput.vue",
     "./components/UserPermissionEditor.vue": "./resources/js/user-permission-editor/UserPermissionEditor.vue",
     "./components/Language.vue": "./resources/js/preferences/Language.vue",
     "./components/Timezone.vue": "./resources/js/preferences/Timezone.vue",
