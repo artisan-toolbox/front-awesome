@@ -27,6 +27,8 @@ Add `frontAwesome()` from `@artisan-toolbox/front-awesome/vite` to the applicati
 
 ## Integrations
 
+VueUse composables can simplify Vue event listeners and DOM measurements. Declare `@vueuse/core` in your app if your own code imports it. Use the [VueUse documentation](https://vueuse.org/) to check the installed API.
+
 Import `createFrontAwesome` from `@artisan-toolbox/front-awesome` and register it with `app.use(createFrontAwesome())` in Inertia's `withApp` hook. It registers Mosaicast, adds the Web Awesome toast stack to `document.body`, and listens for Mosaicast events and Inertia flash. To receive private broadcasts, pass the configured Echo instance in `createFrontAwesome({ mosaicast: { echo } })`.
 
 To show a toast from Vue, import `useToast` from `@artisan-toolbox/front-awesome` and call `useToast().show(message, options)` from a component. Use `$frontAwesome.toast.show(message, options)` in templates or `this.$frontAwesome.toast.show(message, options)` in the Options API. Front Awesome registers its Vue global services under `$frontAwesome`.
@@ -278,11 +280,49 @@ Run the application's build, type in both inputs, call `form.reset()`, and set t
 
 The shared binding covers Input, Checkbox, Switch, RadioGroup, ColorPicker, KnownDate, NumberInput, OtpInput, Rating, Select, Slider, TagInput, Textarea, TimeInput, and the Pro Combobox, DateInput, DatePicker, and FileInput. Bind the owning group, not its Radio or Option children. CheckboxGroup is a grouping container; bind its individual Checkbox controls.
 
-Use boolean fields for Checkbox and Switch, finite numbers for Rating and Slider, and `File[]` for FileInput. NumberInput remains `string | null`. Single Select and Combobox fields must accept `string | null`; multiple fields must accept `string[] | null`. Bound null clears current selection while preserving reset defaults; multiple mode normalizes an empty selection to an empty array. Date controls can accept Dates but commit strings, and TagInput commits string arrays. Field types must accept both the setter input and native output. Collection values must contain supported entries at every array position. Sparse arrays are rejected; an empty array remains valid where the control accepts a collection. Never combine a primary model with `:form`, or supply a competing current `value`, `checked`, or `files` prop. Native reset defaults are separate inputs.
+Use boolean fields for Checkbox and Switch, finite numbers for Rating and Slider, and `File[]` for FileInput. NumberInput remains `string | null`. A single Select or Combobox field accepts the resolved option value or `null`. A multiple field accepts an array of resolved values or `null`. Bound null clears current selection while preserving reset defaults; multiple mode normalizes an empty selection to an empty array. Date controls can accept Dates but commit strings, and TagInput commits string arrays. Field types must accept both the setter input and native output. Collection values must contain supported entries at every array position. Sparse arrays are rejected; an empty array remains valid where the control accepts a collection. Never combine a primary model with `:form`, or supply a competing current `value`, `checked`, or `files` prop. Native reset defaults are separate inputs.
 
 All bound data-entry controls show the flat `form.errors[field]` messages and danger appearance. Errors clear when the application clears them, not automatically on input. For a Vue-only model, pass `:failed="true"` for danger appearance or a nonempty string or string array for appearance and escaped messages. `false` or an empty array clears only manual validation. Vue Boolean prop casting treats a bare `failed` and `:failed="''"` as true. Manual false cannot hide server errors. Rating and DatePicker render messages outside their interactive host because upstream has no hint slot. A stable presentation element preserves their native host and focus when validation is activated later. Its inactive mode uses `display: contents` without group semantics. Their component ref's `$el` still returns the native host. DatePicker contributes no native FormData entry. Some native focused controls do not forward host ARIA attributes to their internal input; inspect actual focused semantics in accessibility-sensitive compositions.
 
 Import `useFormBridge` from `@artisan-toolbox/front-awesome` for a custom text control. Its writable `value` routes edits to the active owner; `errors` and `invalid` expose presentation state. The generic overload accepts separate `acceptsWrite` and `acceptsRead` guards for non-text values. Their predicates infer both value domains even when the emit callback ignores its argument; omitting both guards keeps the legacy text overload. With `optional: true`, inspect the discriminated `source` or `isBound` before accessing `value`. Your custom control owns escaped error rendering, its label, ARIA relationships, and styles. See the runnable custom-control example in the Forms guide.
+
+## Choose values from data
+
+Give Select and the Pro Combobox an `options` array. By default, each entry supplies both the model value and the displayed label. For objects, pass the property names as `option-value` and `option-label`. Use `createFrontAwesome({ optionValue: 'id', optionLabel: 'name' })` to set app defaults. A local property name overrides its default. Pass `:option-value="null"` or `:option-label="null"` to use the entire entry for that part.
+
+```vue
+<template>
+    <Select v-model="city" label="City" :options="cities" option-value="id" option-label="name">
+        <template #option="{ label, option }">
+            {{ label }}
+            <span slot="end" aria-hidden="true">{{ option.region }}</span>
+        </template>
+    </Select>
+</template>
+
+<script setup>
+import { ref } from 'vue';
+import { Select } from '@artisan-toolbox/front-awesome/components/WebAwesome';
+
+const city = ref(1);
+const cities = [
+    { id: 1, name: 'São Paulo', region: 'SP' },
+    { id: 2, name: 'Salvador', region: 'BA' },
+];
+</script>
+```
+
+Open City and type `sao`. Select shows São Paulo, and choosing it keeps the numeric ID `1` in `city`. Press Down Arrow to move focus to the first enabled match and Enter to choose it. Set `strict-search` to match case and accents exactly. Combobox uses Web Awesome's native editable field for searching and commits selection changes to the Vue or Inertia model.
+
+Use `#option="{ value, label, option }"` to customize option content. `label` is display text, `value` is the resolved model value, and `option` is the original array entry. Place decorations in the `start` or `end` slot. Use `disabled: true` on an object to make it unavailable. Move manually slotted Option children to `options` when migrating.
+
+Set `grouped` and pass groups such as `[{ label: 'Northeast', options: [{ id: 1, name: 'Recife' }] }]`. With `option-value="id"` and `option-label="name"`, choosing Recife stores the number `1`. Use the exported `OptionGroup<T>` type for grouped data in TypeScript. A group label is optional. The controls insert one divider between visible groups and hide groups with no matching options. The slot customizes individual options. An option with an undefined resolved value is skipped.
+
+For a TypeScript app with a global value key, augment `FrontAwesomeOptionTypes` in the `@artisan-toolbox/front-awesome` module with the same `optionValue` literal you pass to `createFrontAwesome`. This types the model, Inertia field, and slot value when you omit the component prop.
+
+Use Vue or Inertia for rich values. Use unique resolved values within a control. Native DOM values, including values submitted through HTML `FormData`, are strings. Use unique string option values when a native form must transmit exact values.
+
+Read [the Forms guide](https://atb.dev.br/docs/front-awesome/web-awesome/components/forms#select) for live examples.
 
 ## Synchronize component state
 
@@ -326,16 +366,13 @@ After the installation and style setup above, place this in a Vue page:
         Email updates
         <template #hint>You can change this later.</template>
     </Checkbox>
-    <Select v-model="delivery" label="Delivery">
-        <Option value="weekly">Weekly</Option>
-        <Option value="monthly">Monthly</Option>
-    </Select>
+    <Select v-model="delivery" label="Delivery" :options="['weekly', 'monthly']" />
     <p>{{ subscribed ? 'Subscribed' : 'Unsubscribed' }}. Delivery {{ delivery }}.</p>
 </template>
 
 <script setup>
 import { ref } from 'vue';
-import { Checkbox, Select, Option } from '@artisan-toolbox/front-awesome/components/WebAwesome';
+import { Checkbox, Select } from '@artisan-toolbox/front-awesome/components/WebAwesome';
 
 const subscribed = ref(false);
 const delivery = ref('weekly');
@@ -344,7 +381,7 @@ const delivery = ref('weekly');
 
 The page shows an unchecked checkbox and a weekly delivery choice. Changing either control updates the paragraph. Native `input` and `change` handlers receive the original event. Check its target type before reading values in TypeScript. Existing `Input` retains its required `v-model` or Inertia form contract. Other wrappers expose native values and events without requiring an Inertia form.
 
-New wrappers accept Vue named slots as well as native `slot` attributes on default-slot children. Named text content receives a span so the browser can assign its slot. For structured content such as options, tabs and tree items, keep the native parent-child arrangement. Use a single native element or single-root component for named slot content.
+New wrappers accept Vue named slots as well as native `slot` attributes on default-slot children. Named text content receives a span so the browser can assign its slot. For tabs and tree items, keep the native parent-child arrangement. Use a single native element or single-root component for named slot content.
 
 Use `checked`, `selected` and `value` for current state. When upstream separates these from `defaultChecked`, `defaultSelected` or `defaultValue`, initial scalar inputs establish native reset attributes unless an explicit default overrides them. Complex values such as arrays, Dates, and FormData stay on current properties and retain native property-reset behavior. Supply a supported native default explicitly when the reset must restore a complex current value. Do not pass arrays to a textual `defaultValue`. Subsequent current-state changes do not redefine reset defaults. Pass the native `form` attribute as a form ID string. Rich values, element references and callbacks reach native properties after browser registration. Methods remain on the component ref's `$el`; wait for `customElements.whenDefined()` before invoking them.
 

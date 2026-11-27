@@ -4,7 +4,6 @@ import { page, userEvent } from 'vite-plus/test/browser';
 import { createApp, h, nextTick, shallowReactive } from 'vue';
 import type { Component } from 'vue';
 import * as Pro from '@artisan-toolbox/front-awesome/components/WebAwesome/Pro';
-import { Option } from '@artisan-toolbox/front-awesome/components/WebAwesome';
 import videoUrl from './fixtures/color-test.mp4?url';
 import '../frontend/app.css';
 import '@artisan-toolbox/front-awesome/web-awesome.css';
@@ -85,20 +84,23 @@ async function nativeFixture<T extends keyof HTMLElementTagNameMap>(tag: T, prop
     return { host, root };
 }
 
-const options = () => [
-    h(Option, { value: 'apple' }, () => 'Apple'),
-    h(Option, { value: 'apricot', disabled: true }, () => 'Apricot'),
-    h(Option, { value: 'banana' }, () => 'Banana'),
+const options = [
+    { value: 'apple', label: 'Apple' },
+    { value: 'apricot', label: 'Apricot', disabled: true },
+    { value: 'banana', label: 'Banana' },
 ];
 
 test('Pro Combobox filters text, skips disabled options, selects with the keyboard and clears FormData', async () => {
     const change = vi.fn();
-    const { host, root, props } = await fixture(
-        'wa-combobox',
-        Pro.Combobox,
-        { label: 'Fruit', name: 'fruit', withClear: true, onchange: change },
+    const { host, root, props } = await fixture('wa-combobox', Pro.Combobox, {
+        label: 'Fruit',
+        name: 'fruit',
+        withClear: true,
+        onchange: change,
         options,
-    );
+        optionValue: 'value',
+        optionLabel: 'label',
+    });
     const input = shadow<HTMLInputElement>(host, 'input[role="combobox"]');
     await userEvent.fill(input, 'ap');
     await vi.waitFor(() =>
@@ -120,12 +122,14 @@ test('Pro Combobox filters text, skips disabled options, selects with the keyboa
 });
 
 test('Pro Combobox submits multiple choices and removes a selected tag', async () => {
-    const { host, root } = await fixture(
-        'wa-combobox',
-        Pro.Combobox,
-        { label: 'Fruit', name: 'fruit', multiple: true },
+    const { host, root } = await fixture('wa-combobox', Pro.Combobox, {
+        label: 'Fruit',
+        name: 'fruit',
+        multiple: true,
         options,
-    );
+        optionValue: 'value',
+        optionLabel: 'label',
+    });
     const input = shadow<HTMLInputElement>(host, 'input[role="combobox"]');
     await userEvent.fill(input, 'app');
     await vi.waitFor(() =>

@@ -103,7 +103,7 @@ const primaryCases = [
         event: 'input',
         initial: ['one'],
         next: ['two'],
-        attrs: { multiple: true },
+        attrs: { multiple: true, options: ['one', 'two'] },
     },
     {
         name: 'TagInput',
@@ -664,24 +664,20 @@ test('Rating retains its host, native value and focus when validation activates 
 
 for (const item of [
     { name: 'TagInput', tag: 'wa-tag-input', attrs: {} },
-    { name: 'Select', tag: 'wa-select', attrs: { multiple: true } },
+    { name: 'Select', tag: 'wa-select', attrs: { multiple: true, options: ['one', 'two'] } },
 ] satisfies { name: keyof typeof controls; tag: string; attrs: object }[]) {
     test(`${item.name} applies in-place reactive model array edits without requiring replacement`, async () => {
         const state = reactive({ values: ['one'], count: 0 });
         const container = mount({
             render: () =>
-                h(
-                    component(item.name),
-                    {
-                        ...item.attrs,
-                        modelValue: state.values,
-                        'onUpdate:modelValue': (value: string[] | string | null) => {
-                            if (Array.isArray(value)) state.values = value;
-                        },
-                        'data-count': state.count,
+                h(component(item.name), {
+                    ...item.attrs,
+                    modelValue: state.values,
+                    'onUpdate:modelValue': (value: string[] | string | null) => {
+                        if (Array.isArray(value)) state.values = value;
                     },
-                    () => ['one', 'two'].map((value) => h(controls.Option, { value }, () => value)),
-                ),
+                    'data-count': state.count,
+                }),
         });
         const element = host(container, item.tag);
         await ready(element);

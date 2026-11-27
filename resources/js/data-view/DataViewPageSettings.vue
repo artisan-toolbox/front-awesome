@@ -24,12 +24,11 @@
             :size="size"
             :model-value="sizeDraft"
             :disabled="busy"
+            :options="paging.per_page.options.map(String)"
+            :option-value="null"
+            :option-label="null"
             @update:model-value="setPerPage"
-        >
-            <Option v-for="count in paging.per_page.options" :key="count" :value="String(count)">{{
-                count
-            }}</Option>
-        </Select>
+        />
         <div class="pager-actions">
             <Button
                 v-if="!adapter.infinite && paging.has_previous"
@@ -84,7 +83,6 @@ import { shallowRef, watch } from 'vue';
 import Button from '../components/WebAwesome/Button.vue';
 import Input from '../components/WebAwesome/Input.vue';
 import Select from '../components/WebAwesome/Select.vue';
-import Option from '../components/WebAwesome/Option.vue';
 import Icon from '../components/WebAwesome/Icon.vue';
 import { usePageNavigation } from './pageNavigation';
 import { useDataViewText } from './messages';

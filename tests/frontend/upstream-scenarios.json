@@ -818,7 +818,9 @@
       },
       "externalResources": [],
       "scriptExecution": "scoped",
-      "limitations": [],
+      "limitations": [
+        "Kept native wa-select because the example adds or replaces option elements."
+      ],
       "inputAdaptation": "Input binds the upstream initial value through v-model to preserve its established controlled API."
     },
     {
@@ -11216,7 +11218,9 @@
       },
       "externalResources": [],
       "scriptExecution": "none",
-      "limitations": [],
+      "limitations": [
+        "Kept native wa-select because the example sets attributes or nests markup on native option elements."
+      ],
       "inputAdaptation": null
     },
     {
@@ -11239,7 +11243,9 @@
       },
       "externalResources": [],
       "scriptExecution": "none",
-      "limitations": [],
+      "limitations": [
+        "Kept native wa-select because the example sets attributes or nests markup on native option elements."
+      ],
       "inputAdaptation": null
     },
     {
@@ -11377,7 +11383,9 @@
       },
       "externalResources": [],
       "scriptExecution": "none",
-      "limitations": [],
+      "limitations": [
+        "Kept native wa-select because the example sets attributes or nests markup on native option elements."
+      ],
       "inputAdaptation": null
     },
     {
@@ -11400,7 +11408,9 @@
       },
       "externalResources": [],
       "scriptExecution": "none",
-      "limitations": [],
+      "limitations": [
+        "Kept native wa-select because the example groups native options in the default slot."
+      ],
       "inputAdaptation": null
     },
     {
@@ -11471,7 +11481,9 @@
       },
       "externalResources": [],
       "scriptExecution": "scoped",
-      "limitations": [],
+      "limitations": [
+        "Kept native wa-select because the example sets attributes or nests markup on native option elements."
+      ],
       "inputAdaptation": null
     },
     {
@@ -11496,7 +11508,9 @@
       },
       "externalResources": [],
       "scriptExecution": "scoped",
-      "limitations": [],
+      "limitations": [
+        "Kept native wa-select because the example adds or replaces option elements."
+      ],
       "inputAdaptation": null
     },
     {
@@ -12356,7 +12370,9 @@
       },
       "externalResources": [],
       "scriptExecution": "scoped",
-      "limitations": [],
+      "limitations": [
+        "Kept native wa-select because the example sets attributes or nests markup on native option elements."
+      ],
       "inputAdaptation": null
     },
     {

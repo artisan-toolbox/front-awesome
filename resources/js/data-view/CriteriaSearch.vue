@@ -27,16 +27,17 @@
             <Select
                 :label="t('operator')"
                 :size="size"
-                :model-value="operator ?? ''"
+                :model-value="operator ?? null"
+                :options="
+                    fieldCapability?.available.matchTypes.map((match) => ({
+                        value: match,
+                        label: t(match),
+                    }))
+                "
+                option-value="value"
+                option-label="label"
                 @update:model-value="chooseOperator"
-            >
-                <Option
-                    v-for="match in fieldCapability?.available.matchTypes"
-                    :key="match"
-                    :value="match"
-                    >{{ t(match) }}</Option
-                >
-            </Select>
+            />
             <div class="criteria-actions">
                 <Button type="button" :size="size" @click="submit()"
                     ><Icon slot="start" name="check" library="system" aria-hidden="true" />{{
@@ -59,7 +60,6 @@ import Icon from '../components/WebAwesome/Icon.vue';
 import Input from '../components/WebAwesome/Input.vue';
 import Button from '../components/WebAwesome/Button.vue';
 import Select from '../components/WebAwesome/Select.vue';
-import Option from '../components/WebAwesome/Option.vue';
 import type { DataViewHandle, DataViewSize } from './types';
 import { useControlFeedback } from './controlFeedback';
 import { useDataViewText } from './messages';

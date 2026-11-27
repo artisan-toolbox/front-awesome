@@ -414,11 +414,15 @@
                 <Divider data-upstream-index="5"></Divider>
 
                 <div class="wa-cluster wa-gap-xl" style="align-items: start">
-                    <Select data-upstream-index="6" label="Canvas" name="canvas" value="fixed">
-                        <Option data-upstream-index="7" value="fixed">fixed</Option>
-                        <Option data-upstream-index="8" value="auto">auto</Option>
-                        <Option data-upstream-index="9" value="square">square</Option>
-                        <Option data-upstream-index="10" value="roomy">roomy</Option>
+                    <Select
+                        data-upstream-index="6"
+                        label="Canvas"
+                        name="canvas"
+                        value="fixed"
+                        :options="optionsAt(0)"
+                        option-value="value"
+                        option-label="label"
+                    >
                     </Select>
                     <Slider
                         data-upstream-index="11"
@@ -1012,9 +1016,19 @@ import {
     ColorPicker,
     Divider,
     Icon,
-    Option,
     Select,
     Slider,
 } from '@artisan-toolbox/front-awesome/components/WebAwesome';
 defineProps<{ scenario: string }>();
+const optionSets = [
+    [
+        { value: 'fixed', label: 'fixed' },
+        { value: 'auto', label: 'auto' },
+        { value: 'square', label: 'square' },
+        { value: 'roomy', label: 'roomy' },
+    ],
+];
+function optionsAt(index: number) {
+    return optionSets[index];
+}
 </script>

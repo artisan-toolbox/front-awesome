@@ -31,8 +31,16 @@
                 <Divider data-upstream-index="1"></Divider>
 
                 <div class="controls">
-                    <Select data-upstream-index="2" label="Animation" value="bounce"></Select>
-                    <Select data-upstream-index="3" label="Easing" value="linear"></Select>
+                    <wa-select
+                        data-upstream-index="2"
+                        label="Animation"
+                        :value.attr="'bounce'"
+                    ></wa-select>
+                    <wa-select
+                        data-upstream-index="3"
+                        label="Easing"
+                        :value.attr="'linear'"
+                    ></wa-select>
                     <Input
                         data-upstream-index="4"
                         label="Playback Rate"
@@ -87,8 +95,8 @@ import {
     Button,
     Divider,
     Input,
-    Select,
 } from '@artisan-toolbox/front-awesome/components/WebAwesome';
+import '#front-awesome-webawesome/components/select/select.js';
 defineProps<{ scenario: string }>();
 const input0 = ref('1');
 </script>

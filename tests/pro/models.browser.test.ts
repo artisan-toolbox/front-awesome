@@ -38,8 +38,8 @@ for (const item of [
         property: 'value',
         initial: ['one'],
         next: ['two'],
-        attrs: { multiple: true },
-        event: 'input',
+        attrs: { multiple: true, options: ['one', 'two'] },
+        event: 'change',
     },
     {
         name: 'DateInput',

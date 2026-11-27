@@ -116,7 +116,7 @@
       }
     ]
   },
-  "interactionScope": "Every upstream example renders and its supported setup executes. Dedicated browser tests exercise component families. The examples are not all replayed interaction by interaction.",
+  "interactionScope": "Every upstream example renders and its supported setup executes. Select and Combobox fixtures use data-driven wrapper options where the markup can be mapped directly. Examples that require native option markup keep the native control and record the reason in the inventory. Dedicated browser tests exercise component families.",
   "externalAssets": "External source URLs remain in the original examples. Parity checks do not assert that every external CDN, remote image, remote document, or media file loads successfully. Dedicated interactions use local content where possible.",
   "references": "Action test references identify defined behavioral assertions. Run the browser suites to verify their results.",
   "components": [
@@ -517,7 +517,16 @@
       "edition": "core",
       "ownReferenceExamples": 12,
       "renderedInExamples": 78,
-      "actionTestReferences": []
+      "actionTestReferences": [
+        {
+          "file": "tests/frontend/option-selection.browser.test.ts",
+          "title": "filters Select groups without changing the model or leaving extra dividers"
+        },
+        {
+          "file": "tests/pro/option-selection.browser.test.ts",
+          "title": "uses the native Combobox filter to retain matching groups and preserves the Inertia value"
+        }
+      ]
     },
     {
       "name": "Drawer",
@@ -737,6 +746,10 @@
           "title": "Input refreshes projected parent slot closures while preserving the native host and edited model"
         },
         {
+          "file": "tests/frontend/option-selection.browser.test.ts",
+          "title": "filters labels, navigates enabled results and commits a numeric Inertia value"
+        },
+        {
           "file": "tests/frontend/reset.browser.test.ts",
           "title": "preserves changed and disabled form controls, keyboard sliders and steps under Preflight"
         }
@@ -818,24 +831,12 @@
       "renderedInExamples": 59,
       "actionTestReferences": [
         {
-          "file": "tests/frontend/adapter.browser.test.ts",
-          "title": "passes arrays and callbacks as native properties and leaves options as direct children"
-        },
-        {
-          "file": "tests/frontend/adapter.browser.test.ts",
-          "title": "forwards original cancelable events exactly once and projects named slots without wrapping default children"
-        },
-        {
-          "file": "tests/frontend/adapter.browser.test.ts",
-          "title": "preserves scalar reset attributes and explicitly supplied collection defaults"
+          "file": "tests/frontend/option-selection.browser.test.ts",
+          "title": "filters Select groups without changing the model or leaving extra dividers"
         },
         {
           "file": "tests/frontend/reset.browser.test.ts",
           "title": "preserves interactive open states, content geometry and focus with corrected Preflight"
-        },
-        {
-          "file": "tests/frontend/upstream-interactions.browser.test.ts",
-          "title": "selects multiple options with a custom tag callback and preserves radio selection"
         },
         {
           "file": "tests/pro/interactions.browser.test.ts",
@@ -1123,7 +1124,7 @@
         },
         {
           "file": "tests/frontend/adapter.browser.test.ts",
-          "title": "forwards original cancelable events exactly once and projects named slots without wrapping default children"
+          "title": "forwards original cancelable events exactly once and projects named slots alongside options"
         },
         {
           "file": "tests/frontend/adapter.browser.test.ts",
@@ -1136,6 +1137,10 @@
         {
           "file": "tests/frontend/models.browser.test.ts",
           "title": "Rating retains its host, native value and focus when validation activates and the source changes"
+        },
+        {
+          "file": "tests/frontend/option-selection.browser.test.ts",
+          "title": "applies initial and external arrays with the bare multiple syntax"
         },
         {
           "file": "tests/frontend/reset.browser.test.ts",

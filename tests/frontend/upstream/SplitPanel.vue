@@ -49,11 +49,11 @@
 
                 <Divider data-upstream-index="1"></Divider>
 
-                <Select data-upstream-index="2" label="Primary Panel" style="max-width: 200px">
+                <wa-select data-upstream-index="2" label="Primary Panel" style="max-width: 200px">
                     <Option data-upstream-index="3" value="" selected>None</Option>
                     <Option data-upstream-index="4" value="start">Start</Option>
                     <Option data-upstream-index="5" value="end">End</Option>
-                </Select>
+                </wa-select>
             </div>
         </template>
         <template v-if="scenario === 'split-panel-8'">
@@ -111,8 +111,8 @@ import {
     Divider,
     Icon,
     Option,
-    Select,
     SplitPanel,
 } from '@artisan-toolbox/front-awesome/components/WebAwesome';
+import '#front-awesome-webawesome/components/select/select.js';
 defineProps<{ scenario: string }>();
 </script>

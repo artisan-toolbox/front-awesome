@@ -56,7 +56,12 @@ export function useWebAwesome(
     definitions: readonly ComponentDefinition[],
     tag: string,
     load: () => Promise<unknown>,
-    options: { props?: object; models?: readonly WebAwesomeModelPort[] } = {},
+    options: {
+        props?: object;
+        models?: readonly WebAwesomeModelPort[];
+        handledProps?: readonly string[];
+        handledSlots?: readonly string[];
+    } = {},
 ) {
     const matching = definitions.find((candidate) => candidate.tag === tag);
     if (!matching) throw new Error(`Unknown Web Awesome element "${tag}".`);
@@ -181,6 +186,7 @@ export function useWebAwesome(
         const allInputs: Record<string, unknown> = { ...attrs };
         for (const key of Object.keys(instance?.vnode.props ?? {})) {
             const property = key.replace(/-([a-z])/g, (_, letter: string) => letter.toUpperCase());
+            if (options.handledProps?.includes(property)) continue;
             if (options.props && Object.hasOwn(options.props, property))
                 allInputs[key] = Reflect.get(options.props, property);
         }
@@ -471,6 +477,7 @@ export function useWebAwesome(
 
     const slotNodes = () =>
         Object.entries(slots)
+            .filter(([name]) => !options.handledSlots?.includes(name))
             .flatMap(([name, slot]) =>
                 projectNativeSlot(
                     slot?.() ?? [],

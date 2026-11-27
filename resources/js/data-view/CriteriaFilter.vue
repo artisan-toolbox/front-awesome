@@ -6,12 +6,11 @@
             :multiple="capability.available.multiple"
             :model-value="draft"
             :failed="message || undefined"
+            :options="selectOptions"
+            option-value="value"
+            option-label="label"
             @update:model-value="edit"
-        >
-            <Option v-for="[token, value] in options" :key="token" :value="token">{{
-                resolveControlLabel({ kind: 'option', field, filter, value }, controlLabel)
-            }}</Option>
-        </Select>
+        />
         <div class="criteria-actions">
             <Button type="button" :size="size" @click="apply"
                 ><Icon slot="start" name="check" library="system" aria-hidden="true" />{{
@@ -32,7 +31,6 @@ import type { Scalar } from '@artisan-toolbox/dapter';
 import Icon from '../components/WebAwesome/Icon.vue';
 import Button from '../components/WebAwesome/Button.vue';
 import Select from '../components/WebAwesome/Select.vue';
-import Option from '../components/WebAwesome/Option.vue';
 import type { DataViewHandle, DataViewSize } from './types';
 import {
     useControlFeedback,
@@ -73,6 +71,15 @@ function token(value: Scalar) {
 const options = computed(
     () =>
         new Map(capability.value?.available.values.map((value) => [token(value), value] as const)),
+);
+const selectOptions = computed(() =>
+    Array.from(options.value, ([key, value]) => ({
+        value: key,
+        label: resolveControlLabel(
+            { kind: 'option', field: props.field, filter: props.filter, value },
+            props.controlLabel,
+        ),
+    })),
 );
 const signature = () =>
     JSON.stringify([

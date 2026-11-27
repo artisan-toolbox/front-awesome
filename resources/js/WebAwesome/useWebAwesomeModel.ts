@@ -42,6 +42,11 @@ interface ModelOptions<W, R> {
         | { kind: 'method'; method: string }
         | { kind: 'boolean-method'; on: string; off: string }
         | { kind: 'nullable-selection' };
+    codec?: {
+        write: (value: W) => string | string[];
+        read: (value: unknown) => unknown;
+        afterWrite?: (element: HTMLElement, value: string | string[]) => void;
+    };
     reader?: { kind: 'detail' | 'local-date-detail'; key: string };
 }
 
@@ -87,12 +92,14 @@ export function useWebAwesomeModel<W, R>(
                     value = `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, '0')}-${String(value.getDate()).padStart(2, '0')}`;
                 }
             }
+            const nativeValue = value;
+            if (options.codec) value = options.codec.read(value);
             if (!options.acceptsRead(value))
                 throw new Error(
                     `Front Awesome ${options.componentName} received an unsupported native "${options.property}" value.`,
                 );
             captured.commit(value);
-            return { value };
+            return { value: options.codec ? nativeValue : value };
         };
     }
     return {
@@ -110,9 +117,11 @@ export function useWebAwesomeModel<W, R>(
             if (source.kind === 'native') return undefined;
             const value = source.current();
             const snapshot = modelSnapshot(value);
+            const encoded = options.codec?.write(value);
+            const nativeValue = encoded ?? value;
             return {
-                value,
-                snapshot,
+                value: nativeValue,
+                snapshot: options.codec ? modelSnapshot(nativeValue) : snapshot,
                 sameOwner: () => sameOwner(source),
                 unchanged: () =>
                     sameOwner(source) &&
@@ -120,7 +129,8 @@ export function useWebAwesomeModel<W, R>(
                     sameModelSnapshot(modelSnapshot(bridge.value.value), snapshot),
                 apply(element) {
                     if (!options.writer) {
-                        Reflect.set(element, options.property, value);
+                        Reflect.set(element, options.property, nativeValue);
+                        if (encoded !== undefined) options.codec?.afterWrite?.(element, encoded);
                         return;
                     }
                     if (options.writer.kind === 'nullable-selection') {

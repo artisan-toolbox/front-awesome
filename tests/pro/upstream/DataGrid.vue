@@ -67,13 +67,17 @@
         </template>
         <template v-if="scenario === 'data-grid-7'">
             <div id="grid-size-demo">
-                <Select data-upstream-index="0" value="s" style="max-width: 12rem">
-                    <span slot="label" class="wa-visually-hidden">Size</span>
-                    <Option data-upstream-index="1" value="xs">Extra Small</Option>
-                    <Option data-upstream-index="2" value="s">Small</Option>
-                    <Option data-upstream-index="3" value="m">Medium</Option>
-                    <Option data-upstream-index="4" value="l">Large</Option>
-                    <Option data-upstream-index="5" value="xl">Extra Large</Option>
+                <Select
+                    data-upstream-index="0"
+                    value="s"
+                    style="max-width: 12rem"
+                    :options="optionsAt(0)"
+                    option-value="value"
+                    option-label="label"
+                >
+                    <template #label
+                        ><span slot="label" class="wa-visually-hidden">Size</span></template
+                    >
                 </Select>
                 <Divider data-upstream-index="6"></Divider>
                 <DataGrid
@@ -89,10 +93,17 @@
         </template>
         <template v-if="scenario === 'data-grid-8'">
             <div id="grid-appearance-demo">
-                <Select data-upstream-index="0" value="outlined" style="max-width: 12rem">
-                    <span slot="label" class="wa-visually-hidden">Appearance</span>
-                    <Option data-upstream-index="1" value="outlined">Outlined</Option>
-                    <Option data-upstream-index="2" value="plain">Plain</Option>
+                <Select
+                    data-upstream-index="0"
+                    value="outlined"
+                    style="max-width: 12rem"
+                    :options="optionsAt(1)"
+                    option-value="value"
+                    option-label="label"
+                >
+                    <template #label
+                        ><span slot="label" class="wa-visually-hidden">Appearance</span></template
+                    >
                 </Select>
                 <Divider data-upstream-index="3"></Divider>
                 <DataGrid
@@ -486,10 +497,25 @@ import {
     Callout,
     Divider,
     Icon,
-    Option,
     Select,
     Spinner,
 } from '@artisan-toolbox/front-awesome/components/WebAwesome';
 import { DataGrid } from '@artisan-toolbox/front-awesome/components/WebAwesome/Pro';
 defineProps<{ scenario: string }>();
+const optionSets = [
+    [
+        { value: 'xs', label: 'Extra Small' },
+        { value: 's', label: 'Small' },
+        { value: 'm', label: 'Medium' },
+        { value: 'l', label: 'Large' },
+        { value: 'xl', label: 'Extra Large' },
+    ],
+    [
+        { value: 'outlined', label: 'Outlined' },
+        { value: 'plain', label: 'Plain' },
+    ],
+];
+function optionsAt(index: number) {
+    return optionSets[index];
+}
 </script>

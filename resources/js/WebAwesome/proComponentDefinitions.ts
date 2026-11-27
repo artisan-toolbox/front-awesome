@@ -238,7 +238,7 @@ export const comboboxDefinition = {
             property: 'value',
             write: 'selection',
             read: 'selection',
-            events: ['input'],
+            events: ['change'],
             form: true,
             writer: { kind: 'nullable-selection' },
         },

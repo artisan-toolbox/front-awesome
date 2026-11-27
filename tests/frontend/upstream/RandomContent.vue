@@ -74,11 +74,10 @@
                         label="Items"
                         value="2"
                         style="width: 8rem"
+                        :options="optionsAt(0)"
+                        option-value="value"
+                        option-label="label"
                     >
-                        <Option data-upstream-index="8" value="1">1</Option>
-                        <Option data-upstream-index="9" value="2">2</Option>
-                        <Option data-upstream-index="10" value="3">3</Option>
-                        <Option data-upstream-index="11" value="4">4</Option>
                     </Select>
                     <Button
                         data-upstream-index="12"
@@ -107,10 +106,10 @@
                         label="Mode"
                         value="unique"
                         style="width: 10rem"
+                        :options="optionsAt(1)"
+                        option-value="value"
+                        option-label="label"
                     >
-                        <Option data-upstream-index="7" value="unique">unique</Option>
-                        <Option data-upstream-index="8" value="random">random</Option>
-                        <Option data-upstream-index="9" value="sequence">sequence</Option>
                     </Select>
                     <Button
                         data-upstream-index="10"
@@ -142,13 +141,10 @@
                         label="Animation"
                         value="fade-up"
                         style="width: 10rem"
+                        :options="optionsAt(2)"
+                        option-value="value"
+                        option-label="label"
                     >
-                        <Option data-upstream-index="3" value="none">none</Option>
-                        <Option data-upstream-index="4" value="fade">fade</Option>
-                        <Option data-upstream-index="5" value="fade-up">fade-up</Option>
-                        <Option data-upstream-index="6" value="fade-down">fade-down</Option>
-                        <Option data-upstream-index="7" value="fade-left">fade-left</Option>
-                        <Option data-upstream-index="8" value="fade-right">fade-right</Option>
                     </Select>
                     <Button
                         data-upstream-index="9"
@@ -261,10 +257,33 @@ import {
     Card,
     Divider,
     Icon,
-    Option,
     RandomContent,
     Select,
     Tag,
 } from '@artisan-toolbox/front-awesome/components/WebAwesome';
 defineProps<{ scenario: string }>();
+const optionSets = [
+    [
+        { value: '1', label: '1' },
+        { value: '2', label: '2' },
+        { value: '3', label: '3' },
+        { value: '4', label: '4' },
+    ],
+    [
+        { value: 'unique', label: 'unique' },
+        { value: 'random', label: 'random' },
+        { value: 'sequence', label: 'sequence' },
+    ],
+    [
+        { value: 'none', label: 'none' },
+        { value: 'fade', label: 'fade' },
+        { value: 'fade-up', label: 'fade-up' },
+        { value: 'fade-down', label: 'fade-down' },
+        { value: 'fade-left', label: 'fade-left' },
+        { value: 'fade-right', label: 'fade-right' },
+    ],
+];
+function optionsAt(index: number) {
+    return optionSets[index];
+}
 </script>

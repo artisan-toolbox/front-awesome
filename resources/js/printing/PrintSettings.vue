@@ -9,12 +9,11 @@
             :label="messages.printer"
             :placeholder="messages.choosePrinter"
             :disabled="disabled || connection !== 'ready'"
+            :options="printers"
+            :option-value="null"
+            :option-label="null"
             @update:model-value="(printer) => $emit('configure', { printer: printer ?? '' })"
-        >
-            <Option v-for="printer in printers" :key="printer" :value="printer">{{
-                printer
-            }}</Option>
-        </Select>
+        />
         <NumberInput
             :model-value="String(step.document?.options?.copies ?? 1)"
             :label="messages.copies"
@@ -39,31 +38,29 @@
                     :model-value="step.document?.options?.orientation ?? 'automatic'"
                     :label="messages.orientation"
                     :disabled="disabled"
+                    :options="orientations"
+                    option-value="value"
+                    option-label="label"
                     @update:model-value="orientation"
-                >
-                    <Option value="automatic">{{ messages.automatic }}</Option
-                    ><Option value="portrait">{{ messages.portrait }}</Option
-                    ><Option value="landscape">{{ messages.landscape }}</Option>
-                </Select>
+                />
                 <Select
                     :model-value="step.document?.options?.colorType ?? 'color'"
                     :label="messages.color"
                     :disabled="disabled"
+                    :options="colors"
+                    option-value="value"
+                    option-label="label"
                     @update:model-value="color"
-                >
-                    <Option value="color">{{ messages.fullColor }}</Option
-                    ><Option value="blackwhite">{{ messages.monochrome }}</Option>
-                </Select>
+                />
                 <Select
                     :model-value="duplexValue"
                     :label="messages.duplex"
                     :disabled="disabled"
+                    :options="duplexModes"
+                    option-value="value"
+                    option-label="label"
                     @update:model-value="duplex"
-                >
-                    <Option value="false">{{ messages.singleSided }}</Option
-                    ><Option value="long-edge">{{ messages.longEdge }}</Option
-                    ><Option value="short-edge">{{ messages.shortEdge }}</Option>
-                </Select>
+                />
             </div>
         </Details>
         <slot />
@@ -73,7 +70,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import Select from '../components/WebAwesome/Select.vue';
-import Option from '../components/WebAwesome/Option.vue';
 import NumberInput from '../components/WebAwesome/NumberInput.vue';
 import Details from '../components/WebAwesome/Details.vue';
 import Callout from '../components/WebAwesome/Callout.vue';
@@ -87,6 +83,20 @@ const props = defineProps<{
     messages: PrintingMessages;
 }>();
 const emit = defineEmits<{ configure: [preference: PrintPreference] }>();
+const orientations = computed(() => [
+    { value: 'automatic', label: props.messages.automatic },
+    { value: 'portrait', label: props.messages.portrait },
+    { value: 'landscape', label: props.messages.landscape },
+]);
+const colors = computed(() => [
+    { value: 'color', label: props.messages.fullColor },
+    { value: 'blackwhite', label: props.messages.monochrome },
+]);
+const duplexModes = computed(() => [
+    { value: 'false', label: props.messages.singleSided },
+    { value: 'long-edge', label: props.messages.longEdge },
+    { value: 'short-edge', label: props.messages.shortEdge },
+]);
 const invalidCopies = computed(() => {
     const copies = props.step.document?.options?.copies ?? 1;
     return !Number.isInteger(copies) || copies < 1 || copies > 999;

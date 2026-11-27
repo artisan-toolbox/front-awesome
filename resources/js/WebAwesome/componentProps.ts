@@ -66,6 +66,7 @@ import type WaTooltip from '@awesome.me/webawesome/dist/components/tooltip/toolt
 import type WaTree from '@awesome.me/webawesome/dist/components/tree/tree.js';
 import type WaTreeItem from '@awesome.me/webawesome/dist/components/tree-item/tree-item.js';
 import type WaZoomableFrame from '@awesome.me/webawesome/dist/components/zoomable-frame/zoomable-frame.js';
+import type { OptionModel, OptionSelectionProps, OptionValue } from './optionSelection';
 import type { ControlBindingProps } from './useFormBridge';
 import type * as Upstream from '@awesome.me/webawesome/dist/custom-elements-jsx.d.ts';
 import type { HTMLAttributes } from 'vue';
@@ -1798,19 +1799,21 @@ export interface SelectNativeProps extends Omit<
     onWaInvalid?: Upstream.WaSelectProps['onwa-invalid'];
 }
 
-export type SelectProps<T extends object = object, M extends boolean = boolean> = Omit<
-    SelectNativeProps,
-    'form' | 'multiple'
-> &
+export type SelectProps<
+    T extends object = object,
+    M extends boolean = boolean,
+    O = string,
+    K extends string | null | undefined = undefined,
+    G extends boolean = false,
+> = Omit<SelectNativeProps, 'form' | 'multiple'> &
     ControlBindingProps<
         T,
-        string | string[] | null,
-        Extract<WaSelect['value'], M extends true ? string[] | null : string | null>,
+        OptionModel<OptionValue<O, K>, M>,
+        OptionModel<OptionValue<O, K>, M>,
         'value'
-    > & { multiple?: M } & {
-        'onUpdate:modelValue'?: (
-            value: Extract<WaSelect['value'], M extends true ? string[] | null : string | null>,
-        ) => void;
+    > &
+    OptionSelectionProps<O, K, G> & { multiple?: M; strictSearch?: boolean } & {
+        'onUpdate:modelValue'?: (value: OptionModel<OptionValue<O, K>, M>) => void;
         'onUpdate:open'?: (value: WaSelect['open']) => void;
     };
 

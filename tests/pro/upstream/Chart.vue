@@ -144,10 +144,10 @@
                     label="Palette"
                     value="default"
                     style="min-inline-size: 14ch"
+                    :options="optionsAt(0)"
+                    option-value="value"
+                    option-label="label"
                 >
-                    <Option data-upstream-index="3" value="default">Default</Option>
-                    <Option data-upstream-index="4" value="ocean">Ocean</Option>
-                    <Option data-upstream-index="5" value="sunset">Sunset</Option>
                 </Select>
             </div>
         </template>
@@ -309,12 +309,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-    Button,
-    Divider,
-    Option,
-    Select,
-} from '@artisan-toolbox/front-awesome/components/WebAwesome';
+import { Button, Divider, Select } from '@artisan-toolbox/front-awesome/components/WebAwesome';
 import { Chart } from '@artisan-toolbox/front-awesome/components/WebAwesome/Pro';
 defineProps<{ scenario: string }>();
 const markdownContents = [
@@ -334,4 +329,14 @@ const markdownContents = [
     '\n    {\n      "type": "bar",\n      "data": {\n        "labels": ["Q1", "Q2", "Q3", "Q4"],\n        "datasets": [\n          {\n            "label": "Online",\n            "data": [42, 58, 63, 71]\n          },\n          {\n            "label": "In-Store",\n            "data": [65, 53, 48, 52]\n          },\n          {\n            "label": "Wholesale",\n            "data": [28, 32, 35, 40]\n          }\n        ]\n      }\n    }\n  ',
     '\n    {\n      "type": "pie",\n      "data": {\n        "labels": ["Rent", "Food", "Transport", "Savings"],\n        "datasets": [\n          {\n            "label": "Budget",\n            "data": [35, 25, 15, 25]\n          }\n        ]\n      }\n    }\n  ',
 ];
+const optionSets = [
+    [
+        { value: 'default', label: 'Default' },
+        { value: 'ocean', label: 'Ocean' },
+        { value: 'sunset', label: 'Sunset' },
+    ],
+];
+function optionsAt(index: number) {
+    return optionSets[index];
+}
 </script>

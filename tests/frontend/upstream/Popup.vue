@@ -143,11 +143,10 @@
                             label="Arrow Placement"
                             name="arrow-placement"
                             value="anchor"
+                            :options="optionsAt(0)"
+                            option-value="value"
+                            option-label="label"
                         >
-                            <Option data-upstream-index="3" value="anchor">anchor</Option>
-                            <Option data-upstream-index="4" value="start">start</Option>
-                            <Option data-upstream-index="5" value="end">end</Option>
-                            <Option data-upstream-index="6" value="center">center</Option>
                         </Select>
                     </div>
 
@@ -313,7 +312,6 @@ import { ref } from 'vue';
 import {
     Divider,
     Input,
-    Option,
     Popup,
     Select,
     Slider,
@@ -322,4 +320,15 @@ import {
 defineProps<{ scenario: string }>();
 const input0 = ref('0');
 const input1 = ref('0');
+const optionSets = [
+    [
+        { value: 'anchor', label: 'anchor' },
+        { value: 'start', label: 'start' },
+        { value: 'end', label: 'end' },
+        { value: 'center', label: 'center' },
+    ],
+];
+function optionsAt(index: number) {
+    return optionSets[index];
+}
 </script>

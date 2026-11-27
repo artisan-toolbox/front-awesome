@@ -1225,7 +1225,9 @@
       },
       "externalResources": [],
       "scriptExecution": "none",
-      "limitations": [],
+      "limitations": [
+        "Kept native wa-combobox because the example sets attributes or nests markup on native option elements."
+      ],
       "inputAdaptation": null
     },
     {
@@ -1248,7 +1250,9 @@
       },
       "externalResources": [],
       "scriptExecution": "none",
-      "limitations": [],
+      "limitations": [
+        "Kept native wa-combobox because the example sets attributes or nests markup on native option elements."
+      ],
       "inputAdaptation": null
     },
     {
@@ -1271,7 +1275,9 @@
       },
       "externalResources": [],
       "scriptExecution": "none",
-      "limitations": [],
+      "limitations": [
+        "Kept native wa-combobox because the example sets attributes or nests markup on native option elements."
+      ],
       "inputAdaptation": null
     },
     {
@@ -1317,7 +1323,9 @@
       },
       "externalResources": [],
       "scriptExecution": "none",
-      "limitations": [],
+      "limitations": [
+        "Kept native wa-combobox because the example groups native options in the default slot."
+      ],
       "inputAdaptation": null
     },
     {
@@ -1501,7 +1509,9 @@
       },
       "externalResources": [],
       "scriptExecution": "none",
-      "limitations": [],
+      "limitations": [
+        "Kept native wa-combobox because the example sets attributes or nests markup on native option elements."
+      ],
       "inputAdaptation": null
     },
     {
@@ -1526,7 +1536,9 @@
       },
       "externalResources": [],
       "scriptExecution": "scoped",
-      "limitations": [],
+      "limitations": [
+        "Kept native wa-combobox because the example adds or replaces option elements."
+      ],
       "inputAdaptation": null
     },
     {
@@ -1622,7 +1634,9 @@
       },
       "externalResources": [],
       "scriptExecution": "none",
-      "limitations": [],
+      "limitations": [
+        "Kept native wa-combobox because the example sets attributes or nests markup on native option elements."
+      ],
       "inputAdaptation": null
     },
     {
@@ -1747,7 +1761,9 @@
       },
       "externalResources": [],
       "scriptExecution": "scoped",
-      "limitations": [],
+      "limitations": [
+        "Kept native wa-combobox because the example adds or replaces option elements."
+      ],
       "inputAdaptation": null
     },
     {
@@ -1772,7 +1788,9 @@
       },
       "externalResources": [],
       "scriptExecution": "scoped",
-      "limitations": [],
+      "limitations": [
+        "Kept native wa-combobox because the example sets attributes or nests markup on native option elements."
+      ],
       "inputAdaptation": null
     },
     {

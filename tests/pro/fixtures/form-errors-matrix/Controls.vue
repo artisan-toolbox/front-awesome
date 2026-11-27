@@ -4,10 +4,12 @@
         :form="form"
         field="combobox"
         :failed="failed"
+        :options="selectionOptions"
+        option-value="value"
+        option-label="label"
         v-bind="{ ...attributes, ...(emptySelectionDefault ? { defaultValue: null } : {}) }"
     >
-        <Option value="one">One</Option><Option value="two">Two</Option>
-        <span slot="hint" data-testid="caller-hint">Caller slot hint</span>
+        <template #hint><span data-testid="caller-hint">Caller slot hint</span></template>
     </Combobox>
     <DateInput
         v-else-if="control === 'DateInput'"
@@ -44,10 +46,14 @@ import {
     DatePicker,
     FileInput,
 } from '@artisan-toolbox/front-awesome/components/WebAwesome/Pro';
-import { Option } from '@artisan-toolbox/front-awesome/components/WebAwesome';
 import type { HTMLAttributes } from 'vue';
 import type { InertiaForm } from '@inertiajs/vue3';
 import type { MatrixData } from './data';
+
+const selectionOptions = [
+    { value: 'one', label: 'One' },
+    { value: 'two', label: 'Two' },
+];
 
 defineProps<{
     control: 'Combobox' | 'DateInput' | 'DatePicker' | 'FileInput';

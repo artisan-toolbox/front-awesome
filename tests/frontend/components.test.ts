@@ -53,10 +53,12 @@ for (const definition of definitions.filter((definition) => definition.generated
         expect(nativeHost).toBeDefined();
         expect(html).toContain('data-contract="native"');
         expect(html).toContain('aria-label="Example"');
-        expect(nativeHost).not.toContain('class=');
+        if (definition.name === 'Select') expect(html).not.toContain('<wa-input');
+        else expect(nativeHost).not.toContain('class=');
         expect(nativeHost).not.toContain('style=');
         expect(html).toContain('Example');
-        if (definition.name === 'Rating') expect(html).toContain(`</${definition.tag}>`);
+        if (definition.name === 'Rating' || definition.name === 'Select')
+            expect(html).toContain(`</${definition.tag}>`);
         else expect(html).toMatch(new RegExp(`</${definition.tag}>$`));
     });
 }

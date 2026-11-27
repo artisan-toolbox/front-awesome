@@ -46,16 +46,11 @@
                                         :label="t('criterion')"
                                         :size="size"
                                         :model-value="filterKey"
+                                        :options="filters"
+                                        option-value="key"
+                                        option-label="label"
                                         @update:model-value="filterKey = $event ?? ''"
-                                    >
-                                        <Option
-                                            v-for="entry in filters"
-                                            :key="entry.key"
-                                            :value="entry.key"
-                                        >
-                                            {{ entry.label }}
-                                        </Option>
-                                    </Select>
+                                    />
                                     <CriteriaFilter
                                         v-if="filter?.kind === 'filter'"
                                         :key="JSON.stringify([filter.key, editSession])"
@@ -72,16 +67,11 @@
                                         :label="t('searchScope')"
                                         :size="size"
                                         :model-value="searchKey"
+                                        :options="searches"
+                                        option-value="key"
+                                        option-label="label"
                                         @update:model-value="searchKey = $event ?? ''"
-                                    >
-                                        <Option
-                                            v-for="entry in searches"
-                                            :key="entry.key"
-                                            :value="entry.key"
-                                        >
-                                            {{ entry.label }}
-                                        </Option>
-                                    </Select>
+                                    />
                                     <CriteriaSearch
                                         v-if="search"
                                         :key="JSON.stringify([search.key, editSession])"
@@ -94,17 +84,13 @@
                                         v-if="adapter.setSearchMatch"
                                         :label="t('searchMatch')"
                                         :size="size"
-                                        :model-value="adapter.requested?.searchMatch ?? ''"
+                                        :model-value="adapter.requested?.searchMatch ?? null"
                                         :failed="matchFeedback.message.value || undefined"
+                                        :options="matches"
+                                        option-value="value"
+                                        option-label="label"
                                         @update:model-value="submitMatch"
-                                    >
-                                        <Option
-                                            v-for="match in adapter.global?.searchMatch.allowed"
-                                            :key="match"
-                                            :value="match"
-                                            >{{ t(match) }}</Option
-                                        >
-                                    </Select>
+                                    />
                                 </template>
                                 <template v-else-if="active === 'sort'">
                                     <section
@@ -149,31 +135,21 @@
                                         :size="size"
                                         :model-value="preset.current?.id ?? ''"
                                         :failed="presetFeedback.message.value || undefined"
+                                        :options="presets"
+                                        option-value="id"
+                                        option-label="label"
                                         @update:model-value="submitOrder"
-                                    >
-                                        <Option value="">{{ t('noPreset') }}</Option>
-                                        <Option
-                                            v-for="item in preset.available.presets"
-                                            :key="item.id"
-                                            :value="item.id"
-                                            >{{ item.label }}</Option
-                                        >
-                                    </Select>
+                                    />
                                     <Select
                                         v-if="ordered.length > 1"
                                         :label="t('orderField')"
                                         :size="size"
                                         :model-value="orderField"
+                                        :options="orderFields"
+                                        option-value="value"
+                                        option-label="label"
                                         @update:model-value="orderField = $event ?? ''"
-                                    >
-                                        <Option
-                                            v-for="field in ordered"
-                                            :key="field"
-                                            :value="field"
-                                        >
-                                            {{ controlLabel({ kind: 'field', field }) }}
-                                        </Option>
-                                    </Select>
+                                    />
                                     <OrderField
                                         v-if="orderField"
                                         :key="JSON.stringify([orderField, editSession])"
@@ -221,7 +197,6 @@ import AppliedCriteria from './AppliedCriteria.vue';
 import DataViewPageSettings from './DataViewPageSettings.vue';
 import Button from '../components/WebAwesome/Button.vue';
 import Select from '../components/WebAwesome/Select.vue';
-import Option from '../components/WebAwesome/Option.vue';
 import ControlPanel from './ControlPanel.vue';
 import CriteriaSearch from './CriteriaSearch.vue';
 import CriteriaFilter from './CriteriaFilter.vue';
@@ -273,6 +248,9 @@ const criteria = computed(() =>
 );
 const filters = computed(() => criteria.value.filter((entry) => entry.kind === 'filter'));
 const searches = computed(() => criteria.value.filter((entry) => entry.kind === 'search'));
+const matches = computed(() =>
+    props.adapter.global?.searchMatch.allowed.map((value) => ({ value, label: t(value) })),
+);
 const filterKey = ref('');
 const searchKey = ref('');
 const filter = computed(
@@ -310,6 +288,12 @@ watch(
 const ordered = computed(() =>
     Object.keys(props.adapter.fields ?? {}).filter((field) => orderModel(props.adapter, field)),
 );
+const orderFields = computed(() =>
+    ordered.value.map((field) => ({
+        value: field,
+        label: props.controlLabel({ kind: 'field', field }),
+    })),
+);
 const orderField = ref('');
 watch(
     ordered,
@@ -323,6 +307,10 @@ watch(
 const preset = computed(() =>
     orderMode(props.adapter) === 'offset' ? props.adapter.global?.order : null,
 );
+const presets = computed(() => [
+    { id: '', label: t('noPreset') },
+    ...(preset.value?.available.presets ?? []),
+]);
 const accepted = computed(() => {
     const state = props.adapter.accepted;
     return state && 'order' in state ? state.order : null;

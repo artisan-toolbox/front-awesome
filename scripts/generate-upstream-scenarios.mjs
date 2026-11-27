@@ -27,6 +27,13 @@ const names = new Map(
     declarations.map((declaration) => [declaration.tagName, declaration.name.replace(/^Wa/, '')]),
 );
 const definitions = new Map(declarations.map((declaration) => [declaration.tagName, declaration]));
+const selectionTags = new Set(['wa-select', 'wa-combobox']);
+const examplesEditingOptionNodes = new Set([
+    'animation-2',
+    'select-18',
+    'combobox-20',
+    'combobox-29',
+]);
 const check = process.argv.includes('--check');
 const scenarios = [];
 async function output(file, value) {
@@ -50,6 +57,28 @@ function apply(source, replacements) {
             source,
         );
 }
+
+function selectionOptions(node, id) {
+    if (examplesEditingOptionNodes.has(id)) return 'the example adds or replaces option elements';
+    const children = (node.childNodes ?? []).filter(
+        (child) =>
+            child.nodeName !== '#comment' &&
+            (child.nodeName !== '#text' || child.value.trim()) &&
+            !child.attrs?.some((attribute) => attribute.name === 'slot' && attribute.value),
+    );
+    if (children.some((child) => child.tagName !== 'wa-option'))
+        return 'the example groups native options in the default slot';
+    if (
+        children.some(
+            (option) =>
+                option.attrs.some((attribute) => attribute.name !== 'value') ||
+                option.childNodes.some((child) => child.nodeName !== '#text'),
+        )
+    )
+        return 'the example sets attributes or nests markup on native option elements';
+    return children;
+}
+
 if (process.argv.includes('--coverage')) {
     const inventories = [
         'tests/frontend/upstream-scenarios.json',
@@ -157,7 +186,7 @@ if (process.argv.includes('--coverage')) {
                 })),
         },
         interactionScope:
-            'Every upstream example renders and its supported setup executes. Dedicated browser tests exercise component families. The examples are not all replayed interaction by interaction.',
+            'Every upstream example renders and its supported setup executes. Select and Combobox fixtures use data-driven wrapper options where the markup can be mapped directly. Examples that require native option markup keep the native control and record the reason in the inventory. Dedicated browser tests exercise component families.',
         externalAssets:
             'External source URLs remain in the original examples. Parity checks do not assert that every external CDN, remote image, remote document, or media file loads successfully. Dedicated interactions use local content where possible.',
         references:
@@ -178,6 +207,8 @@ for (const { name, tag } of components) {
     const modelValues = [];
     const markdownContents = [];
     const templateContents = [];
+    const optionSets = new Map();
+    const nativeSelections = new Set();
     for (const match of source.matchAll(/```html[^\n]*\n([\s\S]*?)```/g)) {
         const original = match[1].trim();
         const headings = [...source.slice(0, match.index).matchAll(/^#{1,6}\s+(.+)$/gm)];
@@ -189,6 +220,8 @@ for (const { name, tag } of components) {
         const nativeEdits = [];
         const used = new Set();
         const unknownElements = new Set();
+        const nativeSelectionReasons = new Set();
+        const id = `${tag.slice(3)}-${examples.length + 1}`;
         let elementCount = 0;
         function visit(node) {
             const location = node.sourceCodeLocation;
@@ -258,13 +291,38 @@ for (const { name, tag } of components) {
                 const wrapper = names.get(node.tagName);
                 if (!wrapper) unknownElements.add(node.tagName);
                 else {
-                    used.add(wrapper);
                     const marker = ` data-upstream-index="${elementCount++}"`;
-                    nativeEdits.push({
+                    const markNative = {
                         start: location.startTag.startOffset + 1 + node.tagName.length,
                         end: location.startTag.startOffset + 1 + node.tagName.length,
                         text: marker,
-                    });
+                    };
+                    nativeEdits.push(markNative);
+                    const options = selectionTags.has(node.tagName)
+                        ? selectionOptions(node, id)
+                        : [];
+                    if (typeof options === 'string') {
+                        nativeSelections.add(node.tagName);
+                        nativeSelectionReasons.add(
+                            `Kept native ${node.tagName} because ${options}.`,
+                        );
+                        edits.push(markNative);
+                        const value = node.attrs.find((attribute) => attribute.name === 'value');
+                        if (value) {
+                            const { startOffset, endOffset } = location.attrs.value;
+                            const expression = JSON.stringify(value.value)
+                                .replace(/&/g, '&amp;')
+                                .replace(/"/g, '&quot;');
+                            edits.push({
+                                start: startOffset,
+                                end: endOffset,
+                                text: `:value.attr="${expression}"`,
+                            });
+                        }
+                        for (const child of node.childNodes ?? []) visit(child);
+                        return;
+                    }
+                    used.add(wrapper);
                     let attributes = original.slice(
                         location.startTag.startOffset + node.tagName.length + 1,
                         location.startTag.endOffset - 1,
@@ -330,6 +388,21 @@ for (const { name, tag } of components) {
                         const index = modelValues.push(initial?.value ?? '') - 1;
                         attributes = apply(attributes, attributeEdits) + ` v-model="input${index}"`;
                     } else attributes = apply(attributes, attributeEdits);
+                    if (options.length) {
+                        const rows = options.map((option) => ({
+                            value:
+                                option.attrs.find((attribute) => attribute.name === 'value')
+                                    ?.value ?? '',
+                            label: option.childNodes
+                                .map((child) => child.value)
+                                .join('')
+                                .trim(),
+                        }));
+                        const serialized = JSON.stringify(rows);
+                        if (!optionSets.has(serialized))
+                            optionSets.set(serialized, optionSets.size);
+                        attributes += ` :options="optionsAt(${optionSets.get(serialized)})" option-value="value" option-label="label"`;
+                    }
                     edits.push({
                         start: location.startTag.startOffset,
                         end: location.startTag.endOffset,
@@ -341,6 +414,42 @@ for (const { name, tag } of components) {
                             end: location.endTag.endOffset,
                             text: `</${wrapper}>`,
                         });
+                    if (selectionTags.has(node.tagName)) {
+                        for (const child of node.childNodes ?? []) {
+                            if (!options.includes(child)) {
+                                visit(child);
+                                const slot = child.attrs?.find(
+                                    (attribute) => attribute.name === 'slot',
+                                )?.value;
+                                if (slot && child.sourceCodeLocation) {
+                                    const { startOffset, endOffset } = child.sourceCodeLocation;
+                                    edits.push(
+                                        {
+                                            start: startOffset,
+                                            end: startOffset,
+                                            text: `<template #${slot}>`,
+                                        },
+                                        { start: endOffset, end: endOffset, text: '</template>' },
+                                    );
+                                }
+                                continue;
+                            }
+                            const optionLocation = child.sourceCodeLocation;
+                            const markerOffset =
+                                optionLocation.startTag.startOffset + '<wa-option'.length;
+                            nativeEdits.push({
+                                start: markerOffset,
+                                end: markerOffset,
+                                text: ` data-upstream-index="${elementCount++}"`,
+                            });
+                            edits.push({
+                                start: optionLocation.startOffset,
+                                end: optionLocation.endOffset,
+                                text: '',
+                            });
+                        }
+                        return;
+                    }
                 }
             }
             for (const child of node.childNodes ?? []) visit(child);
@@ -388,7 +497,6 @@ for (const { name, tag } of components) {
             blockers.push('requires-browser-sms-credentials');
         if (activeScripts.some((script) => /\bfetch\s*\(/.test(script)))
             blockers.push('requires-application-api-endpoint');
-        const id = `${tag.slice(3)}-${examples.length + 1}`;
         scenarios.push({
             id,
             component: name,
@@ -418,6 +526,7 @@ for (const { name, tag } of components) {
                       : 'review-required',
             limitations: [
                 ...blockers,
+                ...nativeSelectionReasons,
                 ...[...unknownElements].map(
                     (element) =>
                         `Upstream example references unshipped ${element}; preserved as native markup.`,
@@ -444,6 +553,11 @@ for (const { name, tag } of components) {
             proImports.length
                 ? `import { ${proImports.join(', ')} } from '@artisan-toolbox/front-awesome/components/WebAwesome/Pro';`
                 : '',
+            ...[...nativeSelections].map((tag) => {
+                const slug = tag.slice(3);
+                const edition = coreTags.has(tag) ? '' : '-pro';
+                return `import '#front-awesome-webawesome${edition}/components/${slug}/${slug}.js';`;
+            }),
         ]
             .filter(Boolean)
             .join('\n');
@@ -455,7 +569,7 @@ for (const { name, tag } of components) {
             .join('\n');
         await output(
             `${fixtureRoot}/upstream/${name}.vue`,
-            `<template>\n<div>\n${template}\n</div>\n</template>\n\n<script setup lang="ts">\n${modelValues.length ? "import { ref } from 'vue';\n" : ''}${imports}\ndefineProps<{ scenario: string }>();\n${modelValues.length ? modelValues.map((value, index) => `const input${index} = ref(${JSON.stringify(value)});\n`).join('') : ''}${markdownContents.length ? `const markdownContents = ${JSON.stringify(markdownContents)};\n` : ''}${templateContents.length ? `const templateContents = ${JSON.stringify(templateContents)};\n` : ''}</script>\n`,
+            `<template>\n<div>\n${template}\n</div>\n</template>\n\n<script setup lang="ts">\n${modelValues.length ? "import { ref } from 'vue';\n" : ''}${imports}\ndefineProps<{ scenario: string }>();\n${modelValues.length ? modelValues.map((value, index) => `const input${index} = ref(${JSON.stringify(value)});\n`).join('') : ''}${markdownContents.length ? `const markdownContents = ${JSON.stringify(markdownContents)};\n` : ''}${templateContents.length ? `const templateContents = ${JSON.stringify(templateContents)};\n` : ''}${optionSets.size ? `const optionSets = [${[...optionSets.keys()].join(',')}];\nfunction optionsAt(index: number) { return optionSets[index]; }\n` : ''}</script>\n`,
         );
     }
 }

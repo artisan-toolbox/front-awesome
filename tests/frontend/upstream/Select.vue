@@ -1,12 +1,14 @@
 <template>
     <div>
         <template v-if="scenario === 'select-1'">
-            <Select data-upstream-index="0" label="Coffee order" placeholder="How do you take it?">
-                <Option data-upstream-index="1" value="espresso">Espresso</Option>
-                <Option data-upstream-index="2" value="latte">Latte</Option>
-                <Option data-upstream-index="3" value="cappuccino">Cappuccino</Option>
-                <Option data-upstream-index="4" value="cold-brew">Cold brew</Option>
-                <Option data-upstream-index="5" value="drip">Drip</Option>
+            <Select
+                data-upstream-index="0"
+                label="Coffee order"
+                placeholder="How do you take it?"
+                :options="optionsAt(0)"
+                option-value="value"
+                option-label="label"
+            >
             </Select>
         </template>
         <template v-if="scenario === 'select-2'">
@@ -15,20 +17,23 @@
                 label="Coffee order"
                 hint="We'll grind it fresh to order."
                 value="latte"
+                :options="optionsAt(0)"
+                option-value="value"
+                option-label="label"
             >
-                <Icon data-upstream-index="1" slot="start" name="mug-hot"></Icon>
-                <Option data-upstream-index="2" value="espresso">Espresso</Option>
-                <Option data-upstream-index="3" value="latte">Latte</Option>
-                <Option data-upstream-index="4" value="cappuccino">Cappuccino</Option>
-                <Option data-upstream-index="5" value="cold-brew">Cold brew</Option>
-                <Option data-upstream-index="6" value="drip">Drip</Option>
+                <template #start
+                    ><Icon data-upstream-index="1" slot="start" name="mug-hot"></Icon
+                ></template>
             </Select>
         </template>
         <template v-if="scenario === 'select-3'">
-            <Select data-upstream-index="0" label="Country">
-                <Option data-upstream-index="1" value="us">United States</Option>
-                <Option data-upstream-index="2" value="ca">Canada</Option>
-                <Option data-upstream-index="3" value="mx">Mexico</Option>
+            <Select
+                data-upstream-index="0"
+                label="Country"
+                :options="optionsAt(1)"
+                option-value="value"
+                option-label="label"
+            >
             </Select>
         </template>
         <template v-if="scenario === 'select-4'">
@@ -36,107 +41,161 @@
                 data-upstream-index="0"
                 label="Experience"
                 hint="Tell us how comfortable you are with the command line."
+                :options="optionsAt(2)"
+                option-value="value"
+                option-label="label"
             >
-                <Option data-upstream-index="1" value="1">Novice</Option>
-                <Option data-upstream-index="2" value="2">Intermediate</Option>
-                <Option data-upstream-index="3" value="3">Advanced</Option>
             </Select>
         </template>
         <template v-if="scenario === 'select-5'">
-            <Select data-upstream-index="0" placeholder="Select one">
-                <Option data-upstream-index="1" value="option-1">Option 1</Option>
-                <Option data-upstream-index="2" value="option-2">Option 2</Option>
-                <Option data-upstream-index="3" value="option-3">Option 3</Option>
+            <Select
+                data-upstream-index="0"
+                placeholder="Select one"
+                :options="optionsAt(3)"
+                option-value="value"
+                option-label="label"
+            >
             </Select>
         </template>
         <template v-if="scenario === 'select-6'">
-            <Select data-upstream-index="0" label="Default branch">
+            <wa-select data-upstream-index="0" label="Default branch">
                 <Option data-upstream-index="1" value="main" selected>main</Option>
                 <Option data-upstream-index="2" value="develop">develop</Option>
                 <Option data-upstream-index="3" value="staging">staging</Option>
-            </Select>
+            </wa-select>
         </template>
         <template v-if="scenario === 'select-7'">
-            <Select data-upstream-index="0" label="Toppings" multiple>
+            <wa-select data-upstream-index="0" label="Toppings" multiple>
                 <Option data-upstream-index="1" value="mushrooms" selected>Mushrooms</Option>
                 <Option data-upstream-index="2" value="olives" selected>Olives</Option>
                 <Option data-upstream-index="3" value="peppers">Peppers</Option>
                 <Option data-upstream-index="4" value="onions">Onions</Option>
-            </Select>
+            </wa-select>
         </template>
         <template v-if="scenario === 'select-8'">
             <div class="wa-stack">
-                <Select data-upstream-index="0" appearance="outlined" value="outlined">
-                    <Option data-upstream-index="1" value="outlined">outlined</Option>
+                <Select
+                    data-upstream-index="0"
+                    appearance="outlined"
+                    value="outlined"
+                    :options="optionsAt(4)"
+                    option-value="value"
+                    option-label="label"
+                >
                 </Select>
-                <Select data-upstream-index="2" appearance="filled" value="filled">
-                    <Option data-upstream-index="3" value="filled">filled</Option>
+                <Select
+                    data-upstream-index="2"
+                    appearance="filled"
+                    value="filled"
+                    :options="optionsAt(5)"
+                    option-value="value"
+                    option-label="label"
+                >
                 </Select>
                 <Select
                     data-upstream-index="4"
                     appearance="filled-outlined"
                     value="filled-outlined"
+                    :options="optionsAt(6)"
+                    option-value="value"
+                    option-label="label"
                 >
-                    <Option data-upstream-index="5" value="filled-outlined">filled-outlined</Option>
                 </Select>
             </div>
         </template>
         <template v-if="scenario === 'select-9'">
-            <Select data-upstream-index="0" pill placeholder="Select one">
-                <Option data-upstream-index="1" value="option-1">Option 1</Option>
-                <Option data-upstream-index="2" value="option-2">Option 2</Option>
-                <Option data-upstream-index="3" value="option-3">Option 3</Option>
+            <Select
+                data-upstream-index="0"
+                pill
+                placeholder="Select one"
+                :options="optionsAt(3)"
+                option-value="value"
+                option-label="label"
+            >
             </Select>
         </template>
         <template v-if="scenario === 'select-10'">
             <div class="wa-stack">
-                <Select data-upstream-index="0" size="xs" placeholder="Extra small">
-                    <Option data-upstream-index="1" value="option-1">Option 1</Option>
-                    <Option data-upstream-index="2" value="option-2">Option 2</Option>
+                <Select
+                    data-upstream-index="0"
+                    size="xs"
+                    placeholder="Extra small"
+                    :options="optionsAt(7)"
+                    option-value="value"
+                    option-label="label"
+                >
                 </Select>
-                <Select data-upstream-index="3" size="s" placeholder="Small">
-                    <Option data-upstream-index="4" value="option-1">Option 1</Option>
-                    <Option data-upstream-index="5" value="option-2">Option 2</Option>
+                <Select
+                    data-upstream-index="3"
+                    size="s"
+                    placeholder="Small"
+                    :options="optionsAt(7)"
+                    option-value="value"
+                    option-label="label"
+                >
                 </Select>
-                <Select data-upstream-index="6" size="m" placeholder="Medium">
-                    <Option data-upstream-index="7" value="option-1">Option 1</Option>
-                    <Option data-upstream-index="8" value="option-2">Option 2</Option>
+                <Select
+                    data-upstream-index="6"
+                    size="m"
+                    placeholder="Medium"
+                    :options="optionsAt(7)"
+                    option-value="value"
+                    option-label="label"
+                >
                 </Select>
-                <Select data-upstream-index="9" size="l" placeholder="Large">
-                    <Option data-upstream-index="10" value="option-1">Option 1</Option>
-                    <Option data-upstream-index="11" value="option-2">Option 2</Option>
+                <Select
+                    data-upstream-index="9"
+                    size="l"
+                    placeholder="Large"
+                    :options="optionsAt(7)"
+                    option-value="value"
+                    option-label="label"
+                >
                 </Select>
-                <Select data-upstream-index="12" size="xl" placeholder="Extra large">
-                    <Option data-upstream-index="13" value="option-1">Option 1</Option>
-                    <Option data-upstream-index="14" value="option-2">Option 2</Option>
+                <Select
+                    data-upstream-index="12"
+                    size="xl"
+                    placeholder="Extra large"
+                    :options="optionsAt(7)"
+                    option-value="value"
+                    option-label="label"
+                >
                 </Select>
             </div>
         </template>
         <template v-if="scenario === 'select-11'">
-            <Select data-upstream-index="0" placeholder="Disabled" disabled>
-                <Option data-upstream-index="1" value="option-1">Option 1</Option>
-                <Option data-upstream-index="2" value="option-2">Option 2</Option>
-                <Option data-upstream-index="3" value="option-3">Option 3</Option>
+            <Select
+                data-upstream-index="0"
+                placeholder="Disabled"
+                disabled
+                :options="optionsAt(3)"
+                option-value="value"
+                option-label="label"
+            >
             </Select>
         </template>
         <template v-if="scenario === 'select-12'">
-            <Select data-upstream-index="0" with-clear value="option-1">
-                <Option data-upstream-index="1" value="option-1">Option 1</Option>
-                <Option data-upstream-index="2" value="option-2">Option 2</Option>
-                <Option data-upstream-index="3" value="option-3">Option 3</Option>
+            <Select
+                data-upstream-index="0"
+                with-clear
+                value="option-1"
+                :options="optionsAt(3)"
+                option-value="value"
+                option-label="label"
+            >
             </Select>
         </template>
         <template v-if="scenario === 'select-13'">
-            <Select data-upstream-index="0" label="Notify me about" multiple with-clear>
+            <wa-select data-upstream-index="0" label="Notify me about" multiple with-clear>
                 <Option data-upstream-index="1" value="mentions" selected>Mentions</Option>
                 <Option data-upstream-index="2" value="replies" selected>Replies</Option>
                 <Option data-upstream-index="3" value="reactions">Reactions</Option>
                 <Option data-upstream-index="4" value="follows">New followers</Option>
                 <Option data-upstream-index="5" value="releases">Releases</Option>
-            </Select>
+            </wa-select>
         </template>
         <template v-if="scenario === 'select-14'">
-            <Select data-upstream-index="0" label="Add a language" placeholder="Select one">
+            <wa-select data-upstream-index="0" label="Add a language" placeholder="Select one">
                 <small>Frontend</small>
                 <Option data-upstream-index="1" value="ts">TypeScript</Option>
                 <Option data-upstream-index="2" value="css">CSS</Option>
@@ -145,30 +204,41 @@
                 <Option data-upstream-index="4" value="go">Go</Option>
                 <Option data-upstream-index="5" value="rust">Rust</Option>
                 <Option data-upstream-index="6" value="python">Python</Option>
-            </Select>
+            </wa-select>
         </template>
         <template v-if="scenario === 'select-15'">
-            <Select data-upstream-index="0" placement="top" placeholder="Opens upward">
-                <Option data-upstream-index="1" value="option-1">Option 1</Option>
-                <Option data-upstream-index="2" value="option-2">Option 2</Option>
-                <Option data-upstream-index="3" value="option-3">Option 3</Option>
+            <Select
+                data-upstream-index="0"
+                placement="top"
+                placeholder="Opens upward"
+                :options="optionsAt(3)"
+                option-value="value"
+                option-label="label"
+            >
             </Select>
         </template>
         <template v-if="scenario === 'select-16'">
-            <Select data-upstream-index="0" label="Destination" placeholder="Where to?" with-clear>
-                <Icon
-                    data-upstream-index="1"
-                    slot="start"
-                    name="plane-departure"
-                    variant="solid"
-                ></Icon>
-                <Option data-upstream-index="2" value="lax">Los Angeles</Option>
-                <Option data-upstream-index="3" value="jfk">New York</Option>
-                <Option data-upstream-index="4" value="nrt">Tokyo</Option>
+            <Select
+                data-upstream-index="0"
+                label="Destination"
+                placeholder="Where to?"
+                with-clear
+                :options="optionsAt(8)"
+                option-value="value"
+                option-label="label"
+            >
+                <template #start
+                    ><Icon
+                        data-upstream-index="1"
+                        slot="start"
+                        name="plane-departure"
+                        variant="solid"
+                    ></Icon
+                ></template>
             </Select>
         </template>
         <template v-if="scenario === 'select-17'">
-            <Select
+            <wa-select
                 data-upstream-index="0"
                 placeholder="Select one"
                 multiple
@@ -197,20 +267,20 @@
                     ></Icon>
                     Chat
                 </Option>
-            </Select>
+            </wa-select>
         </template>
         <template v-if="scenario === 'select-18'">
             <form id="lazy-options-example">
                 <div>
-                    <Select
+                    <wa-select
                         data-upstream-index="0"
                         name="select-1"
-                        value="foo"
+                        :value.attr="'foo'"
                         label="Single select (with existing options)"
                     >
                         <Option data-upstream-index="1" value="bar">Bar</Option>
                         <Option data-upstream-index="2" value="baz">Baz</Option>
-                    </Select>
+                    </wa-select>
 
                     <Divider data-upstream-index="3"></Divider>
 
@@ -222,13 +292,13 @@
                 <br />
 
                 <div>
-                    <Select
+                    <wa-select
                         data-upstream-index="5"
                         name="select-2"
-                        value="foo"
+                        :value.attr="'foo'"
                         label="Single select (with no existing options)"
                     >
-                    </Select>
+                    </wa-select>
 
                     <Divider data-upstream-index="6"></Divider>
 
@@ -240,7 +310,7 @@
                 <br />
 
                 <div>
-                    <Select
+                    <wa-select
                         data-upstream-index="8"
                         name="select-3"
                         multiple
@@ -248,7 +318,7 @@
                     >
                         <Option data-upstream-index="9" value="bar" selected>Bar</Option>
                         <Option data-upstream-index="10" value="baz" selected>Baz</Option>
-                    </Select>
+                    </wa-select>
 
                     <Divider data-upstream-index="11"></Divider>
 
@@ -260,14 +330,14 @@
                 <br />
 
                 <div>
-                    <Select
+                    <wa-select
                         data-upstream-index="13"
                         name="select-4"
-                        value="foo"
+                        :value.attr="'foo'"
                         multiple
                         label="Multiple select (with no existing options)"
                     >
-                    </Select>
+                    </wa-select>
 
                     <Divider data-upstream-index="14"></Divider>
 
@@ -307,5 +377,45 @@ import {
     Option,
     Select,
 } from '@artisan-toolbox/front-awesome/components/WebAwesome';
+import '#front-awesome-webawesome/components/select/select.js';
 defineProps<{ scenario: string }>();
+const optionSets = [
+    [
+        { value: 'espresso', label: 'Espresso' },
+        { value: 'latte', label: 'Latte' },
+        { value: 'cappuccino', label: 'Cappuccino' },
+        { value: 'cold-brew', label: 'Cold brew' },
+        { value: 'drip', label: 'Drip' },
+    ],
+    [
+        { value: 'us', label: 'United States' },
+        { value: 'ca', label: 'Canada' },
+        { value: 'mx', label: 'Mexico' },
+    ],
+    [
+        { value: '1', label: 'Novice' },
+        { value: '2', label: 'Intermediate' },
+        { value: '3', label: 'Advanced' },
+    ],
+    [
+        { value: 'option-1', label: 'Option 1' },
+        { value: 'option-2', label: 'Option 2' },
+        { value: 'option-3', label: 'Option 3' },
+    ],
+    [{ value: 'outlined', label: 'outlined' }],
+    [{ value: 'filled', label: 'filled' }],
+    [{ value: 'filled-outlined', label: 'filled-outlined' }],
+    [
+        { value: 'option-1', label: 'Option 1' },
+        { value: 'option-2', label: 'Option 2' },
+    ],
+    [
+        { value: 'lax', label: 'Los Angeles' },
+        { value: 'jfk', label: 'New York' },
+        { value: 'nrt', label: 'Tokyo' },
+    ],
+];
+function optionsAt(index: number) {
+    return optionSets[index];
+}
 </script>

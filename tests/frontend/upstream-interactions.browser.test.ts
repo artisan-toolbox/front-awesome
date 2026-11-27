@@ -21,7 +21,6 @@ import {
     Tree,
     TreeItem,
     Select,
-    Option,
     Radio,
     RadioGroup,
     Rating,
@@ -214,23 +213,22 @@ test('opens and closes dialogs and drawers through the documented public native 
 test('selects multiple options with a custom tag callback and preserves radio selection', async () => {
     let tags = 0;
     const root = await mount(() => [
-        h(
-            Select,
-            {
-                multiple: true,
-                value: ['email'],
-                getTag: (option: HTMLElement) => {
-                    tags++;
-                    const tag = document.createElement('span');
-                    tag.textContent = `Selected ${option.textContent}`;
-                    return tag;
-                },
-            },
-            () => [
-                h(Option, { value: 'email' }, () => 'Email'),
-                h(Option, { value: 'chat' }, () => 'Chat'),
+        h(Select, {
+            multiple: true,
+            value: ['email'],
+            options: [
+                { value: 'email', label: 'Email' },
+                { value: 'chat', label: 'Chat' },
             ],
-        ),
+            optionValue: 'value',
+            optionLabel: 'label',
+            getTag: (option: HTMLElement) => {
+                tags++;
+                const tag = document.createElement('span');
+                tag.textContent = `Selected ${option.textContent}`;
+                return tag;
+            },
+        }),
         h(RadioGroup, { value: 'first' }, () => [
             h(Radio, { value: 'first' }, () => 'First'),
             h(Radio, { value: 'second' }, () => 'Second'),

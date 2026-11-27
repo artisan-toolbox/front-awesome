@@ -24,9 +24,15 @@ beforeAll(async () => {
 async function settle(root: HTMLElement) {
     await vi.dynamicImportSettled();
     await nextTick();
-    const elements = [...root.querySelectorAll<HTMLElement>('[data-upstream-index]')].filter(
+    const marked = [...root.querySelectorAll<HTMLElement>('[data-upstream-index]')].filter(
         (element) => byTag.has(element.localName),
     );
+    const options = new Set(
+        root.querySelectorAll<HTMLElement>(
+            ':is(wa-select, wa-combobox)[data-upstream-index] > wa-option',
+        ),
+    );
+    const elements = [...marked.filter((element) => !options.has(element)), ...options];
     await Promise.all(elements.map((element) => customElements.whenDefined(element.localName)));
     for (let round = 0; round < 3; round++) {
         await Promise.all(elements.map((element) => Reflect.get(element, 'updateComplete')));

@@ -70,11 +70,10 @@
                     id="selection-mode"
                     value="single"
                     label="Selection"
+                    :options="optionsAt(0)"
+                    option-value="value"
+                    option-label="label"
                 >
-                    <Option data-upstream-index="16" value="single">Single</Option>
-                    <Option data-upstream-index="17" value="multiple">Multiple</Option>
-                    <Option data-upstream-index="18" value="leaf">Leaf</Option>
-                    <Option data-upstream-index="19" value="leaf-multiple">Leaf-multiple</Option>
                 </Select>
             </div>
         </template>
@@ -280,10 +279,20 @@
 import {
     Divider,
     Icon,
-    Option,
     Select,
     Tree,
     TreeItem,
 } from '@artisan-toolbox/front-awesome/components/WebAwesome';
 defineProps<{ scenario: string }>();
+const optionSets = [
+    [
+        { value: 'single', label: 'Single' },
+        { value: 'multiple', label: 'Multiple' },
+        { value: 'leaf', label: 'Leaf' },
+        { value: 'leaf-multiple', label: 'Leaf-multiple' },
+    ],
+];
+function optionsAt(index: number) {
+    return optionSets[index];
+}
 </script>

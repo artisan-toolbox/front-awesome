@@ -96,7 +96,13 @@ export const webAwesomeModels = {
         state('expanded', 'boolean', ['wa-after-expand', 'wa-after-collapse']),
         reflected('selected'),
     ],
-    Combobox: [{ ...value('value', 'selection'), writer: { kind: 'nullable-selection' } }, open()],
+    Combobox: [
+        {
+            ...value('value', 'selection', 'selection', ['change']),
+            writer: { kind: 'nullable-selection' },
+        },
+        open(),
+    ],
     DataGrid: [
         state('page', 'number', ['wa-page-change']),
         state('pageSize', 'number', ['wa-page-change']),

@@ -125,13 +125,14 @@
         </template>
         <template v-if="scenario === 'toast-7'">
             <div id="toast-placement">
-                <Select data-upstream-index="0" label="Placement" value="top-end">
-                    <Option data-upstream-index="1" value="top-start">top-start</Option>
-                    <Option data-upstream-index="2" value="top-center">top-center</Option>
-                    <Option data-upstream-index="3" value="top-end">top-end</Option>
-                    <Option data-upstream-index="4" value="bottom-start">bottom-start</Option>
-                    <Option data-upstream-index="5" value="bottom-center">bottom-center</Option>
-                    <Option data-upstream-index="6" value="bottom-end">bottom-end</Option>
+                <Select
+                    data-upstream-index="0"
+                    label="Placement"
+                    value="top-end"
+                    :options="optionsAt(0)"
+                    option-value="value"
+                    option-label="label"
+                >
                 </Select>
                 <br />
                 <Button data-upstream-index="7" appearance="filled">Show notification</Button>
@@ -180,11 +181,19 @@
 </template>
 
 <script setup lang="ts">
-import {
-    Button,
-    Option,
-    Select,
-    Toast,
-} from '@artisan-toolbox/front-awesome/components/WebAwesome';
+import { Button, Select, Toast } from '@artisan-toolbox/front-awesome/components/WebAwesome';
 defineProps<{ scenario: string }>();
+const optionSets = [
+    [
+        { value: 'top-start', label: 'top-start' },
+        { value: 'top-center', label: 'top-center' },
+        { value: 'top-end', label: 'top-end' },
+        { value: 'bottom-start', label: 'bottom-start' },
+        { value: 'bottom-center', label: 'bottom-center' },
+        { value: 'bottom-end', label: 'bottom-end' },
+    ],
+];
+function optionsAt(index: number) {
+    return optionSets[index];
+}
 </script>

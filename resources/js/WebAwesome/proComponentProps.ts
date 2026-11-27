@@ -15,6 +15,7 @@ import type WaScatterChart from '@web.awesome.me/webawesome-pro/dist/components/
 import type WaSparkline from '@web.awesome.me/webawesome-pro/dist/components/sparkline/sparkline.js';
 import type WaVideo from '@web.awesome.me/webawesome-pro/dist/components/video/video.js';
 import type WaVideoPlaylist from '@web.awesome.me/webawesome-pro/dist/components/video-playlist/video-playlist.js';
+import type { OptionModel, OptionSelectionProps, OptionValue } from './optionSelection';
 import type { ControlBindingProps } from './useFormBridge';
 import type { DatePickerModelValue } from './modelDomains';
 import type * as Upstream from '@web.awesome.me/webawesome-pro/dist/custom-elements-jsx.d.ts';
@@ -317,19 +318,21 @@ export interface ComboboxNativeProps extends Omit<
     onWaOptionsError?: Upstream.WaComboboxProps['onwa-options-error'];
 }
 
-export type ComboboxProps<T extends object = object, M extends boolean = boolean> = Omit<
-    ComboboxNativeProps,
-    'form' | 'multiple'
-> &
+export type ComboboxProps<
+    T extends object = object,
+    M extends boolean = boolean,
+    O = string,
+    K extends string | null | undefined = undefined,
+    G extends boolean = false,
+> = Omit<ComboboxNativeProps, 'form' | 'multiple'> &
     ControlBindingProps<
         T,
-        string | string[] | null,
-        Extract<WaCombobox['value'], M extends true ? string[] | null : string | null>,
+        OptionModel<OptionValue<O, K>, M>,
+        OptionModel<OptionValue<O, K>, M>,
         'value'
-    > & { multiple?: M } & {
-        'onUpdate:modelValue'?: (
-            value: Extract<WaCombobox['value'], M extends true ? string[] | null : string | null>,
-        ) => void;
+    > &
+    OptionSelectionProps<O, K, G> & { multiple?: M } & {
+        'onUpdate:modelValue'?: (value: OptionModel<OptionValue<O, K>, M>) => void;
         'onUpdate:open'?: (value: WaCombobox['open']) => void;
     };
 

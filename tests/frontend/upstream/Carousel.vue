@@ -248,10 +248,15 @@
                 <Divider data-upstream-index="6"></Divider>
 
                 <div class="wa-cluster">
-                    <Select data-upstream-index="7" label="Aspect ratio" name="aspect" value="3/2">
-                        <Option data-upstream-index="8" value="1/1">1/1</Option>
-                        <Option data-upstream-index="9" value="3/2">3/2</Option>
-                        <Option data-upstream-index="10" value="16/9">16/9</Option>
+                    <Select
+                        data-upstream-index="7"
+                        label="Aspect ratio"
+                        name="aspect"
+                        value="3/2"
+                        :options="optionsAt(0)"
+                        option-value="value"
+                        option-label="label"
+                    >
                     </Select>
                 </div>
             </div>
@@ -466,9 +471,18 @@ import {
     Carousel,
     CarouselItem,
     Divider,
-    Option,
     Select,
     Switch,
 } from '@artisan-toolbox/front-awesome/components/WebAwesome';
 defineProps<{ scenario: string }>();
+const optionSets = [
+    [
+        { value: '1/1', label: '1/1' },
+        { value: '3/2', label: '3/2' },
+        { value: '16/9', label: '16/9' },
+    ],
+];
+function optionsAt(index: number) {
+    return optionSets[index];
+}
 </script>

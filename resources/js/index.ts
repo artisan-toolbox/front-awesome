@@ -13,6 +13,8 @@ export type {
 } from './dataViewOptions';
 import { initializeFlashToast } from './WebAwesome/flashToast';
 import type { FlashToastOptions } from './WebAwesome/flashToast';
+import { optionDefaultsKey, type OptionDefaults } from './WebAwesome/optionSelection';
+export type { OptionDefaults, OptionGroup } from './WebAwesome/optionSelection';
 import { toastKey, toastService } from './WebAwesome/toast';
 import type { ToastService } from './WebAwesome/toast';
 import { initializeAppearance } from './preferences/appearance';
@@ -111,7 +113,10 @@ declare module 'vue' {
     }
 }
 
-export interface FrontAwesomeOptions {
+/** Augment this interface to type app-wide option keys used by Select and Combobox. */
+export interface FrontAwesomeOptionTypes {}
+
+export interface FrontAwesomeOptions extends OptionDefaults {
     mosaicast?: MosaicastPluginOptions;
     dataView?: DataViewOptions;
     flashToast?: FlashToastOptions;
@@ -133,6 +138,8 @@ export function createFrontAwesome({
     localization,
     preferences,
     dataView,
+    optionValue,
+    optionLabel,
     scrollbar,
 }: FrontAwesomeOptions = {}): Plugin {
     const dataViewOptions = resolveDataViewOptions(dataView);
@@ -142,6 +149,7 @@ export function createFrontAwesome({
             app.directive('scrollbar', configuredScrollbar);
             app.directive('fa-scrollbar', legacyScrollbarDirective);
             app.provide(dataViewOptionsKey, dataViewOptions);
+            app.provide(optionDefaultsKey, { optionValue, optionLabel });
             app.provide(scrollbarDirectiveKey, configuredScrollbar);
             app.provide(toastKey, toastService);
             app.config.globalProperties.$frontAwesome = {

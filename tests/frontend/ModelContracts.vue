@@ -13,6 +13,18 @@
     <Dialog v-model:open="open" />
     <Select v-model="country" v-model:open="open" />
     <Select v-model="channels" multiple />
+    <Select grouped :options="cities" option-value="id" option-label="name" v-model="city">
+        <template #option="{ value, option }">{{ value.toFixed() }} {{ option.name }}</template>
+    </Select>
+    <Select grouped :options="cities" option-value="id" :form="form" field="city" />
+    <!-- @vue-expect-error Grouped mode requires group objects. -->
+    <Select grouped :options="['Vue']" />
+    <!-- @vue-expect-error Groups require an options array. -->
+    <Select grouped :options="[{ label: 'Cities' }]" />
+    <!-- @vue-expect-error The grouped flag is boolean. -->
+    <Select grouped="true" :options="cities" />
+    <!-- @vue-expect-error A grouped numeric ID cannot be bound to a string field. -->
+    <Select grouped :options="cities" option-value="id" :form="form" field="country" />
     <!-- @vue-expect-error Current native aliases cannot compete with a Vue model. -->
     <Checkbox v-model="accepted" :checked="false" />
     <!-- @vue-expect-error Current native aliases cannot compete with an Inertia field. -->
@@ -36,6 +48,7 @@
 <script setup lang="ts">
 import { shallowRef } from 'vue';
 import { useForm } from '@inertiajs/vue3';
+import type { OptionGroup } from '@artisan-toolbox/front-awesome';
 import {
     Checkbox,
     Textarea,
@@ -51,7 +64,12 @@ const open = shallowRef(false);
 const notes = shallowRef('');
 const country = shallowRef<string | null>('br');
 const channels = shallowRef<string[] | null>(['email']);
+const city = shallowRef<number | null>(1);
+const cities: OptionGroup<{ id?: number; name: string }>[] = [
+    { label: 'Northeast', options: [{ id: 1, name: 'Recife' }] },
+];
 interface FormData {
+    city: number | null;
     accepted: boolean;
     notes: string | null;
     quantity: string | null;
@@ -62,6 +80,7 @@ interface FormData {
     count: number;
 }
 const form = useForm<FormData>({
+    city: 1,
     accepted: false,
     notes: '',
     quantity: '2',

@@ -1,0 +1,42 @@
+.fa-select-search {
+    box-sizing: border-box;
+    padding: var(--wa-space-xs);
+    border: var(--wa-border-width-s) var(--wa-border-style) var(--wa-color-surface-border);
+    border-block-end: 0;
+    border-start-start-radius: var(--wa-border-radius-m);
+    border-start-end-radius: var(--wa-border-radius-m);
+    background: var(--wa-color-surface-raised);
+    color: var(--wa-color-text-quiet);
+    font-size: var(--wa-font-size-s);
+}
+
+.fa-select-search wa-input::part(form-control-label) {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.fa-select-search [role='status']:not(.fa-select-search-status) {
+    padding: var(--wa-space-xs) var(--wa-space-s) 0;
+}
+
+.fa-select-search-status {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.fa-select-search wa-input {
+    display: block;
+    inline-size: 100%;
+}
+
+:host([open]) .form-control:has(.fa-select-search:focus-within) [part~='combobox'] {
+    outline-color: transparent;
+}

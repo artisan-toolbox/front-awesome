@@ -98,10 +98,12 @@
         :form="form"
         field="select"
         :failed="failed"
+        :options="selectionOptions"
+        option-value="value"
+        option-label="label"
         v-bind="{ ...attributes, ...(emptySelectionDefault ? { defaultValue: null } : {}) }"
     >
-        <Option value="one">One</Option><Option value="two">Two</Option>
-        <span slot="hint" data-testid="caller-hint">Caller slot hint</span>
+        <template #hint><span data-testid="caller-hint">Caller slot hint</span></template>
     </Select>
     <TagInput
         v-else-if="control === 'TagInput'"
@@ -150,11 +152,15 @@ import {
     KnownDate,
     TimeInput,
     Radio,
-    Option,
 } from '@artisan-toolbox/front-awesome/components/WebAwesome';
 import type { HTMLAttributes } from 'vue';
 import type { InertiaForm } from '@inertiajs/vue3';
 import type { MatrixData } from './data';
+
+const selectionOptions = [
+    { value: 'one', label: 'One' },
+    { value: 'two', label: 'Two' },
+];
 
 defineProps<{
     control:

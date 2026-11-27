@@ -9,23 +9,21 @@
         <Select
             :label="t('direction')"
             :size="size"
-            :model-value="direction ?? ''"
+            :model-value="direction ?? null"
+            :options="model.directions.map((value) => ({ value, label: t(value) }))"
+            option-value="value"
+            option-label="label"
             @update:model-value="chooseDirection"
-        >
-            <Option v-for="value in model.directions" :key="value" :value="value">{{
-                t(value)
-            }}</Option>
-        </Select>
+        />
         <Select
             :label="t('sortType')"
             :size="size"
-            :model-value="sortType ?? ''"
+            :model-value="sortType ?? null"
+            :options="model.sortTypes.map((value) => ({ value, label: t(value) }))"
+            option-value="value"
+            option-label="label"
             @update:model-value="chooseType"
-        >
-            <Option v-for="value in model.sortTypes" :key="value" :value="value">{{
-                t(value)
-            }}</Option>
-        </Select>
+        />
         <div class="order-actions">
             <Button
                 type="button"
@@ -66,7 +64,6 @@ import type { OrderSelection } from '@artisan-toolbox/dapter';
 import Icon from '../components/WebAwesome/Icon.vue';
 import Button from '../components/WebAwesome/Button.vue';
 import Select from '../components/WebAwesome/Select.vue';
-import Option from '../components/WebAwesome/Option.vue';
 import type { DataViewHandle, DataViewSize } from './types';
 import { orderModel } from './OrderModel';
 import { useControlFeedback } from './controlFeedback';

@@ -241,7 +241,7 @@ for (const definition of definitions.filter((definition) => definition.generated
     const slug = tag.slice(3);
     types += `import type Wa${name} from '${editionPackage}/dist/components/${slug}/${slug}.js';\n`;
 }
-types += `import type { ControlBindingProps } from './useFormBridge';\n${pro ? "import type { DatePickerModelValue } from './modelDomains';\n" : ''}`;
+types += `import type { OptionModel, OptionSelectionProps, OptionValue } from './optionSelection';\nimport type { ControlBindingProps } from './useFormBridge';\n${pro ? "import type { DatePickerModelValue } from './modelDomains';\n" : ''}`;
 types += `import type * as Upstream from '${editionPackage}/dist/custom-elements-jsx.d.ts';\nimport type { HTMLAttributes } from 'vue';\n\n`;
 for (const definition of definitions.filter((definition) => definition.generated)) {
     const { name, tag, attributes, properties, events } = definition;
@@ -316,13 +316,15 @@ for (const definition of definitions.filter((definition) => definition.generated
     const readType = (model) =>
         model.type ??
         (selection && model.form
-            ? `Extract<Wa${name}['${model.property}'], M extends true ? string[] | null : string | null>`
+            ? `OptionModel<OptionValue<O, K>, M>`
             : `Wa${name}['${model.property}']`);
     const writeType = (model) =>
         model.type ??
-        (name === 'DatePicker' && model.form
-            ? 'DatePickerModelValue'
-            : (setters.get(model.property) ?? `Wa${name}['${model.property}']`));
+        (selection && model.form
+            ? readType(model)
+            : name === 'DatePicker' && model.form
+              ? 'DatePickerModelValue'
+              : (setters.get(model.property) ?? `Wa${name}['${model.property}']`));
     types += `export interface ${name}NativeProps extends Omit<HTMLAttributes, ${omitted}> {\n`;
     for (const [key, property] of keys) {
         const attribute = attributes.find((attribute) => attribute.property === property);
@@ -350,21 +352,25 @@ for (const definition of definitions.filter((definition) => definition.generated
                 `${model.type ? `    ${model.name}?: ${model.type};\n` : ''}    'onUpdate:${model.name}'?: (value: ${readType(model)}) => void;\n`,
         )
         .join('');
+    const optionProps = selection
+        ? `OptionSelectionProps<O, K, G> & { multiple?: M${name === 'Select' ? '; strictSearch?: boolean' : ''} } & `
+        : '';
     if (primary)
-        types += `export type ${name}Props<T extends object = object${selection ? ', M extends boolean = boolean' : ''}> = Omit<${name}NativeProps, 'form'${selection ? " | 'multiple'" : ''}> & ControlBindingProps<T, ${writeType(primary)}, ${readType(primary)}, '${primary.property}'> & ${selection ? '{ multiple?: M } & ' : ''}{\n${modelTypes}};\n\n`;
+        types += `export type ${name}Props<T extends object = object${selection ? ', M extends boolean = boolean, O = string, K extends string | null | undefined = undefined, G extends boolean = false' : ''}> = Omit<${name}NativeProps, 'form'${selection ? " | 'multiple'" : ''}> & ControlBindingProps<T, ${writeType(primary)}, ${readType(primary)}, '${primary.property}'> & ${optionProps}{\n${modelTypes}};\n\n`;
     else types += `export interface ${name}Props extends ${name}NativeProps {\n${modelTypes}}\n\n`;
+    if (selection) continue;
     const noHint = primary && !definition.slots.includes('hint');
     const noHintLayout = name === 'Rating' ? 'intrinsic' : 'block';
     const propsDeclaration = primary
-        ? `interface Attributes extends /* @vue-ignore */ Omit<${name}NativeProps, 'form'${selection ? " | 'multiple'" : ''}> {}\ntype Props = Attributes & ControlBindingProps<T, ${writeType(primary)}, ${readType(primary)}, '${primary.property}'> & {\n${selection ? '    multiple?: M;\n' : ''}\n${named.map((model) => `    ${model.name}?: ${readType(model)};`).join('\n')}\n};`
+        ? `interface Attributes extends /* @vue-ignore */ Omit<${name}NativeProps, 'form'> {}\ntype Props = Attributes & ControlBindingProps<T, ${writeType(primary)}, ${readType(primary)}, '${primary.property}'> & {\n\n${named.map((model) => `    ${model.name}?: ${readType(model)};`).join('\n')}\n};`
         : `interface Props extends /* @vue-ignore */ ${name}Props {\n${named.map((model) => `    ${model.name}?: ${readType(model)};`).join('\n')}\n}`;
     const modelPorts = models
         .map(
             (model) =>
-                `        useWebAwesomeModel<${writeType(model)}, ${readType(model)}>(props, {\n            name: '${model.name}', property: '${model.property}', events: ${JSON.stringify(model.events)}, ${model.autofill ? `autofill: '${model.autofill}', ` : ''}${model.observeAttribute ? `observeAttribute: '${model.observeAttribute}', ` : ''}${model.ownerEvent ? `ownerEvent: ${JSON.stringify(model.ownerEvent)}, ` : ''}${model.writer ? `writer: ${JSON.stringify(model.writer)}, ` : ''}${model.reader ? `reader: ${JSON.stringify(model.reader)}, ` : ''}form: ${model.form}, componentName: '${name}',\n            acceptsWrite: modelDomains.${model.write}, acceptsRead: ${selection && model.form ? `(value): value is ${readType(model)} => props.multiple == null || props.multiple === false ? modelDomains.nullableString(value) : value === null || modelDomains.strings(value)` : `modelDomains.${model.read}`},\n            emitValue: value => emit('update:${model.name}', value),\n        }),`,
+                `        useWebAwesomeModel<${writeType(model)}, ${readType(model)}>(props, {\n            name: '${model.name}', property: '${model.property}', events: ${JSON.stringify(model.events)}, ${model.autofill ? `autofill: '${model.autofill}', ` : ''}${model.observeAttribute ? `observeAttribute: '${model.observeAttribute}', ` : ''}${model.ownerEvent ? `ownerEvent: ${JSON.stringify(model.ownerEvent)}, ` : ''}${model.writer ? `writer: ${JSON.stringify(model.writer)}, ` : ''}${model.reader ? `reader: ${JSON.stringify(model.reader)}, ` : ''}form: ${model.form}, componentName: '${name}',\n            acceptsWrite: modelDomains.${model.write}, acceptsRead: modelDomains.${model.read},\n            emitValue: value => emit('update:${model.name}', value),\n        }),`,
         )
         .join('\n');
-    const code = `<template>\n${noHint ? `    <FormFieldFrame :active="validationFrame" :invalid="invalid" :errors="errors" :message-id="messageId" :native-slot="nativeSlot" layout="${noHintLayout}">\n` : ''}    <${tag} ref="element" v-bind="bindings()">\n        <component :is="slotContent" :nodes="slotNodes()" />\n    </${tag}>\n${noHint ? '    </FormFieldFrame>\n' : ''}</template>\n\n<script setup lang="ts"${primary ? ` generic="T extends object${selection ? ', M extends boolean = false' : ''}"` : ''}>\nimport type { ${primary ? `${name}NativeProps` : `${name}Props`} } from '../../WebAwesome/${prefix}Props';\nimport { useWebAwesome } from '../../WebAwesome/useWebAwesome';\n${noHint ? "import FormFieldFrame from '../../WebAwesome/FormFieldFrame.vue';\n" : ''}import { ${name.charAt(0).toLowerCase() + name.slice(1)}Definition } from '../../WebAwesome/${prefix}Definitions';\n${models.length ? `import type Wa${name} from '${editionPackage}/dist/components/${slug}/${slug}.js';\nimport { useWebAwesomeModel } from '../../WebAwesome/useWebAwesomeModel';\nimport { modelDomains } from '../../WebAwesome/modelDomains';\n` : ''}${primary ? `import type { ControlBindingProps } from '../../WebAwesome/useFormBridge';\n${name === 'DatePicker' ? "import type { DatePickerModelValue } from '../../WebAwesome/modelDomains';\n" : ''}` : ''}\n${propsDeclaration}\n\ndefineOptions({ inheritAttrs: false });\nconst props = defineProps<Props>();\n${models.length ? `const emit = defineEmits<{\n${models.map((model) => `    'update:${model.name}': [value: ${readType(model)}];`).join('\n')}\n}>();\n` : ''}const { bindings, slotContent, slotNodes${primary ? `, errors, invalid, element${noHint ? ', messageId, validationFrame, nativeSlot' : ''}` : ''} } = useWebAwesome(\n    [${name.charAt(0).toLowerCase() + name.slice(1)}Definition],\n    '${tag}',\n    () => import('#front-awesome-webawesome${pro ? '-pro' : ''}/components/${slug}/${slug}.js'),\n    { props${models.length ? `, models: [\n${modelPorts}\n    ]` : ''} },\n);\n${primary ? 'defineExpose({ errors, invalid, get $el() { return element.value; } });\n' : ''}</script>\n`;
+    const code = `<template>\n${noHint ? `    <FormFieldFrame :active="validationFrame" :invalid="invalid" :errors="errors" :message-id="messageId" :native-slot="nativeSlot" layout="${noHintLayout}">\n` : ''}    <${tag} ref="element" v-bind="bindings()">\n        <component :is="slotContent" :nodes="slotNodes()" />\n    </${tag}>\n${noHint ? '    </FormFieldFrame>\n' : ''}</template>\n\n<script setup lang="ts"${primary ? ' generic="T extends object"' : ''}>\nimport type { ${primary ? `${name}NativeProps` : `${name}Props`} } from '../../WebAwesome/${prefix}Props';\nimport { useWebAwesome } from '../../WebAwesome/useWebAwesome';\n${noHint ? "import FormFieldFrame from '../../WebAwesome/FormFieldFrame.vue';\n" : ''}import { ${name.charAt(0).toLowerCase() + name.slice(1)}Definition } from '../../WebAwesome/${prefix}Definitions';\n${models.length ? `import type Wa${name} from '${editionPackage}/dist/components/${slug}/${slug}.js';\nimport { useWebAwesomeModel } from '../../WebAwesome/useWebAwesomeModel';\nimport { modelDomains } from '../../WebAwesome/modelDomains';\n` : ''}${primary ? `import type { ControlBindingProps } from '../../WebAwesome/useFormBridge';\n${name === 'DatePicker' ? "import type { DatePickerModelValue } from '../../WebAwesome/modelDomains';\n" : ''}` : ''}\n${propsDeclaration}\n\ndefineOptions({ inheritAttrs: false });\nconst props = defineProps<Props>();\n${models.length ? `const emit = defineEmits<{\n${models.map((model) => `    'update:${model.name}': [value: ${readType(model)}];`).join('\n')}\n}>();\n` : ''}const { bindings, slotContent, slotNodes${primary ? `, errors, invalid, element${noHint ? ', messageId, validationFrame, nativeSlot' : ''}` : ''} } = useWebAwesome(\n    [${name.charAt(0).toLowerCase() + name.slice(1)}Definition],\n    '${tag}',\n    () => import('#front-awesome-webawesome${pro ? '-pro' : ''}/components/${slug}/${slug}.js'),\n    { props${models.length ? `, models: [\n${modelPorts}\n    ]` : ''} },\n);\n${primary ? 'defineExpose({ errors, invalid, get $el() { return element.value; } });\n' : ''}</script>\n`;
     output(`resources/js/components/${directory}/${name}.vue`, code);
 }
 output(`resources/js/WebAwesome/${prefix}Props.ts`, types);
@@ -393,6 +399,21 @@ output(
             ', ',
         )} } from '@artisan-toolbox/front-awesome/components/WebAwesome${pro ? '/Pro' : ''}';\n</script>\n`,
 );
+function validateSfc(file, code) {
+    const path = resolve(root, file);
+    const { descriptor } = parse(code, { filename: path });
+    compileScript(descriptor, {
+        id: file,
+        fs: {
+            fileExists: (filename) => outputs.has(relative(root, filename)) || existsSync(filename),
+            readFile: (filename) =>
+                outputs.get(relative(root, filename)) ?? readFileSync(filename, 'utf8'),
+        },
+    });
+}
+const customSelection = `resources/js/components/${directory}/${pro ? 'Combobox' : 'Select'}.vue`;
+validateSfc(customSelection, readFileSync(resolve(root, customSelection), 'utf8'));
+
 for (const [file, content] of outputs) {
     const formatted = await format(file, content, {
         singleQuote: true,
@@ -400,19 +421,7 @@ for (const [file, content] of outputs) {
         tabWidth: file.endsWith('.json') ? 2 : 4,
     });
     if (formatted.errors.length) throw new Error(JSON.stringify(formatted.errors));
-    if (file.endsWith('.vue')) {
-        const path = resolve(root, file);
-        const { descriptor } = parse(formatted.code, { filename: path });
-        compileScript(descriptor, {
-            id: file,
-            fs: {
-                fileExists: (filename) =>
-                    outputs.has(relative(root, filename)) || existsSync(filename),
-                readFile: (filename) =>
-                    outputs.get(relative(root, filename)) ?? readFileSync(filename, 'utf8'),
-            },
-        });
-    }
+    if (file.endsWith('.vue')) validateSfc(file, formatted.code);
     writeOutput(file, formatted.code);
 }
 const packageFile = resolve(root, 'package.json');

@@ -122,8 +122,11 @@
             ></DatePicker>
         </template>
         <template v-if="scenario === 'date-picker-20'">
-            <DatePicker data-upstream-index="0" style="max-width: 300px" locale="es"></DatePicker>
-            <br /><br />
+            <DatePicker
+                data-upstream-index="0"
+                style="max-width: 300px"
+                locale="es"
+            ></DatePicker> <br /><br />
             <DatePicker data-upstream-index="1" style="max-width: 300px" locale="ko"></DatePicker>
         </template>
         <template v-if="scenario === 'date-picker-21'">

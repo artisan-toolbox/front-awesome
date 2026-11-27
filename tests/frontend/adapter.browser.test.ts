@@ -8,7 +8,6 @@ import type WaPopup from '@awesome.me/webawesome/dist/components/popup/popup.js'
 import type WaFormatDate from '@awesome.me/webawesome/dist/components/format-date/format-date.js';
 import Checkbox from '@artisan-toolbox/front-awesome/components/WebAwesome/Checkbox.vue';
 import Select from '@artisan-toolbox/front-awesome/components/WebAwesome/Select.vue';
-import Option from '@artisan-toolbox/front-awesome/components/WebAwesome/Option.vue';
 import Textarea from '@artisan-toolbox/front-awesome/components/WebAwesome/Textarea.vue';
 import Popup from '@artisan-toolbox/front-awesome/components/WebAwesome/Popup.vue';
 import FormatDate from '@artisan-toolbox/front-awesome/components/WebAwesome/FormatDate.vue';
@@ -175,12 +174,17 @@ test('passes arrays and callbacks as native properties and leaves options as dir
     const getTag: WaSelect['getTag'] = (option) => option.label;
     const { container } = mount({
         render: () =>
-            h(Select, { multiple: true, value: values, getTag }, () => [
-                h(Fragment, [
-                    h(Option, { value: 'email' }, () => 'Email'),
-                    h(Option, { value: 'sms' }, () => 'SMS'),
-                ]),
-            ]),
+            h(Select, {
+                multiple: true,
+                value: values,
+                getTag,
+                options: [
+                    { value: 'email', label: 'Email' },
+                    { value: 'sms', label: 'SMS' },
+                ],
+                optionValue: 'value',
+                optionLabel: 'label',
+            }),
     });
     const select = find<WaSelect>(container, 'wa-select');
     expect(select.getAttribute('value')).toBeNull();
@@ -224,7 +228,7 @@ test('preserves object inputs, exact native attribute names and consumer present
     expect(formatted.date).toBe(date);
 });
 
-test('forwards original cancelable events exactly once and projects named slots without wrapping default children', async () => {
+test('forwards original cancelable events exactly once and projects named slots alongside options', async () => {
     const events: Event[] = [];
     const currentTargets: (EventTarget | null)[] = [];
     const { container } = mount({
@@ -232,6 +236,7 @@ test('forwards original cancelable events exactly once and projects named slots 
             h(
                 Select,
                 {
+                    options: ['one'],
                     onWaShow: (event: Event) => {
                         events.push(event);
                         currentTargets.push(event.currentTarget);
@@ -240,7 +245,6 @@ test('forwards original cancelable events exactly once and projects named slots 
                     onChange: (event: Event) => events.push(event),
                 },
                 {
-                    default: () => [h(Option, { value: 'one' }, () => 'One')],
                     label: () => [h(Fragment, [h('strong', 'Choose'), 'Text'])],
                     hint: () => [h('small', { slot: 'end' }, 'Explicit slot')],
                 },
@@ -307,21 +311,29 @@ test('uses the latest queued properties and abandons deferred writes after unmou
 
 test('preserves scalar reset attributes and explicitly supplied collection defaults', async () => {
     const initial = ['email', 'sms'];
+    const options = [
+        { value: 'email', label: 'Email' },
+        { value: 'sms', label: 'SMS' },
+    ];
     const { container } = mount({
         render: () =>
             h('form', [
-                h(Select, { value: 'email', name: 'single' }, () => [
-                    h(Option, { value: 'email' }, () => 'Email'),
-                    h(Option, { value: 'sms' }, () => 'SMS'),
-                ]),
-                h(
-                    Select,
-                    { value: initial, defaultValue: initial, multiple: true, name: 'multiple' },
-                    () => [
-                        h(Option, { value: 'email' }, () => 'Email'),
-                        h(Option, { value: 'sms' }, () => 'SMS'),
-                    ],
-                ),
+                h(Select, {
+                    value: 'email',
+                    name: 'single',
+                    options,
+                    optionValue: 'value',
+                    optionLabel: 'label',
+                }),
+                h(Select, {
+                    value: initial,
+                    defaultValue: initial,
+                    multiple: true,
+                    name: 'multiple',
+                    options,
+                    optionValue: 'value',
+                    optionLabel: 'label',
+                }),
             ]),
     });
     const [single, multiple] = [...container.querySelectorAll<WaSelect>('wa-select')];

@@ -158,11 +158,15 @@
                     :page="1"
                 ></Pagination>
 
-                <Select data-upstream-index="1" label="Items per page" value="10" size="s">
-                    <Option data-upstream-index="2" value="10">10</Option>
-                    <Option data-upstream-index="3" value="20">20</Option>
-                    <Option data-upstream-index="4" value="50">50</Option>
-                    <Option data-upstream-index="5" value="100">100</Option>
+                <Select
+                    data-upstream-index="1"
+                    label="Items per page"
+                    value="10"
+                    size="s"
+                    :options="optionsAt(0)"
+                    option-value="value"
+                    option-label="label"
+                >
                 </Select>
             </div>
         </template>
@@ -261,9 +265,19 @@ import {
     Button,
     Divider,
     Icon,
-    Option,
     Pagination,
     Select,
 } from '@artisan-toolbox/front-awesome/components/WebAwesome';
 defineProps<{ scenario: string }>();
+const optionSets = [
+    [
+        { value: '10', label: '10' },
+        { value: '20', label: '20' },
+        { value: '50', label: '50' },
+        { value: '100', label: '100' },
+    ],
+];
+function optionsAt(index: number) {
+    return optionSets[index];
+}
 </script>

@@ -5,7 +5,6 @@ import { expect, test } from 'vite-plus/test';
 import Checkbox from '@artisan-toolbox/front-awesome/components/WebAwesome/Checkbox.vue';
 import Textarea from '@artisan-toolbox/front-awesome/components/WebAwesome/Textarea.vue';
 import Select from '@artisan-toolbox/front-awesome/components/WebAwesome/Select.vue';
-import Option from '@artisan-toolbox/front-awesome/components/WebAwesome/Option.vue';
 import TagInput from '@artisan-toolbox/front-awesome/components/WebAwesome/TagInput.vue';
 
 async function render(component: Parameters<typeof h>[0], attrs: Record<string, unknown> = {}) {
@@ -13,15 +12,15 @@ async function render(component: Parameters<typeof h>[0], attrs: Record<string, 
 }
 
 test.each([
-    { name: 'Select', component: Select },
-    { name: 'TagInput', component: TagInput },
+    { name: 'Select', component: Select, options: { multiple: true, options: ['one', 'two'] } },
+    { name: 'TagInput', component: TagInput, options: {} },
 ])(
     'rejects a sparse $name model before assigning it to the native control',
-    async ({ component }) => {
+    async ({ component, options }) => {
         const value = ['one', 'two'];
         Reflect.deleteProperty(value, '0');
         await expect(
-            render(component, { modelValue: value, 'onUpdate:modelValue': () => {} }),
+            render(component, { ...options, modelValue: value, 'onUpdate:modelValue': () => {} }),
         ).rejects.toThrow('unsupported value');
     },
 );
@@ -52,18 +51,45 @@ test('renders explicit defaults separately from deferred current properties', as
     );
 });
 
-test('keeps structured default children as native direct children during SSR', async () => {
+test('renders data-driven options and ignores the Select default slot during SSR', async () => {
     const html = await renderToString(
         createSSRApp({
             render: () =>
-                h(Select, { value: ['one'], getTag: () => 'One' }, () => [
-                    h(Option, { value: 'one' }, () => 'One'),
-                ]),
+                h(
+                    Select,
+                    {
+                        value: ['one'],
+                        getTag: () => 'One',
+                        grouped: true,
+                        options: [
+                            { label: 'Group heading', options: [{ value: 'one', label: 'One' }] },
+                            { label: 'Empty group', options: [] },
+                        ],
+                        optionValue: 'value',
+                        optionLabel: 'label',
+                    },
+                    {
+                        default: () => [h('wa-option', { value: 'ignored' }, 'Ignored')],
+                    },
+                ),
         }),
     );
-    expect(html).toContain('<wa-select><!--[--><wa-option');
+    expect(html).toMatch(/<wa-select\b[^>]*>[\s\S]*<wa-option\b[^>]*value="one"/);
+    expect(html).toMatch(/<small\b[^>]*>Group heading<\/small>/);
+    expect(html.match(/<small\b/g)).toHaveLength(1);
+    expect(html.match(/<wa-option\b/g)).toHaveLength(1);
+    expect(html).not.toContain('ignored');
     expect(html).not.toContain('get-tag');
     expect(html).not.toContain('getTag');
+});
+
+test('rejects flat options and invalid group labels in grouped mode at runtime', async () => {
+    const message =
+        'Grouped options must contain objects with an options array and an optional string label.';
+    await expect(render(Select, { grouped: true, options: ['Vue'] })).rejects.toThrow(message);
+    await expect(
+        render(Select, { grouped: true, options: [{ label: 1, options: ['Vue'] }] }),
+    ).rejects.toThrow(message);
 });
 
 test('rejects conflicting aliases while accepting equivalent aliases', async () => {
