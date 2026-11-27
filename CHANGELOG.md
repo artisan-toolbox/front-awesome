@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.0.0-beta.12] - 2026-11-27
+
+### Features
+
+- Add `MaskedInput` for editable text patterns in Vue, Inertia, and native forms. Choose raw or formatted values, optional groups, fixed affixes, and incomplete-value handling. Server-rendered inputs display the bound value and preserve the selected format when hydrated.
+- Reuse mask templates through `useMaskTemplate()` or `$maskTemplates`. Use `brazilian` for CPF, CNPJ, CEP, and phone templates. The `Brazilian` alias still works. The CEP template displays `01.310-100` and keeps `01310100` in the raw model.
+- Use the Front Awesome localization catalog for built-in incomplete-value messages in English, Spanish, and Brazilian Portuguese. Set `MaskTemplate.incompleteMessage` to text or a translation key. The `incomplete-message` prop overrides the default and accepts an empty string to disable it.
+- Populate Select and Pro Combobox from flat or grouped arrays. Set `option-value` and `option-label` to resolve object properties. Vue and Inertia keep the resolved value type. Select includes search in the popup and supports case- and accent-sensitive matching with `strictSearch`.
+
+### Upgrade from beta.11
+
+- Move Select and Pro Combobox options from the default slot to the `options` prop. Use `#option` for custom option content.
+
+### Fixes
+
+- Keep focus on the first enabled search result while the Select popup finishes opening.
+- Run unit and browser coverage in separate Vitest groups so each project can use its configured worker count.
+
 ## [1.0.0-beta.11] - 2026-11-23
 
 - Show a compact information badge below a permission's description when the editor catalog supplies `roleRequirements`. The badge uses the operator's locale and is included in the checkbox's accessible description.
@@ -48,17 +66,6 @@ Sortable table headers use native buttons and distinct indicators for ascending,
 Custom layouts can reuse the same adapter with standalone DataViewSearch, DataViewFilter, DataViewStatus, and DataViewPagination components and opt out of the built-in header or footer with `hide-header` and `hide-footer`. The `toolbar` slot replaces the default controls, while a custom `pagination` slot suppresses the default footer status and navigation as well as the header paging controls. Hiding the header or footer also hides the slots it contains. Direct DataViewToolbar consumers must now pass `includePaging`. DataViewPager delegates to the shared navigation component and defaults to size `m`; custom CSS and tests that target the previous toolbar or pager markup may need updates. The development guide documents the new composition and paging options separately from beta.8 behavior, including how to restore Shift-click multi-sort with `dataView.multiSortKey`.
 
 ## Unreleased
-
-- Add MaskedInput for editable text patterns. Define per-character rules, optional groups, format selection, guides, overwrite behavior, and fixed affixes. Clear incomplete values on blur when enabled. Bind the raw or formatted string to Vue, Inertia, or a native form.
-- Use the bound value in MaskedInput's server-rendered markup. Keep punctuation when hydrating or assigning a formatted value that matches one of several masks.
-- Pass a reusable MaskTemplate to MaskedInput. Use `useMaskTemplate()` for Brazilian tax IDs, postal codes, telephone numbers, IP addresses, hexadecimal colors, UUIDs, and MAC addresses.
-- Use the `brazilian` group for Brazilian masks. `Brazilian` remains a compatibility alias. The CEP template displays `01.310-100` and keeps `01310100` in the raw model.
-- Set `MaskTemplate.incompleteMessage` to literal text or a localization key. Built-in templates use the Vite-exported Front Awesome catalog for English, Spanish, and Brazilian Portuguese. The field's `incomplete-message` prop can replace or disable the default.
-- Use `$maskTemplates` in Vue templates and the Options API after installing the Front Awesome plugin.
-- Use `options`, `optionValue`, and `optionLabel` to populate Select and Combobox from arrays. Set application defaults with `createFrontAwesome`. Vue and Inertia models preserve resolved option values, including numeric IDs.
-- Customize generated options with `#option="{ value, label, option }"`. Migrate default-slot options to the array and move decorations to the new slot. Enable `grouped` to supply groups with an optional label and an options array. Both controls show labels and dividers for groups with matching options.
-- Search inside the Select popup. Matching ignores case and accents by default. Enable `strictSearch` for exact case and accent matching. Use Down Arrow to focus the first enabled result.
-- Keep keyboard focus on a Select result when the popup finishes opening.
 
 - Use Font Awesome `arrow-down-a-z` and `arrow-up-z-a` for the default ascending and descending headers, with `up-down` for an unordered sortable column.
 - Show Font Awesome numbered squares for every active column in a multi-column order. A numeric fallback preserves the priority when an icon is unavailable.

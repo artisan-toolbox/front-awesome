@@ -12,7 +12,7 @@ use ArtisanToolbox\Maintainer\Versionable\Readme\Head;
 
 final class FrontAwesome implements Versionable, WithReadmeHead
 {
-    public const string VERSION = '1.0.0-beta.11';
+    public const string VERSION = '1.0.0-beta.12';
 
     /**
      * Select a custom request-aware store or an authenticatable model implementing HasPreferences.
