@@ -1,7 +1,7 @@
-import { Brazilian } from './brazilian';
+import { brazilian } from './brazilian';
 import { sharedMaskTemplates } from './sharedTemplates';
 
-const templates = Object.freeze({ Brazilian, ...sharedMaskTemplates });
+const templates = Object.freeze({ brazilian, Brazilian: brazilian, ...sharedMaskTemplates });
 
 export function useMaskTemplate() {
     return templates;

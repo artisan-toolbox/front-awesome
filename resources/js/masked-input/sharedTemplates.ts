@@ -1,4 +1,4 @@
-import type { MaskTemplate } from './mask';
+import { localizedTemplate } from './localizedTemplate';
 
 const uppercaseHex = Object.freeze({
     H: Object.freeze({ accept: /[0-9A-F]/, transform: (char: string) => char.toUpperCase() }),
@@ -21,10 +21,10 @@ function isIPv6(raw: string) {
 
 const addressCharacters = Object.freeze({ P: /[^\r\n]/u });
 
-function addressTemplate(maxLength: number, isComplete: (raw: string) => boolean) {
+function addressTemplate(name: string, maxLength: number, isComplete: (raw: string) => boolean) {
     // Nested optional cells let the user end at any position. One overflow cell
     // keeps an overlong paste from becoming a different, complete address.
-    return Object.freeze<MaskTemplate>({
+    return localizedTemplate(`incomplete.${name}`, {
         mask: 'P' + '[P'.repeat(maxLength) + ']'.repeat(maxLength),
         tokens: addressCharacters,
         inputMode: 'url',
@@ -33,32 +33,24 @@ function addressTemplate(maxLength: number, isComplete: (raw: string) => boolean
     });
 }
 
-const ipv4 = addressTemplate(15, isIPv4);
-const ipv6 = addressTemplate(45, isIPv6);
-const ip = addressTemplate(45, (raw) => (raw.includes(':') ? isIPv6(raw) : isIPv4(raw)));
-
-const hexColor = Object.freeze<MaskTemplate>({
-    mask: Object.freeze(['HHH', 'HHHH', 'HHHHHH', 'HHHHHHHH']),
-    tokens: uppercaseHex,
-    prefix: '#',
-    valueMode: 'formatted',
-});
-const uuid = Object.freeze<MaskTemplate>({
-    mask: 'HHHHHHHH-HHHH-HHHH-HHHH-HHHHHHHHHHHH',
-    tokens: lowercaseHex,
-    valueMode: 'formatted',
-});
-const macAddress = Object.freeze<MaskTemplate>({
-    mask: 'HH:HH:HH:HH:HH:HH',
-    tokens: uppercaseHex,
-    valueMode: 'formatted',
-});
-
 export const sharedMaskTemplates = Object.freeze({
-    ipv4: () => ipv4,
-    ipv6: () => ipv6,
-    ip: () => ip,
-    hexColor: () => hexColor,
-    uuid: () => uuid,
-    macAddress: () => macAddress,
+    ipv4: addressTemplate('ipv4', 15, isIPv4),
+    ipv6: addressTemplate('ipv6', 45, isIPv6),
+    ip: addressTemplate('ip', 45, (raw) => (raw.includes(':') ? isIPv6(raw) : isIPv4(raw))),
+    hexColor: localizedTemplate('incomplete.hexColor', {
+        mask: Object.freeze(['HHH', 'HHHH', 'HHHHHH', 'HHHHHHHH']),
+        tokens: uppercaseHex,
+        prefix: '#',
+        valueMode: 'formatted',
+    }),
+    uuid: localizedTemplate('incomplete.uuid', {
+        mask: 'HHHHHHHH-HHHH-HHHH-HHHH-HHHHHHHHHHHH',
+        tokens: lowercaseHex,
+        valueMode: 'formatted',
+    }),
+    macAddress: localizedTemplate('incomplete.macAddress', {
+        mask: 'HH:HH:HH:HH:HH:HH',
+        tokens: uppercaseHex,
+        valueMode: 'formatted',
+    }),
 });

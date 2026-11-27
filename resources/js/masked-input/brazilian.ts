@@ -1,8 +1,8 @@
+import { localizedTemplate } from './localizedTemplate';
 import type { MaskTemplate } from './mask';
 
-function template(options: MaskTemplate): () => Readonly<MaskTemplate> {
-    const preset = Object.freeze(options);
-    return () => preset;
+function template(name: string, options: MaskTemplate) {
+    return localizedTemplate(`brazilian.incomplete.${name}`, options);
 }
 
 const cnpjTokens = Object.freeze({
@@ -24,8 +24,8 @@ const shortCode4 = { mask: '####', complete: /^1\d{3}$/ };
 const shortCode5 = { mask: '#####', complete: /^10[36]\d{2}$/ };
 const nonGeographic = { mask: '#### ### ####', complete: /^0(?:300|303|500|800|900)\d{7}$/ };
 
-function phone(shape: PhoneShape) {
-    return template({
+function phone(name: string, shape: PhoneShape) {
+    return template(name, {
         mask: shape.mask,
         inputMode: 'tel',
         isComplete: (raw) => shape.complete.test(raw),
@@ -50,44 +50,44 @@ function domesticShape(digits: string) {
     return landline;
 }
 
-function dynamicPhone(shape: (digits: string) => PhoneShape) {
-    return template({
+function dynamicPhone(name: string, shape: (digits: string) => PhoneShape) {
+    return template(name, {
         mask: (proposed) => shape(proposed.replace(/\D/g, '')).mask,
         inputMode: 'tel',
         isComplete: (raw) => shape(raw).complete.test(raw),
     });
 }
 
-function nonGeographicSeries(prefix: string) {
-    return template({
+function nonGeographicSeries(name: string, prefix: string) {
+    return template(name, {
         mask: nonGeographic.mask,
         inputMode: 'tel',
         isComplete: (raw) => raw.startsWith(prefix),
     });
 }
 
-export const Brazilian = Object.freeze({
-    cpf: template({ mask: '###.###.###-##', inputMode: 'numeric' }),
-    cnpjLegacy: template({ mask: '##.###.###/####-##', inputMode: 'numeric' }),
-    cnpj: template({ mask: 'XX.XXX.XXX/XXXX-##', tokens: cnpjTokens, inputMode: 'text' }),
-    cep: template({ mask: '#####-###', inputMode: 'numeric' }),
-    phone: dynamicPhone(domesticShape),
-    landline: phone(landline),
-    mobile: phone(mobile),
-    regionalLandline: phone(regionalLandline),
-    regionalMobile: phone(regionalMobile),
-    regionalPhone: dynamicPhone(regionalShape),
-    shortCode3: phone(shortCode3),
-    shortCode4: phone(shortCode4),
-    shortCode5: phone(shortCode5),
-    serviceCenter: phone({ mask: landline.mask, complete: /^[34]00\d{5}$/ }),
-    nonGeographicPhone: phone(nonGeographic),
-    tollFree: nonGeographicSeries('0800'),
-    sharedCost: nonGeographicSeries('0300'),
-    donation: nonGeographicSeries('0500'),
-    premium: nonGeographicSeries('0900'),
-    telemarketing: nonGeographicSeries('0303'),
-    internationalPhone: template({
+export const brazilian = Object.freeze({
+    cpf: template('cpf', { mask: '###.###.###-##', inputMode: 'numeric' }),
+    cnpjLegacy: template('cnpjLegacy', { mask: '##.###.###/####-##', inputMode: 'numeric' }),
+    cnpj: template('cnpj', { mask: 'XX.XXX.XXX/XXXX-##', tokens: cnpjTokens, inputMode: 'text' }),
+    cep: template('cep', { mask: '##.###-###', inputMode: 'numeric' }),
+    phone: dynamicPhone('phone', domesticShape),
+    landline: phone('landline', landline),
+    mobile: phone('mobile', mobile),
+    regionalLandline: phone('regionalLandline', regionalLandline),
+    regionalMobile: phone('regionalMobile', regionalMobile),
+    regionalPhone: dynamicPhone('regionalPhone', regionalShape),
+    shortCode3: phone('shortCode3', shortCode3),
+    shortCode4: phone('shortCode4', shortCode4),
+    shortCode5: phone('shortCode5', shortCode5),
+    serviceCenter: phone('serviceCenter', { mask: landline.mask, complete: /^[34]00\d{5}$/ }),
+    nonGeographicPhone: phone('nonGeographicPhone', nonGeographic),
+    tollFree: nonGeographicSeries('tollFree', '0800'),
+    sharedCost: nonGeographicSeries('sharedCost', '0300'),
+    donation: nonGeographicSeries('donation', '0500'),
+    premium: nonGeographicSeries('premium', '0900'),
+    telemarketing: nonGeographicSeries('telemarketing', '0303'),
+    internationalPhone: template('internationalPhone', {
         mask: (proposed) => '+CC ' + regionalShape(proposed.replace(/\D/g, '').slice(2)).mask,
         tokens: Object.freeze({ C: /5/ }),
         inputMode: 'tel',

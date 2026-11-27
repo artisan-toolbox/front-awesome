@@ -52,6 +52,8 @@ Custom layouts can reuse the same adapter with standalone DataViewSearch, DataVi
 - Add MaskedInput for editable text patterns. Define per-character rules, optional groups, format selection, guides, overwrite behavior, and fixed affixes. Clear incomplete values on blur when enabled. Bind the raw or formatted string to Vue, Inertia, or a native form.
 - Use the bound value in MaskedInput's server-rendered markup. Keep punctuation when hydrating or assigning a formatted value that matches one of several masks.
 - Pass a reusable MaskTemplate to MaskedInput. Use `useMaskTemplate()` for Brazilian tax IDs, postal codes, telephone numbers, IP addresses, hexadecimal colors, UUIDs, and MAC addresses.
+- Use the `brazilian` group for Brazilian masks. `Brazilian` remains a compatibility alias. The CEP template displays `01.310-100` and keeps `01310100` in the raw model.
+- Set `MaskTemplate.incompleteMessage` to literal text or a localization key. Built-in templates use the Vite-exported Front Awesome catalog for English, Spanish, and Brazilian Portuguese. The field's `incomplete-message` prop can replace or disable the default.
 - Use `$maskTemplates` in Vue templates and the Options API after installing the Front Awesome plugin.
 - Use `options`, `optionValue`, and `optionLabel` to populate Select and Combobox from arrays. Set application defaults with `createFrontAwesome`. Vue and Inertia models preserve resolved option values, including numeric IDs.
 - Customize generated options with `#option="{ value, label, option }"`. Migrate default-slot options to the array and move decorations to the new slot. Enable `grouped` to supply groups with an optional label and an options array. Both controls show labels and dividers for groups with matching options.

@@ -25,6 +25,7 @@
 <script setup lang="ts" generic="T extends object">
 import {
     computed,
+    inject,
     nextTick,
     onBeforeUnmount,
     onMounted,
@@ -35,6 +36,7 @@ import {
     watch,
 } from 'vue';
 import type WaInput from '@awesome.me/webawesome/dist/components/input/input.js';
+import { localizationKey } from '../localization/context';
 import type { InputAttributes } from '../WebAwesome/inputProps';
 import { inputBooleanAttributes } from '../WebAwesome/inputProps';
 import { projectNativeSlot } from '../WebAwesome/nativeSlots';
@@ -98,6 +100,14 @@ const options = computed<MaskOptions>(() => {
     };
 });
 const valueMode = computed(() => props.valueMode ?? template.value.valueMode ?? 'raw');
+const localization = inject(localizationKey, undefined);
+const incompleteMessage = computed(() => {
+    const message = props.incompleteMessage ?? template.value.incompleteMessage;
+    if (typeof message === 'string') return message;
+    if (!message || !localization) return '';
+    const translated = localization.t(message.key);
+    return translated === message.key ? '' : translated;
+});
 const formId = computed(() => (typeof props.form === 'string' ? props.form : undefined));
 const binding = computed(() => (bridge.isBound.value ? (bridge.value.value ?? '') : undefined));
 const initialValue = props.defaultValue ?? binding.value ?? '';
@@ -183,7 +193,7 @@ function synchronizeForm() {
     if (!host || !input) return;
     const { raw, formatted, complete } = state.value;
     host.setValue(state.value[valueMode.value], formatted);
-    const message = raw && !complete && host.willValidate ? (props.incompleteMessage ?? '') : '';
+    const message = raw && !complete && host.willValidate ? incompleteMessage.value : '';
     if (message && host.validationMessage !== message) host.setCustomValidity(message);
     else if (!message && ownedMessage && host.validationMessage === ownedMessage)
         host.setCustomValidity('');
@@ -248,7 +258,7 @@ watch(binding, (value) => {
     if (value !== lastEmitted) readBinding();
 });
 watch([options, valueMode], () => readBinding(true), { deep: true });
-watch([bridge.invalid, () => props.incompleteMessage], synchronizeForm, { flush: 'post' });
+watch([bridge.invalid, incompleteMessage], synchronizeForm, { flush: 'post' });
 
 function remember(previous: RecordOfEdit) {
     if (undoStack.length === 100) undoStack.shift();

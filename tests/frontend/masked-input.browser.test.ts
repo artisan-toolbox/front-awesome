@@ -1,10 +1,11 @@
 import { useForm } from '@inertiajs/vue3';
 import { expect, onTestFinished, test, vi } from 'vite-plus/test';
 import { page, userEvent } from 'vitest/browser';
-import { createSSRApp, h, nextTick, reactive } from 'vue';
+import { createApp, createSSRApp, h, nextTick, reactive, shallowRef } from 'vue';
 import { useMaskTemplate, useMaskTemplates } from '@artisan-toolbox/front-awesome';
 import type { MaskOptions, MaskTemplate } from '@artisan-toolbox/front-awesome';
 import MaskedInput from '@artisan-toolbox/front-awesome/components/MaskedInput.vue';
+import { createLocalization } from '@artisan-toolbox/front-awesome/localization';
 import '@artisan-toolbox/front-awesome/web-awesome.css';
 import { inputReady, webAwesomeFixture } from './fixtures/web-awesome';
 
@@ -12,8 +13,8 @@ const mount = webAwesomeFixture('wa-input');
 
 test('passes the Brazilian CPF template directly to a masked Inertia field', async () => {
     const form = useForm({ cpf: '' });
-    const template = useMaskTemplate().Brazilian.cpf();
-    expect(useMaskTemplates().Brazilian.cpf()).toBe(template);
+    const template = useMaskTemplate().brazilian.cpf();
+    expect(useMaskTemplates().brazilian.cpf()).toBe(template);
     const { element } = mount({
         render: () =>
             h(MaskedInput<{ cpf: string }>, {
@@ -38,6 +39,7 @@ test('supports custom template implementations and gives explicit field props pr
         readonly overwrite = true;
         readonly inputMode = 'numeric';
         readonly valueMode = 'formatted';
+        readonly incompleteMessage = 'Enter a complete code.';
         private readonly finalDigit = '8';
 
         isComplete(raw: string) {
@@ -45,6 +47,7 @@ test('supports custom template implementations and gives explicit field props pr
         }
     }
     const template = new CustomTemplate();
+    const message = shallowRef<string>();
     const { element } = mount({
         render: () =>
             h('form', [
@@ -55,7 +58,7 @@ test('supports custom template implementations and gives explicit field props pr
                     inputmode: 'tel',
                     valueMode: 'raw',
                     overwrite: false,
-                    incompleteMessage: 'End the code with 8.',
+                    incompleteMessage: message.value,
                 }),
             ]),
     });
@@ -64,13 +67,82 @@ test('supports custom template implementations and gives explicit field props pr
     await expect.element(field).toHaveAttribute('inputmode', 'tel');
     await field.fill('12');
     await expect.element(field).toHaveValue('#12');
+    expect(element.validationMessage).toBe('Enter a complete code.');
+    message.value = 'End the code with 8.';
+    await nextTick();
     expect(element.validationMessage).toBe('End the code with 8.');
     expect(new FormData(element.form ?? undefined).get('code')).toBe('12');
     element.setSelectionRange(1, 1);
     await userEvent.keyboard('8');
     await expect.element(field).toHaveValue('#81');
+    message.value = '';
+    await nextTick();
+    expect(element.checkValidity()).toBe(true);
+    message.value = undefined;
+    await nextTick();
+    expect(element.validationMessage).toBe('Enter a complete code.');
     await field.fill('18');
     expect(element.checkValidity()).toBe(true);
+});
+
+test('updates a Brazilian postal code validation message as the locale changes', async () => {
+    const key = 'front-awesome::mask.brazilian.incomplete.cep';
+    const localization = createLocalization({
+        version: 1,
+        fallbackLocale: 'en',
+        locales: {
+            en: {
+                sourceLocale: 'en',
+                label: 'English',
+                messages: { [key]: 'Enter all eight digits.' },
+            },
+            es: {
+                sourceLocale: 'es',
+                label: 'Español',
+                messages: { [key]: 'Ingresa los ocho dígitos.' },
+            },
+        },
+    });
+    const originalLocale = document.documentElement.lang;
+    document.documentElement.lang = 'en';
+    const container = document.createElement('div');
+    const submit = vi.fn((event: SubmitEvent) => event.preventDefault());
+    const app = createApp({
+        render: () =>
+            h('form', { onSubmit: submit }, [
+                h(MaskedInput, {
+                    mask: useMaskTemplate().brazilian.cep(),
+                    label: 'CEP',
+                    name: 'cep',
+                }),
+                h('button', { type: 'submit' }, 'Save CEP'),
+            ]),
+    }).use(localization);
+    document.body.append(container);
+    onTestFinished(() => {
+        app.unmount();
+        container.remove();
+        document.documentElement.lang = originalLocale;
+    });
+    app.mount(container);
+    const element = container.querySelector('wa-input');
+    if (!element) throw new Error('Expected a CEP field.');
+    await inputReady(element);
+    const field = page.getByRole('textbox', { name: 'CEP' });
+    const button = page.getByRole('button', { name: 'Save CEP' });
+    expect(element.checkValidity()).toBe(true);
+    await field.fill('013');
+    expect(element.validationMessage).toBe('Enter all eight digits.');
+    localization.setLocale('es');
+    await expect.poll(() => element.validationMessage).toBe('Ingresa los ocho dígitos.');
+    await button.click();
+    expect(submit).not.toHaveBeenCalled();
+    await field.fill('01310100');
+    await expect.element(field).toHaveValue('01.310-100');
+    expect(element.validationMessage).toBe('');
+    expect(new FormData(element.form ?? undefined).get('cep')).toBe('01310100');
+    await button.click();
+    expect(submit).toHaveBeenCalledOnce();
 });
 
 test('uses a late raw model assignment on startup and preserves the explicit reset value', async () => {

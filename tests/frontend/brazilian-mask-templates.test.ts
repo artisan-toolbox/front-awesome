@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vite-plus/test';
-import { Brazilian } from '../../resources/js/masked-input/brazilian';
+import { brazilian } from '../../resources/js/masked-input/brazilian';
 import { editMask, formatMask } from '../../resources/js/masked-input/mask';
 
 const phones = [
@@ -25,32 +25,40 @@ const phones = [
 describe('Brazilian mask templates', () => {
     it.each([
         ['cpf', '00000000000', '000.000.000-00'],
-        ['cep', '01001000', '01001-000'],
+        ['cep', '01001000', '01.001-000'],
         ['cnpjLegacy', '00000000000191', '00.000.000/0001-91'],
         ['cnpj', '00000000000191', '00.000.000/0001-91'],
         ['cnpj', '00000000E08G12', '00.000.000/E08G-12'],
     ] as const)('formats %s and preserves the raw identifier', (name, raw, formatted) => {
-        const template = Brazilian[name]();
+        const template = brazilian[name]();
         expect(formatMask(raw, template)).toMatchObject({ raw, formatted, complete: true });
         expect(formatMask(formatted, template, 'formatted')).toMatchObject({ raw, formatted });
         expect(formatMask(raw.slice(0, -1), template).complete).toBe(false);
     });
 
+    it('accepts a saved CEP with the previous display format', () => {
+        expect(formatMask('01001-000', brazilian.cep(), 'formatted')).toMatchObject({
+            raw: '01001000',
+            formatted: '01.001-000',
+            complete: true,
+        });
+    });
+
     it('accepts ASCII letters only in the first twelve alphanumeric CNPJ positions', () => {
-        expect(formatMask('ıſß０12.abc.345/01de-35', Brazilian.cnpj(), 'formatted')).toMatchObject({
+        expect(formatMask('ıſß０12.abc.345/01de-35', brazilian.cnpj(), 'formatted')).toMatchObject({
             raw: '12ABC34501DE35',
             formatted: '12.ABC.345/01DE-35',
             complete: true,
         });
-        expect(formatMask('12ABC34501DEz5', Brazilian.cnpj())).toMatchObject({
+        expect(formatMask('12ABC34501DEz5', brazilian.cnpj())).toMatchObject({
             raw: '12ABC34501DE5',
             complete: false,
         });
-        expect(formatMask('12ABC34501DE35', Brazilian.cnpjLegacy()).complete).toBe(false);
+        expect(formatMask('12ABC34501DE35', brazilian.cnpjLegacy()).complete).toBe(false);
     });
 
     it.each(phones)('formats %s alone and in a domestic phone field', (name, raw, formatted) => {
-        for (const template of [Brazilian[name](), Brazilian.phone()]) {
+        for (const template of [brazilian[name](), brazilian.phone()]) {
             const expected = { raw, formatted, complete: true };
             expect(formatMask(raw, template)).toMatchObject(expected);
             expect(formatMask(formatted, template, 'formatted')).toMatchObject(expected);
@@ -87,11 +95,11 @@ describe('Brazilian mask templates', () => {
         ['phone', '234'],
         ['phone', '10987654321'],
     ] as const)('keeps an incompatible %s entry incomplete', (name, input) => {
-        expect(formatMask(input, Brazilian[name]()).complete).toBe(false);
+        expect(formatMask(input, brazilian[name]()).complete).toBe(false);
     });
 
     it('reclassifies an ambiguous DDD and local number when the last digit is deleted', () => {
-        const template = Brazilian.phone();
+        const template = brazilian.phone();
         const full = formatMask('9834567890', template);
         expect(full).toMatchObject({
             raw: '9834567890',
@@ -118,7 +126,7 @@ describe('Brazilian mask templates', () => {
         ['553134567890', '+55 (31) 3456-7890'],
         ['5555987654321', '+55 (55) 98765-4321'],
     ])('retains the international country code in raw and formatted input', (raw, formatted) => {
-        const template = Brazilian.internationalPhone();
+        const template = brazilian.internationalPhone();
         expect(formatMask(raw, template)).toMatchObject({ raw, formatted, complete: true });
         expect(formatMask(formatted, template, 'formatted')).toMatchObject({
             raw,

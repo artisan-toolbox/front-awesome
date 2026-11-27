@@ -6,6 +6,8 @@ import { promisify } from 'node:util';
 import { build, createServer, type ViteDevServer } from 'vite';
 import { expect, test, vi } from 'vite-plus/test';
 import { frontAwesome } from '@artisan-toolbox/front-awesome/vite';
+import { useMaskTemplate } from '@artisan-toolbox/front-awesome';
+import type { LaravelLocalizationCatalog } from '../../resources/js/localization';
 import { createLocalization } from '../../resources/js/localization';
 import {
     closeTranslationFixture,
@@ -50,10 +52,27 @@ test('exports through the real Laravel command before a clean Vite build scans J
         expect(await readFile(join(root, 'generated/catalog.d.ts'), 'utf8')).toContain(
             '"app.greeting": string;',
         );
-        const localization = createLocalization(JSON.parse(await readCatalog(root)));
+        const catalog: LaravelLocalizationCatalog = JSON.parse(await readCatalog(root));
+        const localization = createLocalization(catalog);
         expect(localization.locales.map(({ locale }) => locale)).toEqual(['en']);
         expect(localization.t('app.welcome', { name: 'Ana' })).toBe('Welcome, Ana!');
         expect(localization.t('app.documents', { count: 2 })).toBe('2 documents');
+        const { brazilian, Brazilian, ...shared } = useMaskTemplate();
+        expect(Brazilian).toBe(brazilian);
+        for (const create of [...Object.values(brazilian), ...Object.values(shared)]) {
+            const message = create().incompleteMessage;
+            if (typeof message !== 'object') throw new Error('Expected a translated mask message.');
+            for (const { messages } of Object.values(catalog.locales)) {
+                expect(messages[message.key], message.key).toBeTruthy();
+            }
+        }
+        const cepKey = 'front-awesome::mask.brazilian.incomplete.cep';
+        expect(output.join('\n')).toContain(cepKey);
+        expect(localization.t(cepKey)).toBe('Enter all eight digits of the postal code.');
+        expect(catalog.locales.es.messages[cepKey]).toBe(
+            'Ingresa los ocho dígitos del código postal.',
+        );
+        expect(catalog.locales['pt-BR'].messages[cepKey]).toBe('Digite os oito dígitos do CEP.');
     } finally {
         await rm(root, { recursive: true, force: true });
     }

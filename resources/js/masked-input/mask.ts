@@ -40,6 +40,7 @@ export type MaskInputMode =
 export interface MaskTemplate extends Readonly<MaskOptions> {
     readonly inputMode?: MaskInputMode;
     readonly valueMode?: 'raw' | 'formatted';
+    readonly incompleteMessage?: string | Readonly<{ key: string }>;
 }
 
 export interface MaskState {

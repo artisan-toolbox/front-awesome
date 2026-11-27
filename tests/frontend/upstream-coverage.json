@@ -739,6 +739,10 @@
         },
         {
           "file": "tests/frontend/masked-input.browser.test.ts",
+          "title": "updates a Brazilian postal code validation message as the locale changes"
+        },
+        {
+          "file": "tests/frontend/masked-input.browser.test.ts",
           "title": "hydrates a formatted v-model and applies late model assignments without emitting edits"
         },
         {
