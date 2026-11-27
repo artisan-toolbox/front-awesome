@@ -251,6 +251,11 @@ test('filters Select groups without changing the model or leaving extra dividers
         );
     const frontend = page.getByText('Frontend', { exact: true });
     const backend = page.getByText('Backend', { exact: true });
+    const popup = select.popup.popup;
+    popup.style.animationPlayState = 'paused';
+    const shown = new Promise<void>((resolve) => {
+        select.addEventListener('wa-after-show', () => resolve(), { once: true });
+    });
     await page.getByRole('combobox', { name: 'Framework' }).click();
     await expect.element(frontend).toBeVisible();
     await expect.element(backend).toBeVisible();
@@ -281,8 +286,17 @@ test('filters Select groups without changing the model or leaving extra dividers
     await expect.element(frontend).toBeVisible();
     expect(dividers()).toHaveLength(2);
     await search.fill('server');
+    const server = page.getByRole('option', { name: 'Server kit' });
+    await expect.element(server).toBeVisible();
     await userEvent.keyboard('{ArrowDown}');
-    await expectFocus(page.getByRole('option', { name: 'Server kit' }));
+    await expectFocus(server);
+    const animations = popup.getAnimations();
+    expect(animations).not.toHaveLength(0);
+    for (const animation of animations) animation.finish();
+    await shown;
+    popup.style.removeProperty('animation-play-state');
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+    await expectFocus(server);
     await userEvent.keyboard('{Enter}');
     await expect.poll(() => selected.value).toBe(3);
 });

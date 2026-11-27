@@ -56,6 +56,7 @@ Custom layouts can reuse the same adapter with standalone DataViewSearch, DataVi
 - Use `options`, `optionValue`, and `optionLabel` to populate Select and Combobox from arrays. Set application defaults with `createFrontAwesome`. Vue and Inertia models preserve resolved option values, including numeric IDs.
 - Customize generated options with `#option="{ value, label, option }"`. Migrate default-slot options to the array and move decorations to the new slot. Enable `grouped` to supply groups with an optional label and an options array. Both controls show labels and dividers for groups with matching options.
 - Search inside the Select popup. Matching ignores case and accents by default. Enable `strictSearch` for exact case and accent matching. Use Down Arrow to focus the first enabled result.
+- Keep keyboard focus on a Select result when the popup finishes opening.
 
 - Use Font Awesome `arrow-down-a-z` and `arrow-up-z-a` for the default ascending and descending headers, with `up-down` for an unordered sortable column.
 - Show Font Awesome numbered squares for every active column in a multi-column order. A numeric fallback preserves the priority when an icon is unavailable.

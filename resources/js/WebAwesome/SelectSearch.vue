@@ -60,6 +60,7 @@ const header = useTemplateRef<HTMLElement>('header');
 const search = () => header.value?.querySelector('wa-input');
 const { height } = useElementSize(header, undefined, { box: 'border-box' });
 const open = ref(false);
+let optionFocusedByKeyboard: HTMLElementTagNameMap['wa-option'] | undefined;
 const localization = inject(localizationKey, undefined);
 const messages = {
     en: {
@@ -105,6 +106,7 @@ function focusSearch() {
 useEventListener(select, 'wa-show', (event) => {
     const root = select.value;
     if (!root || event.target !== root) return;
+    optionFocusedByKeyboard = undefined;
     // Select has no popup header slot. Keep search beside the published listbox part.
     const listbox = root.shadowRoot?.querySelector('[part~="listbox"]');
     if (!listbox?.parentElement) return;
@@ -127,7 +129,7 @@ useEventListener(select, 'wa-after-show', async (event) => {
     await nextTick();
     await root.ownerDocument.defaultView?.customElements.whenDefined('wa-input');
     await search()?.updateComplete;
-    if (!root.open) return;
+    if (!root.open || optionFocusedByKeyboard?.matches(':focus')) return;
     if (root.currentOption) {
         root.currentOption.current = false;
         root.currentOption.tabIndex = -1;
@@ -179,6 +181,7 @@ function focusOption(option: HTMLElementTagNameMap['wa-option'] | undefined) {
     option.current = true;
     option.tabIndex = -1;
     option.focus({ preventScroll: true });
+    optionFocusedByKeyboard = option;
     const listbox = target.value?.nextElementSibling;
     if (listbox) {
         const bounds = listbox.getBoundingClientRect();
