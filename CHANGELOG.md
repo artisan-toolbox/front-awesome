@@ -1,13 +1,23 @@
 # Changelog
 
-## [Unreleased]
+## [1.0.0-beta.13] - 2026-11-28
 
-- Keep numeric Tailwind spacing independent of component spacing in the shared theme. Move the application's global `--spacing` declaration from `@theme` into `@layer app-branding` to enable the same isolation on component hosts.
-- Restore Web Awesome's native affix and group-label spacing under Preflight. Rebind mapped control radii, panel radii, and focus rings when local branding changes their inputs.
-- Render Button's Vue `#start` and `#end` slots alongside native slot attributes. When a conditional `anchor` binding is removed from Popup, the inline anchor slot works again.
-- Refresh Textarea and Slider's submitted values after an accepted native form reset. Preserve canceled resets and the configured native defaults.
-- Verify the existing Core catalog with Web Awesome 3.15.0 and Tailwind 4.3.5. Web Awesome 3.14 remains supported, and licensed Pro keeps its own runtime selection.
-- Add the experimental `RichTextEditor` wrapper for Web Awesome Pro 3.15.0 or later. Edit HTML or Markdown with Vue, Inertia, or native forms. Use `default-value` or trusted initial slot content to set the native reset value. The editor preserves Web Awesome toolbar controls, suggestions, and media providers.
+### Features
+
+- Add the experimental `RichTextEditor` wrapper for licensed Web Awesome Pro 3.15.0 or later. Edit and submit HTML or Markdown with Vue, Inertia, or native forms. Set `default-value` or use trusted initial slot content for the native reset value.
+- Support Vue `#start` and `#end` slots on Button alongside native slot attributes.
+
+### Fixes
+
+- Keep numeric Tailwind utilities independent of Web Awesome's component-local spacing. Restore native affix and group-label spacing under Preflight. Rebind mapped control radii, panel radii, and focus rings when local branding changes their inputs.
+- Restore Popup's slotted anchor when a conditional external `anchor` binding is removed.
+- Refresh the values submitted by Textarea and Slider after an accepted native form reset. Preserve canceled edits and the order of fields with the same name.
+- Verify the existing Core catalog with Web Awesome 3.15.0 and Tailwind 4.3.5. Web Awesome Core 3.14 remains supported.
+
+### Upgrade from beta.12
+
+- Move the global `--spacing` declaration from `@theme` into `:root` within `@layer app-branding`. Keep its value to preserve the application's spacing scale.
+- When serializing in the same handler as `form.reset()`, await `updateComplete` on each affected Textarea or Slider host before constructing `FormData`.
 
 ## [1.0.0-beta.12] - 2026-11-27
 
