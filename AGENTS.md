@@ -60,6 +60,8 @@ The Web Awesome and Inertia references come from the versions installed by `npm 
 - Run `npm run theme:check` and `npm run test:theme` after dependency or theme changes. The latter builds real base and optional PrimeVue consumers and checks their computed browser styles. Set `CHROMIUM_EXECUTABLE` when a system Chromium installation is required.
 - Review the owned and inherited token inventory and exact tested versions in `tests/theme-compatibility.json`. After reviewing upstream changes and passing all checks, refresh it with `node scripts/check-theme-compatibility.mjs --record`. A new record alone does not prove compatibility.
 - Retain upstream default theme and utility imports. Keep native.css out of the shared entry and preserve the existing styles.css, web-awesome.css, and appearance:true contracts.
+- Keep the `--spacing` used by Web Awesome hosts independent of Tailwind's numeric utility unit. Check ordinary HTML slots, host utilities, scoped branding, and custom elements with their own spacing. Run the legacy branding consumer before removing its compatibility rules.
+- Restore styles erased by Preflight at the affected property and slot boundary. Check computed styles with and without a Tailwind override. Keep application overrides in the branding or utilities layers.
 - Keep PrimeVue imports confined to the optional export. Its official Aura base retains component-specific behavior. Do not claim all PrimeVue colors or dimensions are shared.
 - Test root and local role classes, nested modes, inversion, custom branding scopes, opposite OS mode, physical key/on pairs, semantic contrast, and wa-page mechanics. Pro requires a real licensed dependency before it can be recorded as tested.
 

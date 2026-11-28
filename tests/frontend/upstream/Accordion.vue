@@ -210,6 +210,19 @@
             </Accordion>
         </template>
         <template v-if="scenario === 'accordion-12'">
+            <Accordion data-upstream-index="0" class="brand-accordion">
+                <AccordionItem data-upstream-index="1" label="Background and border">
+                    These go on the accordion element itself.
+                </AccordionItem>
+                <AccordionItem data-upstream-index="2" label="Dividers">
+                    Each divider is the top border of the item below it.
+                </AccordionItem>
+                <AccordionItem data-upstream-index="3" label="Everything else">
+                    Style headers and content with the accordion item's CSS parts.
+                </AccordionItem>
+            </Accordion>
+        </template>
+        <template v-if="scenario === 'accordion-13'">
             <Accordion data-upstream-index="0">
                 <AccordionItem data-upstream-index="1">
                     <div slot="label" class="wa-split">
@@ -239,7 +252,7 @@
                 </AccordionItem>
             </Accordion>
         </template>
-        <template v-if="scenario === 'accordion-13'">
+        <template v-if="scenario === 'accordion-14'">
             <div>
                 <Accordion data-upstream-index="0" id="accordion-methods">
                     <AccordionItem data-upstream-index="1" label="Section one"
@@ -265,7 +278,7 @@
                 </div>
             </div>
         </template>
-        <template v-if="scenario === 'accordion-14'">
+        <template v-if="scenario === 'accordion-15'">
             <Accordion data-upstream-index="0">
                 <AccordionItem data-upstream-index="1" label="Fruits" expanded>
                     <Accordion data-upstream-index="2" mode="single">
@@ -292,7 +305,7 @@
                 </AccordionItem>
             </Accordion>
         </template>
-        <template v-if="scenario === 'accordion-15'">
+        <template v-if="scenario === 'accordion-16'">
             <Accordion data-upstream-index="0" id="accordion-prevent">
                 <AccordionItem data-upstream-index="1" label="Locked open" expanded>
                     This item is locked open — the <code>wa-collapse</code> event is being

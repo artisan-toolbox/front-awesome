@@ -84,6 +84,9 @@
             <Tag data-upstream-index="4" size="xl" pill>Extra Large</Tag>
         </template>
         <template v-if="scenario === 'tag-7'">
+            <Tag data-upstream-index="0" class="brand-tag">Custom Tag</Tag>
+        </template>
+        <template v-if="scenario === 'tag-8'">
             <div class="tags-removable">
                 <Tag data-upstream-index="0" size="xs" with-remove>Extra Small</Tag>
                 <Tag data-upstream-index="1" size="s" with-remove>Small</Tag>

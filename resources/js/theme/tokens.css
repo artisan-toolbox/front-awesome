@@ -15,7 +15,29 @@
     --color-brand-950: var(--color-blue-950);
 }
 
+/* Resolve numeric utilities against the branding unit, including on WA hosts with local spacing. */
+@theme inline reference {
+    --spacing: var(--fa-utility-spacing, var(--spacing));
+}
+
+@layer theme {
+  :where(:root, :host) {
+    --spacing: 0.25rem;
+  }
+}
+
 @layer wa-theme-overrides {
+  :where(:root, .fa-theme, .wa-theme-default, .wa-light, .wa-dark, .wa-invert):not(:where(wa-accordion-item, wa-card, wa-details, wa-dialog, wa-divider, wa-drawer, wa-lightbox)) {
+    --fa-spacing: var(--spacing);
+    --fa-utility-spacing: initial;
+  }
+  :where(wa-accordion-item, wa-card, wa-details, wa-dialog, wa-divider, wa-drawer, wa-lightbox) {
+    --fa-utility-spacing: var(--fa-spacing);
+    --fa-slotted-spacing: var(--fa-spacing);
+  }
+  :where(wa-accordion-item, wa-card, wa-details, wa-dialog, wa-divider, wa-drawer, wa-lightbox) :where(:root, .fa-theme, .wa-theme-default, .wa-light, .wa-dark, .wa-invert):not(:where(wa-accordion-item, wa-card, wa-details, wa-dialog, wa-divider, wa-drawer, wa-lightbox), :where(wa-card[orientation='horizontal'] > [slot='actions'])) {
+    --spacing: var(--fa-slotted-spacing);
+  }
   :where(:root, .fa-theme, .wa-theme-default, .wa-light, .wa-dark, .wa-invert) {
     --wa-font-size-3xs: round(calc(var(--text-xs) / 1.265625 * var(--wa-font-size-scale)), 1px);
     --wa-font-size-2xs: round(calc(var(--text-xs) / 1.125 * var(--wa-font-size-scale)), 1px);
@@ -39,20 +61,22 @@
     --wa-line-height-condensed: var(--leading-tight);
     --wa-line-height-normal: var(--leading-normal);
     --wa-line-height-expanded: var(--leading-loose);
-    --wa-space-3xs: calc(var(--spacing) * 0.5 * var(--wa-space-scale));
-    --wa-space-2xs: calc(var(--spacing) * 1 * var(--wa-space-scale));
-    --wa-space-xs: calc(var(--spacing) * 2 * var(--wa-space-scale));
-    --wa-space-s: calc(var(--spacing) * 3 * var(--wa-space-scale));
-    --wa-space-m: calc(var(--spacing) * 4 * var(--wa-space-scale));
-    --wa-space-l: calc(var(--spacing) * 6 * var(--wa-space-scale));
-    --wa-space-xl: calc(var(--spacing) * 8 * var(--wa-space-scale));
-    --wa-space-2xl: calc(var(--spacing) * 10 * var(--wa-space-scale));
-    --wa-space-3xl: calc(var(--spacing) * 12 * var(--wa-space-scale));
-    --wa-space-4xl: calc(var(--spacing) * 16 * var(--wa-space-scale));
-    --wa-space-5xl: calc(var(--spacing) * 20 * var(--wa-space-scale));
+    --wa-space-3xs: calc(var(--fa-spacing) * 0.5 * var(--wa-space-scale));
+    --wa-space-2xs: calc(var(--fa-spacing) * 1 * var(--wa-space-scale));
+    --wa-space-xs: calc(var(--fa-spacing) * 2 * var(--wa-space-scale));
+    --wa-space-s: calc(var(--fa-spacing) * 3 * var(--wa-space-scale));
+    --wa-space-m: calc(var(--fa-spacing) * 4 * var(--wa-space-scale));
+    --wa-space-l: calc(var(--fa-spacing) * 6 * var(--wa-space-scale));
+    --wa-space-xl: calc(var(--fa-spacing) * 8 * var(--wa-space-scale));
+    --wa-space-2xl: calc(var(--fa-spacing) * 10 * var(--wa-space-scale));
+    --wa-space-3xl: calc(var(--fa-spacing) * 12 * var(--wa-space-scale));
+    --wa-space-4xl: calc(var(--fa-spacing) * 16 * var(--wa-space-scale));
+    --wa-space-5xl: calc(var(--fa-spacing) * 20 * var(--wa-space-scale));
     --wa-border-radius-s: calc(var(--radius-sm) * var(--wa-border-radius-scale));
     --wa-border-radius-m: calc(var(--radius-md) * var(--wa-border-radius-scale));
     --wa-border-radius-l: calc(var(--radius-xl) * var(--wa-border-radius-scale));
+    --wa-form-control-border-radius: var(--wa-border-radius-m);
+    --wa-panel-border-radius: var(--wa-border-radius-l);
     --wa-shadow-s: var(--shadow-sm);
     --wa-shadow-m: var(--shadow-md);
     --wa-shadow-l: var(--shadow-lg);
@@ -326,6 +350,7 @@
     --wa-color-text-quiet: light-dark(var(--wa-color-neutral-30), var(--wa-color-neutral-70));
     --wa-color-text-link: light-dark(var(--wa-color-brand-30), var(--wa-color-brand-70));
     --wa-color-focus: light-dark(var(--wa-color-brand-30), var(--wa-color-brand-60));
+    --wa-focus-ring: var(--wa-focus-ring-style) var(--wa-focus-ring-width) var(--wa-color-focus);
     --wa-form-control-background-color: var(--wa-color-surface-default);
     --wa-form-control-border-color: var(--wa-color-neutral-border-loud);
     --wa-form-control-activated-color: var(--wa-color-brand-fill-loud);

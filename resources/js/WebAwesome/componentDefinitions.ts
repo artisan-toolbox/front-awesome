@@ -1026,6 +1026,12 @@ export const pageDefinition = {
             enumerated: false,
         },
         {
+            attribute: 'disable-sticky',
+            property: 'disableSticky',
+            boolean: false,
+            enumerated: false,
+        },
+        {
             attribute: 'navigation-placement',
             property: 'navigationPlacement',
             boolean: false,
@@ -1039,12 +1045,6 @@ export const pageDefinition = {
         },
         { attribute: 'dir', property: 'dir', boolean: false, enumerated: false },
         { attribute: 'lang', property: 'lang', boolean: false, enumerated: false },
-        {
-            attribute: 'disable-sticky',
-            property: 'disableSticky',
-            boolean: false,
-            enumerated: false,
-        },
     ],
     properties: [],
     events: [],

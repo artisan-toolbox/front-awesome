@@ -4,6 +4,11 @@ import { isDeepStrictEqual } from 'node:util';
 import { format } from 'vite-plus/fmt';
 import ts from 'typescript';
 import { compileScript, parse } from 'vue/compiler-sfc';
+import {
+    requireRichTextEditor,
+    supportsCoreWrapper,
+    usesProLicense,
+} from './web-awesome-edition.mjs';
 import { webAwesomeModels } from './web-awesome-models.mjs';
 
 const root = resolve(import.meta.dirname, '..');
@@ -12,20 +17,14 @@ const pro = process.argv.includes('--pro');
 const editionPackage = pro ? '@web.awesome.me/webawesome-pro' : '@awesome.me/webawesome';
 const directory = pro ? 'WebAwesomePro' : 'WebAwesome';
 const prefix = pro ? 'proComponent' : 'component';
+const editionDist = resolve(root, `node_modules/${editionPackage}/dist`);
 const coreManifest = JSON.parse(
     readFileSync(
         resolve(root, 'node_modules/@awesome.me/webawesome/dist/custom-elements.json'),
         'utf8',
     ),
 );
-const coreTags = new Set(
-    coreManifest.modules
-        .flatMap((module) => module.declarations ?? [])
-        .flatMap((declaration) => (declaration.tagName ? [declaration.tagName] : [])),
-);
-const manifest = JSON.parse(
-    readFileSync(resolve(root, `node_modules/${editionPackage}/dist/custom-elements.json`), 'utf8'),
-);
+const manifest = JSON.parse(readFileSync(resolve(editionDist, 'custom-elements.json'), 'utf8'));
 const existing = new Set(['Button', 'ButtonGroup', 'Input', 'Icon', 'Tag']);
 const propertyInputs = {
     Chart: ['config'],
@@ -41,6 +40,7 @@ const propertyInputs = {
     DateInput: ['value', 'isDateDisabled', 'dayContent'],
     DatePicker: ['isDateDisabled', 'dayContent'],
     FileInput: ['files'],
+    RichTextEditor: ['value', 'imageProvider', 'embedProvider', 'suggestions'],
     DataGrid: [
         'data',
         'columns',
@@ -73,9 +73,22 @@ const propertyInputs = {
     Textarea: ['value'],
     TimeInput: ['value'],
 };
-const definitions = manifest.modules
-    .flatMap((module) => module.declarations ?? [])
-    .filter((declaration) => declaration.tagName && (!pro || !coreTags.has(declaration.tagName)))
+const editorEventTypes = {
+    input: 'InputEvent',
+    selectionchange: 'Event',
+    focus: 'FocusEvent',
+    blur: 'FocusEvent',
+    change: 'Event',
+    'wa-invalid': "GlobalEventHandlersEventMap['wa-invalid']",
+    'wa-suggestions-error': `GlobalEventHandlersEventMap[Extract<keyof GlobalEventHandlersEventMap, 'wa-suggestions-error'>]`,
+};
+const declarations = manifest.modules.flatMap((module) => module.declarations ?? []);
+if (pro) requireRichTextEditor(declarations);
+const definitions = declarations
+    .filter(
+        ({ tagName }) =>
+            tagName && (pro ? usesProLicense(editionDist, tagName) : supportsCoreWrapper(tagName)),
+    )
     .map((declaration) => {
         const name = declaration.name.replace(/^Wa/, '');
         const attributes = (declaration.attributes ?? [])
@@ -92,7 +105,7 @@ const definitions = manifest.modules
                 boolean: attribute.type?.text === 'boolean',
                 enumerated: ['spellcheck', 'autocorrect'].includes(attribute.name),
             }));
-        if (name === 'Page')
+        if (name === 'Page' && !attributes.some(({ attribute }) => attribute === 'disable-sticky'))
             attributes.push({
                 attribute: 'disable-sticky',
                 property: 'disableSticky',
@@ -100,7 +113,9 @@ const definitions = manifest.modules
                 enumerated: false,
             });
         const properties = propertyInputs[name] ?? [];
-        const events = (declaration.events ?? []).map((event) => event.name);
+        const events = (declaration.events ?? [])
+            .map((event) => event.name)
+            .filter((event) => name !== 'RichTextEditor' || event !== 'type');
         return {
             name,
             tag: declaration.tagName,
@@ -114,6 +129,7 @@ const definitions = manifest.modules
             ),
             slots: (declaration.slots ?? []).map((slot) => slot.name),
             models: webAwesomeModels[name] ?? [],
+            ...(name === 'RichTextEditor' ? { seedResetDefault: false } : {}),
             generated: pro || !existing.has(name),
         };
     })
@@ -235,14 +251,20 @@ function setterInputs(definition) {
     }
     return setters;
 }
-let types = '';
+let types = pro
+    ? '// oxlint-disable-next-line typescript/triple-slash-reference -- Composer-installed consumers need the optional editor Vite module declaration.\n/// <reference path="./optionalProModules.d.ts" />\n'
+    : '';
 for (const definition of definitions.filter((definition) => definition.generated)) {
     const { name, tag } = definition;
+    if (name === 'RichTextEditor') continue;
     const slug = tag.slice(3);
     types += `import type Wa${name} from '${editionPackage}/dist/components/${slug}/${slug}.js';\n`;
 }
+if (pro) types += `import type {} from '${editionPackage}/dist/events/events.js';\n`;
 types += `import type { OptionModel, OptionSelectionProps, OptionValue } from './optionSelection';\nimport type { ControlBindingProps } from './useFormBridge';\n${pro ? "import type { DatePickerModelValue } from './modelDomains';\n" : ''}`;
 types += `import type * as Upstream from '${editionPackage}/dist/custom-elements-jsx.d.ts';\nimport type { HTMLAttributes } from 'vue';\n\n`;
+if (pro)
+    types += `// Web Awesome Pro versions before 3.15 do not declare the editor element.\ntype EditorElementName = Extract<keyof HTMLElementTagNameMap, 'wa-rich-text-editor'>;\ntype WaRichTextEditor = [EditorElementName] extends [never] ? { value: string } & Record<string, never> : HTMLElementTagNameMap[EditorElementName];\nexport type RichTextEditorValue = WaRichTextEditor['value'];\n\n`;
 for (const definition of definitions.filter((definition) => definition.generated)) {
     const { name, tag, attributes, properties, events } = definition;
     const slug = tag.slice(3);
@@ -315,9 +337,11 @@ for (const definition of definitions.filter((definition) => definition.generated
     const selection = ['Select', 'Combobox'].includes(name);
     const readType = (model) =>
         model.type ??
-        (selection && model.form
-            ? `OptionModel<OptionValue<O, K>, M>`
-            : `Wa${name}['${model.property}']`);
+        (name === 'RichTextEditor'
+            ? 'RichTextEditorValue'
+            : selection && model.form
+              ? `OptionModel<OptionValue<O, K>, M>`
+              : `Wa${name}['${model.property}']`);
     const writeType = (model) =>
         model.type ??
         (selection && model.form
@@ -342,8 +366,10 @@ for (const definition of definitions.filter((definition) => definition.generated
     }
     if (definition.formAssociated) types += `    form?: string;\n`;
     types += `    slot?: string;\n`;
-    for (const [index, event] of events.entries())
-        types += `    ${listeners[index]}?: Upstream.Wa${name}Props['on${event}'];\n`;
+    for (const [index, event] of events.entries()) {
+        const eventType = name === 'RichTextEditor' ? editorEventTypes[event] : undefined;
+        types += `    ${listeners[index]}?: ${eventType ? `(event: ${eventType}) => void` : `Upstream.Wa${name}Props['on${event}']`};\n`;
+    }
     types += `}\n\n`;
     const named = models.filter((model) => !model.form);
     const modelTypes = models
@@ -370,7 +396,11 @@ for (const definition of definitions.filter((definition) => definition.generated
                 `        useWebAwesomeModel<${writeType(model)}, ${readType(model)}>(props, {\n            name: '${model.name}', property: '${model.property}', events: ${JSON.stringify(model.events)}, ${model.autofill ? `autofill: '${model.autofill}', ` : ''}${model.observeAttribute ? `observeAttribute: '${model.observeAttribute}', ` : ''}${model.ownerEvent ? `ownerEvent: ${JSON.stringify(model.ownerEvent)}, ` : ''}${model.writer ? `writer: ${JSON.stringify(model.writer)}, ` : ''}${model.reader ? `reader: ${JSON.stringify(model.reader)}, ` : ''}form: ${model.form}, componentName: '${name}',\n            acceptsWrite: modelDomains.${model.write}, acceptsRead: modelDomains.${model.read},\n            emitValue: value => emit('update:${model.name}', value),\n        }),`,
         )
         .join('\n');
-    const code = `<template>\n${noHint ? `    <FormFieldFrame :active="validationFrame" :invalid="invalid" :errors="errors" :message-id="messageId" :native-slot="nativeSlot" layout="${noHintLayout}">\n` : ''}    <${tag} ref="element" v-bind="bindings()">\n        <component :is="slotContent" :nodes="slotNodes()" />\n    </${tag}>\n${noHint ? '    </FormFieldFrame>\n' : ''}</template>\n\n<script setup lang="ts"${primary ? ' generic="T extends object"' : ''}>\nimport type { ${primary ? `${name}NativeProps` : `${name}Props`} } from '../../WebAwesome/${prefix}Props';\nimport { useWebAwesome } from '../../WebAwesome/useWebAwesome';\n${noHint ? "import FormFieldFrame from '../../WebAwesome/FormFieldFrame.vue';\n" : ''}import { ${name.charAt(0).toLowerCase() + name.slice(1)}Definition } from '../../WebAwesome/${prefix}Definitions';\n${models.length ? `import type Wa${name} from '${editionPackage}/dist/components/${slug}/${slug}.js';\nimport { useWebAwesomeModel } from '../../WebAwesome/useWebAwesomeModel';\nimport { modelDomains } from '../../WebAwesome/modelDomains';\n` : ''}${primary ? `import type { ControlBindingProps } from '../../WebAwesome/useFormBridge';\n${name === 'DatePicker' ? "import type { DatePickerModelValue } from '../../WebAwesome/modelDomains';\n" : ''}` : ''}\n${propsDeclaration}\n\ndefineOptions({ inheritAttrs: false });\nconst props = defineProps<Props>();\n${models.length ? `const emit = defineEmits<{\n${models.map((model) => `    'update:${model.name}': [value: ${readType(model)}];`).join('\n')}\n}>();\n` : ''}const { bindings, slotContent, slotNodes${primary ? `, errors, invalid, element${noHint ? ', messageId, validationFrame, nativeSlot' : ''}` : ''} } = useWebAwesome(\n    [${name.charAt(0).toLowerCase() + name.slice(1)}Definition],\n    '${tag}',\n    () => import('#front-awesome-webawesome${pro ? '-pro' : ''}/components/${slug}/${slug}.js'),\n    { props${models.length ? `, models: [\n${modelPorts}\n    ]` : ''} },\n);\n${primary ? 'defineExpose({ errors, invalid, get $el() { return element.value; } });\n' : ''}</script>\n`;
+    const nativeTypeImport =
+        name === 'RichTextEditor'
+            ? `import type { RichTextEditorValue } from '../../WebAwesome/${prefix}Props';\n`
+            : `import type Wa${name} from '${editionPackage}/dist/components/${slug}/${slug}.js';\n`;
+    const code = `<template>\n${noHint ? `    <FormFieldFrame :active="validationFrame" :invalid="invalid" :errors="errors" :message-id="messageId" :native-slot="nativeSlot" layout="${noHintLayout}">\n` : ''}    <${tag} ref="element" v-bind="bindings()">\n        <component :is="slotContent" :nodes="slotNodes()" />\n    </${tag}>\n${noHint ? '    </FormFieldFrame>\n' : ''}</template>\n\n<script setup lang="ts"${primary ? ' generic="T extends object"' : ''}>\nimport type { ${primary ? `${name}NativeProps` : `${name}Props`} } from '../../WebAwesome/${prefix}Props';\nimport { useWebAwesome } from '../../WebAwesome/useWebAwesome';\n${noHint ? "import FormFieldFrame from '../../WebAwesome/FormFieldFrame.vue';\n" : ''}import { ${name.charAt(0).toLowerCase() + name.slice(1)}Definition } from '../../WebAwesome/${prefix}Definitions';\n${models.length ? `${nativeTypeImport}import { useWebAwesomeModel } from '../../WebAwesome/useWebAwesomeModel';\nimport { modelDomains } from '../../WebAwesome/modelDomains';\n` : ''}${primary ? `import type { ControlBindingProps } from '../../WebAwesome/useFormBridge';\n${name === 'DatePicker' ? "import type { DatePickerModelValue } from '../../WebAwesome/modelDomains';\n" : ''}` : ''}\n${propsDeclaration}\n\ndefineOptions({ inheritAttrs: false });\nconst props = defineProps<Props>();\n${models.length ? `const emit = defineEmits<{\n${models.map((model) => `    'update:${model.name}': [value: ${readType(model)}];`).join('\n')}\n}>();\n` : ''}const { bindings, slotContent, slotNodes${primary ? `, errors, invalid, element${noHint ? ', messageId, validationFrame, nativeSlot' : ''}` : ''} } = useWebAwesome(\n    [${name.charAt(0).toLowerCase() + name.slice(1)}Definition],\n    '${tag}',\n    () => import('#front-awesome-webawesome${pro ? '-pro' : ''}/components/${slug}/${slug}.js'),\n    { props${models.length ? `, models: [\n${modelPorts}\n    ]` : ''} },\n);\n${primary ? 'defineExpose({ errors, invalid, get $el() { return element.value; } });\n' : ''}</script>\n`;
     output(`resources/js/components/${directory}/${name}.vue`, code);
 }
 output(`resources/js/WebAwesome/${prefix}Props.ts`, types);

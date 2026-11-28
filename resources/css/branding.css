@@ -149,13 +149,6 @@
     /* --radius-xl: 1rem; */
 
     /*
-     * The spacing base changes numeric Tailwind spacing and mapped WA spacing.
-     * It does not scale every component dimension or each breakpoint.
-     * Recheck compact forms and mobile navigation after changing it.
-     */
-    /* --spacing: 0.25rem; */
-
-    /*
      * Full-shadow integration.
      * Tailwind shadow values may contain several shadows. The mapped WA final
      * shadows therefore bypass WA's offset, blur, spread, and shadow-color knobs.
@@ -169,6 +162,13 @@
 
 @layer app-branding {
     :root {
+        /*
+         * Use this layer for the shared spacing unit. Move an existing
+         * --spacing declaration here from @theme so host utilities use it too.
+         * Recheck compact forms and mobile navigation after changing it.
+         */
+        /* --spacing: 0.25rem; */
+
         /*
          * Advanced WA-only tuning. These controls do not change Tailwind.
          * Prefer shared @theme inputs for project-wide identity.

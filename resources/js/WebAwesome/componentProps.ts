@@ -1235,28 +1235,28 @@ export interface PageNativeProps extends Omit<
     | 'navOpen'
     | 'mobile-breakpoint'
     | 'mobileBreakpoint'
+    | 'disable-sticky'
+    | 'disableSticky'
     | 'navigation-placement'
     | 'navigationPlacement'
     | 'disable-navigation-toggle'
     | 'disableNavigationToggle'
     | 'dir'
     | 'lang'
-    | 'disable-sticky'
-    | 'disableSticky'
 > {
     nonce?: WaPage['nonce'];
     'nav-open'?: WaPage['navOpen'];
     navOpen?: WaPage['navOpen'];
     'mobile-breakpoint'?: WaPage['mobileBreakpoint'];
     mobileBreakpoint?: WaPage['mobileBreakpoint'];
+    'disable-sticky'?: string;
+    disableSticky?: string;
     'navigation-placement'?: WaPage['navigationPlacement'];
     navigationPlacement?: WaPage['navigationPlacement'];
     'disable-navigation-toggle'?: WaPage['disableNavigationToggle'];
     disableNavigationToggle?: WaPage['disableNavigationToggle'];
     dir?: WaPage['dir'];
     lang?: WaPage['lang'];
-    'disable-sticky'?: string;
-    disableSticky?: string;
     slot?: string;
 }
 

@@ -30,6 +30,7 @@ interface ComponentDefinition {
     attributes: readonly AttributeDefinition[];
     properties: readonly string[];
     formAssociated?: boolean;
+    seedResetDefault?: boolean;
     slots?: readonly string[];
 }
 
@@ -106,6 +107,7 @@ export function useWebAwesome(
     const resetAttributes = new Map<string, AttributeDefinition>();
     const initialAttributes = new Map<string, unknown>();
     const propertyDestinations = new Set<string>();
+    const attributeDefaults = new Map<string, unknown>();
     let modelWriters = new Map<string, (element: HTMLElement) => void>();
     let pendingOwners = new Map<string, () => boolean>();
     let appliedOwners = new Map<string, () => boolean>();
@@ -178,6 +180,7 @@ export function useWebAwesome(
         targets.set(property, target);
         targets.set(kebabCase(property), target);
     }
+    const seededResetAttributes = definition.seedResetDefault === false ? [] : resetAttributes;
 
     function collect() {
         const bindings: Record<string, unknown> = {};
@@ -293,7 +296,7 @@ export function useWebAwesome(
                       ? 'calendar'
                       : 'form-control';
         }
-        for (const [property, attribute] of resetAttributes) {
+        for (const [property, attribute] of seededResetAttributes) {
             if (!initialAttributes.has(attribute.attribute))
                 initialAttributes.set(attribute.attribute, properties.get(property));
             const destination = `^${attribute.attribute}`;
@@ -311,12 +314,30 @@ export function useWebAwesome(
     function applyProperties() {
         const root = element.value;
         if (phase !== 'ready' || !root) return;
-        collect();
+        const bindings = collect();
+        for (const [property, original] of attributeDefaults) {
+            if (pendingProperties.has(property)) continue;
+            const target = targets.get(property);
+            if (
+                target?.kind === 'attribute' &&
+                !Object.hasOwn(bindings, `^${target.definition.attribute}`)
+            )
+                Reflect.set(root, property, original);
+            attributeDefaults.delete(property);
+            propertyDestinations.delete(property);
+        }
         const ordered = [...pendingProperties].sort(
             ([left], [right]) =>
                 Number(right.startsWith('default')) - Number(left.startsWith('default')),
         );
         for (const [property, value] of ordered) {
+            // Object-valued attributes bypass Vue's native attribute removal.
+            if (
+                propertyDestinations.has(property) &&
+                targets.get(property)?.kind === 'attribute' &&
+                !attributeDefaults.has(property)
+            )
+                attributeDefaults.set(property, Reflect.get(root, property));
             const sameIdentity = Object.is(appliedProperties.get(property), value);
             const ownerChanged = pendingOwners.has(property)
                 ? !appliedOwners.get(property)?.()
@@ -394,10 +415,31 @@ export function useWebAwesome(
             return;
         const commits = models.map((model) => model.captureCommit());
         for (const observer of autofill.values()) observer.reset(event);
-        queueMicrotask(() => {
-            if (phase === 'ready' && !event.defaultPrevented && element.value === root)
+        // These elements reset their backing field without notifying Lit of the value change.
+        const requestUpdate: unknown =
+            (tag === 'wa-textarea' || tag === 'wa-slider') && Reflect.get(root, 'requestUpdate');
+        let previous: unknown = requestUpdate && Reflect.get(root, 'value');
+        const refreshFormValue = () => {
+            if (
+                typeof requestUpdate !== 'function' ||
+                phase !== 'ready' ||
+                event.defaultPrevented ||
+                element.value !== root
+            )
+                return;
+            const current: unknown = Reflect.get(root, 'value');
+            if (Object.is(current, previous)) return;
+            Reflect.apply(requestUpdate, root, ['value', previous]);
+            previous = current;
+        };
+        if (requestUpdate) queueMicrotask(refreshFormValue);
+        // The native reset callback can run after the reset event's microtasks.
+        setTimeout(() => {
+            if (phase === 'ready' && !event.defaultPrevented && element.value === root) {
+                refreshFormValue();
                 for (const commit of commits) commit(root);
-        });
+            }
+        }, 0);
     }
 
     onMounted(async () => {

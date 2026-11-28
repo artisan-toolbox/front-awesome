@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
+import { spacingHosts } from '../resources/js/theme/spacing.mjs';
 import { layers } from './theme-tokens.mjs';
 const packageNames = ['@awesome.me/webawesome', 'tailwindcss', 'primevue', '@primeuix/themes'];
 const files = [
@@ -12,7 +13,20 @@ const files = [
     'styles/color/variants/success.css',
     'styles/color/variants/warning.css',
     'styles/color/variants/danger.css',
-    'components/page/page.styles.js',
+    ...new Set(
+        [
+            ...spacingHosts.map((tag) => tag.slice(3)),
+            'badge',
+            'breadcrumb-item',
+            'button',
+            'callout',
+            'input',
+            'option',
+            'page',
+            'select',
+            'tag-input',
+        ].map((name) => `components/${name}/${name}.styles.js`),
+    ),
 ];
 const versions = Object.fromEntries(
     await Promise.all(
@@ -82,7 +96,7 @@ assert.deepEqual(inventory.unresolved, [], 'Adapter contains unresolved token in
 const record = {
     versions,
     edition: 'Core',
-    pro: 'Not tested. Resolver unit fixtures do not establish Pro theme compatibility.',
+    pro: 'Use FRONT_AWESOME_PRO=1 npm run test:theme with a licensed installation.',
     hashes,
     inventory,
 };

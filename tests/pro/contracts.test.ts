@@ -15,18 +15,22 @@ import coreDefinitions from '../../resources/js/WebAwesome/components.json';
 const root = resolve(import.meta.dirname, '../..');
 
 test('publishes every licensed-only component without introducing licensed dependencies into Core imports', () => {
-    const manifest = JSON.parse(
-        readFileSync(
-            resolve(root, 'node_modules/@web.awesome.me/webawesome-pro/dist/custom-elements.json'),
-            'utf8',
-        ),
-    );
+    const dist = resolve(root, 'node_modules/@web.awesome.me/webawesome-pro/dist');
+    const manifest = JSON.parse(readFileSync(resolve(dist, 'custom-elements.json'), 'utf8'));
     const coreTags = new Set(coreDefinitions.map((definition) => definition.tag));
     const tags = manifest.modules
         .flatMap((module: { declarations?: { tagName?: string }[] }) => module.declarations ?? [])
-        .flatMap((declaration: { tagName?: string }) =>
-            declaration.tagName && !coreTags.has(declaration.tagName) ? [declaration.tagName] : [],
-        );
+        .flatMap(({ tagName }: { tagName?: string }) => {
+            if (!tagName) return [];
+            const reference = resolve(
+                dist,
+                `skills/webawesome/references/components/${tagName.slice(3)}.md`,
+            );
+            const title = readFileSync(reference, 'utf8').split('\n', 1)[0]?.trimEnd();
+            return title?.endsWith('[Pro]') ? [tagName] : [];
+        });
+    expect(tags).toContain('wa-rich-text-editor');
+    expect(tags.some((tag: string) => coreTags.has(tag))).toBe(false);
     expect(definitions.map((definition) => definition.tag).sort()).toEqual(tags.sort());
     const pkg = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8'));
     for (const definition of definitions) {

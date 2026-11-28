@@ -302,6 +302,17 @@
             </Dropdown>
         </template>
         <template v-if="scenario === 'dropdown-13'">
+            <Dropdown data-upstream-index="0" class="brand-dropdown">
+                <Button data-upstream-index="1" appearance="filled" slot="trigger" with-caret
+                    >Edit</Button
+                >
+
+                <DropdownItem data-upstream-index="2">Cut</DropdownItem>
+                <DropdownItem data-upstream-index="3">Copy</DropdownItem>
+                <DropdownItem data-upstream-index="4">Paste</DropdownItem>
+            </Dropdown>
+        </template>
+        <template v-if="scenario === 'dropdown-14'">
             <div class="dropdown-zoom-demo">
                 <div class="dropdown-zoom-stage">
                     <div class="dropdown-zoom-content">

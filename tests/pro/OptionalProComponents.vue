@@ -12,6 +12,7 @@
     <PieChart />
     <PolarAreaChart />
     <RadarChart />
+    <RichTextEditor />
     <ScatterChart />
     <Sparkline />
     <Video />
@@ -33,6 +34,7 @@ import {
     PieChart,
     PolarAreaChart,
     RadarChart,
+    RichTextEditor,
     ScatterChart,
     Sparkline,
     Video,

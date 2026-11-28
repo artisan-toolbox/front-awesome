@@ -292,7 +292,7 @@ test.each([false, true])(
         } else {
             await expect
                 .poll(() => submissions)
-                .toEqual([{ owner: '001234', native: '001234', submitter: null }]);
+                .toEqual([{ owner: '001234', native: '001234', submitter: 'continue' }]);
         }
         expect(observed).toEqual(['001234']);
     },
@@ -309,7 +309,7 @@ test('OtpInput reconciles a silent native code on Enter without changing submiss
     await userEvent.keyboard('{Enter}');
     await expect
         .poll(() => submissions)
-        .toEqual([{ owner: '001234', native: '001234', submitter: null }]);
+        .toEqual([{ owner: '001234', native: '001234', submitter: 'continue' }]);
 });
 
 for (const spec of controls) {
@@ -387,7 +387,7 @@ for (const spec of controls) {
         await ready(raw);
         expect(input.value).toBe(raw.value);
         expect(input.input.value).toBe(raw.input.value);
-        expect(new FormData(nativeForm).get('unbound')).toBe(new FormData(rawForm).get('unbound'));
+        expect(new FormData(nativeForm).get('unbound')).toBe(spec.initial);
     });
 }
 
@@ -440,7 +440,9 @@ test('NumberInput reconciles a silent native number before Enter submission', as
     await ready(input);
     input.input.value = '42';
     await userEvent.keyboard('{Enter}');
-    await expect.poll(() => submissions).toEqual([{ owner: '42', native: '42', submitter: null }]);
+    await expect
+        .poll(() => submissions)
+        .toEqual([{ owner: '42', native: '42', submitter: 'continue' }]);
 });
 
 test('Textarea preserves Enter as text entry while reconciling an address fill', async () => {

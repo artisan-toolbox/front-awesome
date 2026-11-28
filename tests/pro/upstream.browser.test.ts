@@ -46,6 +46,21 @@ function scalarState(element: HTMLElement) {
             if (!property || property === 'form') return [];
             let value: unknown = Reflect.get(element, property);
             if (
+                element.localName === 'wa-rich-text-editor' &&
+                property === 'defaultValue' &&
+                typeof value === 'string' &&
+                Reflect.get(element, 'format') === 'html'
+            ) {
+                // Vue compiles template whitespace. The editor's serialized value is compared separately.
+                const template = document.createElement('template');
+                template.innerHTML = value;
+                for (const node of template.content.querySelectorAll<HTMLElement>('[style]'))
+                    node.setAttribute('style', node.style.cssText);
+                value = template.innerHTML
+                    .replace(/>\s+|\s+</g, (boundary) => boundary.trim())
+                    .replace(/\s+/g, ' ');
+            }
+            if (
                 ['min', 'max', 'step'].includes(property) &&
                 typeof value === 'string' &&
                 value !== '' &&

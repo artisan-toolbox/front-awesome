@@ -46,8 +46,8 @@ export const frontAwesomePrimeVueTheme = {
             primary: palette('brand'),
             focusRing: { color: 'var(--wa-color-focus)' },
             formField: {
-                paddingX: 'calc(var(--spacing) * 3)',
-                paddingY: 'calc(var(--spacing) * 2)',
+                paddingX: 'calc(var(--fa-utility-spacing, var(--spacing)) * 3)',
+                paddingY: 'calc(var(--fa-utility-spacing, var(--spacing)) * 2)',
             },
             overlay: {
                 select: { shadow: 'var(--shadow-md)' },

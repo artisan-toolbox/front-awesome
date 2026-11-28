@@ -2,13 +2,13 @@
   "upstream": [
     {
       "edition": "core",
-      "version": "3.14.0",
-      "examples": 647
+      "version": "3.15.0",
+      "examples": 653
     },
     {
       "edition": "pro",
-      "version": "3.14.0",
-      "examples": 259
+      "version": "3.15.0",
+      "examples": 299
     }
   ],
   "assertions": [
@@ -19,8 +19,8 @@
     "Shadow part structure"
   ],
   "scriptSetup": {
-    "executedExamples": 256,
-    "examplesWithoutExecutableScripts": 644,
+    "executedExamples": 264,
+    "examplesWithoutExecutableScripts": 677,
     "additionalPrerequisites": [
       {
         "id": "otp-input-17",
@@ -113,6 +113,64 @@
           ],
           "environmentLimit": "The deterministic orders response verifies the request boundary. Production API availability is outside this fixture."
         }
+      },
+      {
+        "id": "rich-text-editor-13",
+        "component": "RichTextEditor",
+        "limitations": ["The reference opens a browser alert on submit."],
+        "isolatedVerification": {
+          "testFile": "tests/pro/rich-text-editor.browser.test.ts",
+          "branches": ["Native validation and serialized FormData"],
+          "environmentLimit": "The reference opens a browser alert on submit."
+        }
+      },
+      {
+        "id": "rich-text-editor-15",
+        "component": "RichTextEditor",
+        "limitations": [
+          "The installed reference collapses the line breaks in the Markdown source."
+        ],
+        "isolatedVerification": {
+          "testFile": "tests/pro/rich-text-editor.browser.test.ts",
+          "branches": ["Markdown editing and serialized FormData"],
+          "environmentLimit": "The installed reference collapses the line breaks in the Markdown source."
+        }
+      },
+      {
+        "id": "rich-text-editor-28",
+        "component": "RichTextEditor",
+        "limitations": [
+          "The installed reference collapses the script into a line containing comments. The test uses a local provider."
+        ],
+        "isolatedVerification": {
+          "testFile": "tests/pro/rich-text-editor.browser.test.ts",
+          "branches": ["Image insertion and provider cancellation"],
+          "environmentLimit": "The installed reference collapses the script into a line containing comments. The test uses a local provider."
+        }
+      },
+      {
+        "id": "rich-text-editor-35",
+        "component": "RichTextEditor",
+        "limitations": [
+          "The installed reference collapses the script into a line containing comments. The test uses a local suggestion source."
+        ],
+        "isolatedVerification": {
+          "testFile": "tests/pro/rich-text-editor.browser.test.ts",
+          "branches": ["Suggestion formatting, keyboard selection, and rejected requests"],
+          "environmentLimit": "The installed reference collapses the script into a line containing comments. The test uses a local suggestion source."
+        }
+      },
+      {
+        "id": "rich-text-editor-37",
+        "component": "RichTextEditor",
+        "limitations": [
+          "The installed reference collapses the script into a line containing comments."
+        ],
+        "isolatedVerification": {
+          "testFile": "tests/pro/rich-text-editor.browser.test.ts",
+          "branches": ["Track edits and mark a saved value clean"],
+          "environmentLimit": "The installed reference collapses the script into a line containing comments."
+        }
       }
     ]
   },
@@ -124,8 +182,8 @@
       "name": "Accordion",
       "tag": "wa-accordion",
       "edition": "core",
-      "ownReferenceExamples": 15,
-      "renderedInExamples": 16,
+      "ownReferenceExamples": 16,
+      "renderedInExamples": 17,
       "actionTestReferences": [
         {
           "file": "tests/frontend/upstream-interactions.browser.test.ts",
@@ -138,7 +196,7 @@
       "tag": "wa-accordion-item",
       "edition": "core",
       "ownReferenceExamples": 1,
-      "renderedInExamples": 16,
+      "renderedInExamples": 17,
       "actionTestReferences": [
         {
           "file": "tests/frontend/models.browser.test.ts",
@@ -193,7 +251,7 @@
       "tag": "wa-avatar",
       "edition": "core",
       "ownReferenceExamples": 6,
-      "renderedInExamples": 8,
+      "renderedInExamples": 9,
       "actionTestReferences": []
     },
     {
@@ -240,7 +298,7 @@
       "tag": "wa-button",
       "edition": "core",
       "ownReferenceExamples": 14,
-      "renderedInExamples": 155,
+      "renderedInExamples": 160,
       "actionTestReferences": [
         {
           "file": "tests/frontend/appearance.browser.test.ts",
@@ -265,6 +323,14 @@
         {
           "file": "tests/frontend/upstream-interactions.browser.test.ts",
           "title": "opens a dropdown from its projected trigger and forwards item selection"
+        },
+        {
+          "file": "tests/frontend/wrapper-compatibility.browser.test.ts",
+          "title": "projects Button named slots and native slotted children together across updates"
+        },
+        {
+          "file": "tests/pro/rich-text-editor.browser.test.ts",
+          "title": "RichTextEditor mounts before registration, preserves slots and listeners, and keeps a separate reset default"
         }
       ]
     },
@@ -293,8 +359,8 @@
       "name": "Card",
       "tag": "wa-card",
       "edition": "core",
-      "ownReferenceExamples": 8,
-      "renderedInExamples": 10,
+      "ownReferenceExamples": 9,
+      "renderedInExamples": 11,
       "actionTestReferences": [
         {
           "file": "tests/frontend/form-validation.browser.test.ts",
@@ -561,8 +627,8 @@
       "name": "Dropdown",
       "tag": "wa-dropdown",
       "edition": "core",
-      "ownReferenceExamples": 13,
-      "renderedInExamples": 17,
+      "ownReferenceExamples": 14,
+      "renderedInExamples": 18,
       "actionTestReferences": [
         {
           "file": "tests/frontend/models.browser.test.ts",
@@ -583,7 +649,7 @@
       "tag": "wa-dropdown-item",
       "edition": "core",
       "ownReferenceExamples": 1,
-      "renderedInExamples": 18,
+      "renderedInExamples": 19,
       "actionTestReferences": [
         {
           "file": "tests/frontend/models.browser.test.ts",
@@ -636,8 +702,8 @@
       "name": "Icon",
       "tag": "wa-icon",
       "edition": "core",
-      "ownReferenceExamples": 41,
-      "renderedInExamples": 131,
+      "ownReferenceExamples": 43,
+      "renderedInExamples": 132,
       "actionTestReferences": [
         {
           "file": "tests/frontend/appearance.browser.test.ts",
@@ -964,6 +1030,10 @@
           "title": "preserves object inputs, exact native attribute names and consumer presentation"
         },
         {
+          "file": "tests/frontend/wrapper-compatibility.browser.test.ts",
+          "title": "removing an external Popup anchor restores positioning against its slotted anchor"
+        },
+        {
           "file": "tests/pro/upstream-prerequisites.browser.test.ts",
           "title": "runs original Core ${id} placement controls with licensed Pro Combobox"
         }
@@ -1182,6 +1252,14 @@
         {
           "file": "tests/frontend/upstream-interactions.browser.test.ts",
           "title": "updates ratings and sliders through keyboard controls and applies value formatter callbacks"
+        },
+        {
+          "file": "tests/frontend/wrapper-compatibility.browser.test.ts",
+          "title": "${control} submits its reset default after editing and keeps its value when reset is canceled"
+        },
+        {
+          "file": "tests/frontend/wrapper-compatibility.browser.test.ts",
+          "title": "programmatic reset serializes unbound and Inertia controls after their native update"
         }
       ]
     },
@@ -1253,7 +1331,7 @@
       "tag": "wa-switch",
       "edition": "core",
       "ownReferenceExamples": 7,
-      "renderedInExamples": 18,
+      "renderedInExamples": 19,
       "actionTestReferences": [
         {
           "file": "tests/frontend/reset.browser.test.ts",
@@ -1328,8 +1406,8 @@
       "name": "Tag",
       "tag": "wa-tag",
       "edition": "core",
-      "ownReferenceExamples": 7,
-      "renderedInExamples": 10,
+      "ownReferenceExamples": 8,
+      "renderedInExamples": 11,
       "actionTestReferences": [
         {
           "file": "tests/frontend/reset.browser.test.ts",
@@ -1379,7 +1457,7 @@
       "tag": "wa-textarea",
       "edition": "core",
       "ownReferenceExamples": 13,
-      "renderedInExamples": 15,
+      "renderedInExamples": 16,
       "actionTestReferences": [
         {
           "file": "tests/frontend/adapter.browser.test.ts",
@@ -1396,6 +1474,14 @@
         {
           "file": "tests/frontend/upstream-interactions.browser.test.ts",
           "title": "handles textarea and number input edits and restores their form reset values"
+        },
+        {
+          "file": "tests/frontend/wrapper-compatibility.browser.test.ts",
+          "title": "${control} submits its reset default after editing and keeps its value when reset is canceled"
+        },
+        {
+          "file": "tests/frontend/wrapper-compatibility.browser.test.ts",
+          "title": "programmatic reset serializes unbound and Inertia controls after their native update"
         }
       ]
     },
@@ -1776,6 +1862,31 @@
         {
           "file": "tests/pro/interactions.browser.test.ts",
           "title": "Pro ${tag} paints a real canvas, executes configured click callbacks and updates reactive config"
+        }
+      ]
+    },
+    {
+      "name": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "edition": "pro",
+      "ownReferenceExamples": 40,
+      "renderedInExamples": 40,
+      "actionTestReferences": [
+        {
+          "file": "tests/pro/rich-text-editor.browser.test.ts",
+          "title": "RichTextEditor mounts before registration, preserves slots and listeners, and keeps a separate reset default"
+        },
+        {
+          "file": "tests/pro/rich-text-editor.browser.test.ts",
+          "title": "RichTextEditor matches native interactions and parts without Tailwind after prior registration"
+        },
+        {
+          "file": "tests/pro/rich-text-editor.browser.test.ts",
+          "title": "RichTextEditor forwards suggestions by identity and emits the original typed error when a request rejects"
+        },
+        {
+          "file": "tests/pro/rich-text-editor.browser.test.ts",
+          "title": "RichTextEditor preserves provider identity and handles accepted, canceled, and rejected media"
         }
       ]
     },

@@ -1,6 +1,6 @@
 {
   "edition": "core",
-  "version": "3.14.0",
+  "version": "3.15.0",
   "components": [
     {
       "name": "Accordion",
@@ -555,6 +555,31 @@
       "id": "accordion-12",
       "component": "Accordion",
       "tag": "wa-accordion",
+      "title": "Customizing",
+      "source": "skills/webawesome/references/components/accordion.md",
+      "original": "<wa-accordion class=\"brand-accordion\">\n  <wa-accordion-item label=\"Background and border\">\n    These go on the accordion element itself.\n  </wa-accordion-item>\n  <wa-accordion-item label=\"Dividers\">\n    Each divider is the top border of the item below it.\n  </wa-accordion-item>\n  <wa-accordion-item label=\"Everything else\">\n    Style headers and content with the accordion item's CSS parts.\n  </wa-accordion-item>\n</wa-accordion>\n\n<style>\n  wa-accordion.brand-accordion {\n    background-color: var(--wa-color-brand-fill-quiet);\n    border-color: var(--wa-color-brand-border-quiet);\n    border-radius: var(--wa-border-radius-s);\n  }\n\n  wa-accordion.brand-accordion > wa-accordion-item {\n    border-top-color: var(--wa-color-brand-border-quiet);\n  }\n</style>",
+      "markup": "<wa-accordion data-upstream-index=\"0\" class=\"brand-accordion\">\n  <wa-accordion-item data-upstream-index=\"1\" label=\"Background and border\">\n    These go on the accordion element itself.\n  </wa-accordion-item>\n  <wa-accordion-item data-upstream-index=\"2\" label=\"Dividers\">\n    Each divider is the top border of the item below it.\n  </wa-accordion-item>\n  <wa-accordion-item data-upstream-index=\"3\" label=\"Everything else\">\n    Style headers and content with the accordion item's CSS parts.\n  </wa-accordion-item>\n</wa-accordion>\n\n",
+      "scripts": [],
+      "styles": [
+        "wa-accordion.brand-accordion {\n    background-color: var(--wa-color-brand-fill-quiet);\n    border-color: var(--wa-color-brand-border-quiet);\n    border-radius: var(--wa-border-radius-s);\n  }\n\n  wa-accordion.brand-accordion > wa-accordion-item {\n    border-top-color: var(--wa-color-brand-border-quiet);\n  }"
+      ],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 0,
+        "dataScripts": 0,
+        "styles": 1,
+        "elements": 4
+      },
+      "externalResources": [],
+      "scriptExecution": "none",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "accordion-13",
+      "component": "Accordion",
+      "tag": "wa-accordion",
       "title": "HTML in the Label",
       "source": "skills/webawesome/references/components/accordion.md",
       "original": "<wa-accordion>\n  <wa-accordion-item>\n    <div slot=\"label\" class=\"wa-split\">\n      <span>Tasks</span>\n      <wa-badge appearance=\"filled\" variant=\"success\" style=\"font-size: var(--wa-font-size-xs);\">3 ready</wa-badge>\n    </div>\n    All three tasks are ready to be reviewed.\n  </wa-accordion-item>\n  <wa-accordion-item>\n    <div slot=\"label\" class=\"wa-split\">\n      <span>Issues</span>\n      <wa-badge appearance=\"filled\" variant=\"danger\" style=\"font-size: var(--wa-font-size-xs);\">2 open</wa-badge>\n    </div>\n    There are two open issues that need your attention.\n  </wa-accordion-item>\n</wa-accordion>",
@@ -575,7 +600,7 @@
       "inputAdaptation": null
     },
     {
-      "id": "accordion-13",
+      "id": "accordion-14",
       "component": "Accordion",
       "tag": "wa-accordion",
       "title": "Expand & Collapse All",
@@ -600,7 +625,7 @@
       "inputAdaptation": null
     },
     {
-      "id": "accordion-14",
+      "id": "accordion-15",
       "component": "Accordion",
       "tag": "wa-accordion",
       "title": "Nested Accordions",
@@ -623,7 +648,7 @@
       "inputAdaptation": null
     },
     {
-      "id": "accordion-15",
+      "id": "accordion-16",
       "component": "Accordion",
       "tag": "wa-accordion",
       "title": "Preventing Expand or Collapse",
@@ -2290,6 +2315,31 @@
       "externalResources": [
         "https://images.unsplash.com/photo-1559209172-0ff8f6d49ff7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=80"
       ],
+      "scriptExecution": "none",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "card-9",
+      "component": "Card",
+      "tag": "wa-card",
+      "title": "Customizing",
+      "source": "skills/webawesome/references/components/card.md",
+      "original": "<wa-card class=\"brand-card\">\n  <div slot=\"header\">Custom Card</div>\n  These styles are set on the card element itself.\n</wa-card>\n\n<style>\n  wa-card.brand-card {\n    max-width: 300px;\n    background-color: var(--wa-color-brand-fill-quiet);\n    border-color: var(--wa-color-brand-border-quiet);\n    box-shadow: none;\n  }\n</style>",
+      "markup": "<wa-card data-upstream-index=\"0\" class=\"brand-card\">\n  <div slot=\"header\">Custom Card</div>\n  These styles are set on the card element itself.\n</wa-card>\n\n",
+      "scripts": [],
+      "styles": [
+        "wa-card.brand-card {\n    max-width: 300px;\n    background-color: var(--wa-color-brand-fill-quiet);\n    border-color: var(--wa-color-brand-border-quiet);\n    box-shadow: none;\n  }"
+      ],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 0,
+        "dataScripts": 0,
+        "styles": 1,
+        "elements": 1
+      },
+      "externalResources": [],
       "scriptExecution": "none",
       "limitations": [],
       "inputAdaptation": null
@@ -4990,6 +5040,31 @@
       "id": "dropdown-13",
       "component": "Dropdown",
       "tag": "wa-dropdown",
+      "title": "Customizing",
+      "source": "skills/webawesome/references/components/dropdown.md",
+      "original": "<wa-dropdown class=\"brand-dropdown\">\n  <wa-button appearance=\"filled\" slot=\"trigger\" with-caret>Edit</wa-button>\n\n  <wa-dropdown-item>Cut</wa-dropdown-item>\n  <wa-dropdown-item>Copy</wa-dropdown-item>\n  <wa-dropdown-item>Paste</wa-dropdown-item>\n</wa-dropdown>\n\n<style>\n  wa-dropdown.brand-dropdown::part(menu) {\n    background-color: var(--wa-color-brand-fill-quiet);\n    border-color: var(--wa-color-brand-border-quiet);\n    border-radius: var(--wa-border-radius-l);\n  }\n</style>",
+      "markup": "<wa-dropdown data-upstream-index=\"0\" class=\"brand-dropdown\">\n  <wa-button data-upstream-index=\"1\" appearance=\"filled\" slot=\"trigger\" with-caret>Edit</wa-button>\n\n  <wa-dropdown-item data-upstream-index=\"2\">Cut</wa-dropdown-item>\n  <wa-dropdown-item data-upstream-index=\"3\">Copy</wa-dropdown-item>\n  <wa-dropdown-item data-upstream-index=\"4\">Paste</wa-dropdown-item>\n</wa-dropdown>\n\n",
+      "scripts": [],
+      "styles": [
+        "wa-dropdown.brand-dropdown::part(menu) {\n    background-color: var(--wa-color-brand-fill-quiet);\n    border-color: var(--wa-color-brand-border-quiet);\n    border-radius: var(--wa-border-radius-l);\n  }"
+      ],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 0,
+        "dataScripts": 0,
+        "styles": 1,
+        "elements": 5
+      },
+      "externalResources": [],
+      "scriptExecution": "none",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "dropdown-14",
+      "component": "Dropdown",
+      "tag": "wa-dropdown",
       "title": "Reacting to Selections",
       "source": "skills/webawesome/references/components/dropdown.md",
       "original": "<div class=\"dropdown-zoom-demo\">\n  <div class=\"dropdown-zoom-stage\">\n    <div class=\"dropdown-zoom-content\">\n      <wa-icon name=\"image\"></wa-icon>\n      <span class=\"dropdown-zoom-level\">100%</span>\n    </div>\n  </div>\n\n  <wa-dropdown>\n    <wa-button appearance=\"filled\" slot=\"trigger\" with-caret>View</wa-button>\n    <wa-dropdown-item value=\"zoom-in\">Zoom in</wa-dropdown-item>\n    <wa-dropdown-item value=\"zoom-out\">Zoom out</wa-dropdown-item>\n    <wa-divider></wa-divider>\n    <wa-dropdown-item value=\"actual\">Actual size</wa-dropdown-item>\n  </wa-dropdown>\n</div>\n\n<script>\n  const demo = document.querySelector('.dropdown-zoom-demo');\n  const content = demo.querySelector('.dropdown-zoom-content');\n  const level = demo.querySelector('.dropdown-zoom-level');\n  const dropdown = demo.querySelector('wa-dropdown');\n  let zoom = 1;\n\n  dropdown.addEventListener('wa-select', event => {\n    const action = event.detail.item.value;\n\n    if (action === 'zoom-in') zoom = Math.min(zoom + 0.25, 2);\n    if (action === 'zoom-out') zoom = Math.max(zoom - 0.25, 0.5);\n    if (action === 'actual') zoom = 1;\n\n    content.style.transform = `scale(${zoom})`;\n    level.textContent = `${Math.round(zoom * 100)}%`;\n  });\n</script>\n\n<style>\n  .dropdown-zoom-demo .dropdown-zoom-stage {\n    display: grid;\n    place-items: center;\n    height: 12rem;\n    margin-block-end: 1rem;\n    overflow: hidden;\n    border-radius: var(--wa-border-radius-l);\n    background-color: color-mix(in srgb, var(--wa-color-brand-fill-loud) 8%, transparent);\n  }\n\n  .dropdown-zoom-demo .dropdown-zoom-content {\n    display: flex;\n    flex-direction: column;\n    align-items: center;\n    gap: var(--wa-space-2xs);\n    transition: transform 150ms ease;\n  }\n\n  .dropdown-zoom-demo .dropdown-zoom-content wa-icon {\n    font-size: 3rem;\n    color: var(--wa-color-brand-fill-loud);\n  }\n\n  .dropdown-zoom-demo .dropdown-zoom-level {\n    font-size: var(--wa-font-size-s);\n    font-variant-numeric: tabular-nums;\n  }\n</style>",
@@ -5988,6 +6063,59 @@
       "id": "icon-24",
       "component": "Icon",
       "tag": "wa-icon",
+      "title": "Changing the Default Family & Variant",
+      "source": "skills/webawesome/references/components/icon.md",
+      "original": "<html data-fa-kit-code=\"YOUR_KIT_CODE_HERE\" data-fa-family=\"sharp\" data-fa-variant=\"light\">\n  …\n</html>",
+      "markup": "<wa-icon data-upstream-index=\"0\"></wa-icon>\n<html data-fa-kit-code=\"YOUR_KIT_CODE_HERE\" data-fa-family=\"sharp\" data-fa-variant=\"light\">\n  …\n</html>",
+      "scripts": [],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": "Creates the referenced Icon before running the standalone API snippet.",
+      "counts": {
+        "scripts": 0,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 1
+      },
+      "externalResources": [],
+      "scriptExecution": "none",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "icon-25",
+      "component": "Icon",
+      "tag": "wa-icon",
+      "title": "Changing the Default Family & Variant",
+      "source": "skills/webawesome/references/components/icon.md",
+      "original": "<script type=\"module\">\n  import { setDefaultIconFamily } from '/dist/webawesome.js';\n\n  setDefaultIconFamily('sharp', 'light');\n</script>",
+      "markup": "<wa-icon data-upstream-index=\"0\"></wa-icon>\n",
+      "scripts": [
+        "import { setDefaultIconFamily } from '/dist/webawesome.js';\n\n  setDefaultIconFamily('sharp', 'light');"
+      ],
+      "styles": [],
+      "scriptImports": [
+        {
+          "names": ["setDefaultIconFamily"],
+          "source": "/dist/webawesome.js"
+        }
+      ],
+      "fixtureSetup": "Creates the referenced Icon before running the standalone API snippet.",
+      "counts": {
+        "scripts": 1,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 1
+      },
+      "externalResources": [],
+      "scriptExecution": "scoped",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "icon-26",
+      "component": "Icon",
+      "tag": "wa-icon",
       "title": "Canvas",
       "source": "skills/webawesome/references/components/icon.md",
       "original": "<div class=\"canvas-demo\">\n  <div class=\"canvas-demo-preview wa-cluster\">\n    <wa-icon\n      name=\"ruler-horizontal\"\n      style=\"background: var(--wa-color-brand-fill-quiet); border: var(--wa-border-width-s) dashed var(--wa-color-brand-border-loud);\"\n    ></wa-icon>\n    <wa-icon\n      name=\"image\"\n      style=\"background: var(--wa-color-brand-fill-quiet); border: var(--wa-border-width-s) dashed var(--wa-color-brand-border-loud);\"\n    ></wa-icon>\n    <wa-icon\n      name=\"face-smile\"\n      style=\"background: var(--wa-color-brand-fill-quiet); border: var(--wa-border-width-s) dashed var(--wa-color-brand-border-loud);\"\n    ></wa-icon>\n    <wa-icon\n      name=\"file\"\n      style=\"background: var(--wa-color-brand-fill-quiet); border: var(--wa-border-width-s) dashed var(--wa-color-brand-border-loud);\"\n    ></wa-icon>\n    <wa-icon\n      name=\"ruler-vertical\"\n      style=\"background: var(--wa-color-brand-fill-quiet); border: var(--wa-border-width-s) dashed var(--wa-color-brand-border-loud);\"\n    ></wa-icon>\n  </div>\n\n  <wa-divider></wa-divider>\n\n  <div class=\"wa-cluster wa-gap-xl\" style=\"align-items: start;\">\n    <wa-select label=\"Canvas\" name=\"canvas\" value=\"fixed\">\n      <wa-option value=\"fixed\">fixed</wa-option>\n      <wa-option value=\"auto\">auto</wa-option>\n      <wa-option value=\"square\">square</wa-option>\n      <wa-option value=\"roomy\">roomy</wa-option>\n    </wa-select>\n    <wa-slider label=\"Size\" min=\"0\" max=\"4\" value=\"2\" with-markers style=\"flex: 1 1 14rem;\">\n      <span slot=\"reference\">1.5rem</span>\n      <span slot=\"reference\">2rem</span>\n      <span slot=\"reference\">3rem</span>\n      <span slot=\"reference\">4rem</span>\n      <span slot=\"reference\">5rem</span>\n    </wa-slider>\n  </div>\n</div>\n\n<style>\n  .canvas-demo-preview {\n    margin-block-end: 1.5rem;\n    font-size: 3rem;\n  }\n</style>\n\n<script>\n  (() => {\n    const demo = document.querySelector('.canvas-demo');\n    const preview = demo.querySelector('.canvas-demo-preview');\n    const icons = preview.querySelectorAll('wa-icon');\n    const sizes = ['1.5rem', '2rem', '3rem', '4rem', '5rem'];\n\n    demo.querySelector('wa-select[name=\"canvas\"]').addEventListener('change', event => {\n      icons.forEach(icon => (icon.canvas = event.target.value));\n    });\n    demo.querySelector('wa-slider').addEventListener('input', event => {\n      preview.style.fontSize = sizes[event.target.value];\n    });\n  })();\n</script>",
@@ -6012,7 +6140,7 @@
       "inputAdaptation": null
     },
     {
-      "id": "icon-25",
+      "id": "icon-27",
       "component": "Icon",
       "tag": "wa-icon",
       "title": "Rotating & Flipping",
@@ -6035,7 +6163,7 @@
       "inputAdaptation": null
     },
     {
-      "id": "icon-26",
+      "id": "icon-28",
       "component": "Icon",
       "tag": "wa-icon",
       "title": "Beat",
@@ -6058,7 +6186,7 @@
       "inputAdaptation": null
     },
     {
-      "id": "icon-27",
+      "id": "icon-29",
       "component": "Icon",
       "tag": "wa-icon",
       "title": "Fade",
@@ -6081,7 +6209,7 @@
       "inputAdaptation": null
     },
     {
-      "id": "icon-28",
+      "id": "icon-30",
       "component": "Icon",
       "tag": "wa-icon",
       "title": "Beat-Fade",
@@ -6104,7 +6232,7 @@
       "inputAdaptation": null
     },
     {
-      "id": "icon-29",
+      "id": "icon-31",
       "component": "Icon",
       "tag": "wa-icon",
       "title": "Bounce",
@@ -6127,7 +6255,7 @@
       "inputAdaptation": null
     },
     {
-      "id": "icon-30",
+      "id": "icon-32",
       "component": "Icon",
       "tag": "wa-icon",
       "title": "Flip",
@@ -6150,7 +6278,7 @@
       "inputAdaptation": null
     },
     {
-      "id": "icon-31",
+      "id": "icon-33",
       "component": "Icon",
       "tag": "wa-icon",
       "title": "Flip 360",
@@ -6173,7 +6301,7 @@
       "inputAdaptation": null
     },
     {
-      "id": "icon-32",
+      "id": "icon-34",
       "component": "Icon",
       "tag": "wa-icon",
       "title": "Shake",
@@ -6196,7 +6324,7 @@
       "inputAdaptation": null
     },
     {
-      "id": "icon-33",
+      "id": "icon-35",
       "component": "Icon",
       "tag": "wa-icon",
       "title": "Spin",
@@ -6219,7 +6347,7 @@
       "inputAdaptation": null
     },
     {
-      "id": "icon-34",
+      "id": "icon-36",
       "component": "Icon",
       "tag": "wa-icon",
       "title": "Spin Snap",
@@ -6242,7 +6370,7 @@
       "inputAdaptation": null
     },
     {
-      "id": "icon-35",
+      "id": "icon-37",
       "component": "Icon",
       "tag": "wa-icon",
       "title": "Buzz",
@@ -6265,7 +6393,7 @@
       "inputAdaptation": null
     },
     {
-      "id": "icon-36",
+      "id": "icon-38",
       "component": "Icon",
       "tag": "wa-icon",
       "title": "Float",
@@ -6288,7 +6416,7 @@
       "inputAdaptation": null
     },
     {
-      "id": "icon-37",
+      "id": "icon-39",
       "component": "Icon",
       "tag": "wa-icon",
       "title": "Jello",
@@ -6311,7 +6439,7 @@
       "inputAdaptation": null
     },
     {
-      "id": "icon-38",
+      "id": "icon-40",
       "component": "Icon",
       "tag": "wa-icon",
       "title": "Swing",
@@ -6334,7 +6462,7 @@
       "inputAdaptation": null
     },
     {
-      "id": "icon-39",
+      "id": "icon-41",
       "component": "Icon",
       "tag": "wa-icon",
       "title": "Wag",
@@ -6357,7 +6485,7 @@
       "inputAdaptation": null
     },
     {
-      "id": "icon-40",
+      "id": "icon-42",
       "component": "Icon",
       "tag": "wa-icon",
       "title": "Duotone",
@@ -6384,7 +6512,7 @@
       "inputAdaptation": null
     },
     {
-      "id": "icon-41",
+      "id": "icon-43",
       "component": "Icon",
       "tag": "wa-icon",
       "title": "Swap Duotone Opacity",
@@ -13451,6 +13579,31 @@
     },
     {
       "id": "tag-7",
+      "component": "Tag",
+      "tag": "wa-tag",
+      "title": "Customizing",
+      "source": "skills/webawesome/references/components/tag.md",
+      "original": "<wa-tag class=\"brand-tag\">Custom Tag</wa-tag>\n\n<style>\n  wa-tag.brand-tag {\n    background-color: var(--wa-color-brand-fill-quiet);\n    border-color: var(--wa-color-brand-border-normal);\n    border-style: dashed;\n    color: var(--wa-color-brand-on-quiet);\n  }\n</style>",
+      "markup": "<wa-tag data-upstream-index=\"0\" class=\"brand-tag\">Custom Tag</wa-tag>\n\n",
+      "scripts": [],
+      "styles": [
+        "wa-tag.brand-tag {\n    background-color: var(--wa-color-brand-fill-quiet);\n    border-color: var(--wa-color-brand-border-normal);\n    border-style: dashed;\n    color: var(--wa-color-brand-on-quiet);\n  }"
+      ],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 0,
+        "dataScripts": 0,
+        "styles": 1,
+        "elements": 1
+      },
+      "externalResources": [],
+      "scriptExecution": "none",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "tag-8",
       "component": "Tag",
       "tag": "wa-tag",
       "title": "Removable",

@@ -2,6 +2,11 @@ import { mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { parseFragment } from 'parse5';
 import { format } from 'vite-plus/fmt';
+import {
+    requireRichTextEditor,
+    supportsCoreWrapper,
+    usesProLicense,
+} from './web-awesome-edition.mjs';
 
 const root = resolve(import.meta.dirname, '..');
 const pro = process.argv.includes('--pro');
@@ -12,19 +17,25 @@ const coreManifest = JSON.parse(readFileSync(resolve(core, 'custom-elements.json
 const coreTags = new Set(
     coreManifest.modules
         .flatMap((module) => module.declarations ?? [])
-        .filter((declaration) => declaration.tagName)
+        .filter(({ tagName }) => tagName && supportsCoreWrapper(tagName))
         .map((declaration) => declaration.tagName),
 );
 const manifest = JSON.parse(readFileSync(resolve(upstream, 'custom-elements.json'), 'utf8'));
 const declarations = manifest.modules
     .flatMap((module) => module.declarations ?? [])
     .filter((declaration) => declaration.tagName);
+if (pro) requireRichTextEditor(declarations);
 const components = declarations
-    .filter((declaration) => !pro || !coreTags.has(declaration.tagName))
+    .filter(({ tagName }) =>
+        pro ? usesProLicense(upstream, tagName) : supportsCoreWrapper(tagName),
+    )
     .map((declaration) => ({ name: declaration.name.replace(/^Wa/, ''), tag: declaration.tagName }))
     .sort((left, right) => left.name.localeCompare(right.name));
+const supportedTags = new Set([...coreTags, ...components.map((component) => component.tag)]);
 const names = new Map(
-    declarations.map((declaration) => [declaration.tagName, declaration.name.replace(/^Wa/, '')]),
+    declarations
+        .filter((declaration) => supportedTags.has(declaration.tagName))
+        .map((declaration) => [declaration.tagName, declaration.name.replace(/^Wa/, '')]),
 );
 const definitions = new Map(declarations.map((declaration) => [declaration.tagName, declaration]));
 const selectionTags = new Set(['wa-select', 'wa-combobox']);
@@ -34,8 +45,72 @@ const examplesEditingOptionNodes = new Set([
     'combobox-20',
     'combobox-29',
 ]);
+const richTextEditorSetup = new Map([
+    [
+        'rich-text-editor-13',
+        {
+            branches: ['Native validation and serialized FormData'],
+            environmentLimit: 'The reference opens a browser alert on submit.',
+        },
+    ],
+    [
+        'rich-text-editor-15',
+        {
+            branches: ['Markdown editing and serialized FormData'],
+            environmentLimit:
+                'The installed reference collapses the line breaks in the Markdown source.',
+        },
+    ],
+    [
+        'rich-text-editor-28',
+        {
+            branches: ['Image insertion and provider cancellation'],
+            environmentLimit:
+                'The installed reference collapses the script into a line containing comments. The test uses a local provider.',
+        },
+    ],
+    [
+        'rich-text-editor-35',
+        {
+            branches: ['Suggestion formatting, keyboard selection, and rejected requests'],
+            environmentLimit:
+                'The installed reference collapses the script into a line containing comments. The test uses a local suggestion source.',
+        },
+    ],
+    [
+        'rich-text-editor-37',
+        {
+            branches: ['Track edits and mark a saved value clean'],
+            environmentLimit:
+                'The installed reference collapses the script into a line containing comments.',
+        },
+    ],
+]);
 const check = process.argv.includes('--check');
 const scenarios = [];
+function textContent(node) {
+    return node.value ?? (node.childNodes ?? []).map(textContent).join('');
+}
+
+function sourceExamples(source, tag) {
+    const fenced = [...source.matchAll(/```html[^\n]*\n([\s\S]*?)```/g)].map((match) => ({
+        original: match[1].trim(),
+        index: match.index,
+    }));
+    if (tag !== 'wa-rich-text-editor') return fenced;
+
+    // The editor reference also contains highlighted HTML examples after the Markdown fences.
+    const inline = source.matchAll(
+        /<div class="code-example-source"[^>]*>\s*<pre[^>]*><code[^>]*>([\s\S]*?)<\/code>/g,
+    );
+    return fenced.concat(
+        Array.from(inline, (match) => ({
+            original: textContent(parseFragment(match[1])).trim(),
+            index: match.index,
+        })),
+    );
+}
+
 async function output(file, value) {
     const path = resolve(root, file);
     const formatted = await format(path, value, {
@@ -162,27 +237,32 @@ if (process.argv.includes('--coverage')) {
                                   environmentLimit:
                                       'Physical SMS transport is outside the synthetic credential service fixture.',
                               }
-                            : id === 'data-grid-31'
+                            : richTextEditorSetup.has(id)
                               ? {
-                                    testFile: 'tests/pro/upstream-prerequisites.browser.test.ts',
-                                    branches: [
-                                        'Exact request URL and AbortSignal',
-                                        'Orders response and loading state',
-                                        'Empty search results',
-                                    ],
-                                    environmentLimit:
-                                        'The deterministic orders response verifies the request boundary. Production API availability is outside this fixture.',
+                                    testFile: 'tests/pro/rich-text-editor.browser.test.ts',
+                                    ...richTextEditorSetup.get(id),
                                 }
-                              : {
-                                    testFile: 'tests/pro/upstream-prerequisites.browser.test.ts',
-                                    branches: [
-                                        'Real Pro Combobox keyboard selection',
-                                        'Original placement, distance, and arrow callbacks',
-                                        'Native and Vue popup dimensions',
-                                    ],
-                                    environmentLimit:
-                                        'The original Core reference needs a licensed Pro Combobox component.',
-                                },
+                              : id === 'data-grid-31'
+                                ? {
+                                      testFile: 'tests/pro/upstream-prerequisites.browser.test.ts',
+                                      branches: [
+                                          'Exact request URL and AbortSignal',
+                                          'Orders response and loading state',
+                                          'Empty search results',
+                                      ],
+                                      environmentLimit:
+                                          'The deterministic orders response verifies the request boundary. Production API availability is outside this fixture.',
+                                  }
+                                : {
+                                      testFile: 'tests/pro/upstream-prerequisites.browser.test.ts',
+                                      branches: [
+                                          'Real Pro Combobox keyboard selection',
+                                          'Original placement, distance, and arrow callbacks',
+                                          'Native and Vue popup dimensions',
+                                      ],
+                                      environmentLimit:
+                                          'The original Core reference needs a licensed Pro Combobox component.',
+                                  },
                 })),
         },
         interactionScope:
@@ -209,10 +289,15 @@ for (const { name, tag } of components) {
     const templateContents = [];
     const optionSets = new Map();
     const nativeSelections = new Set();
-    for (const match of source.matchAll(/```html[^\n]*\n([\s\S]*?)```/g)) {
-        const original = match[1].trim();
-        const headings = [...source.slice(0, match.index).matchAll(/^#{1,6}\s+(.+)$/gm)];
-        const title = headings.at(-1)?.[1] ?? name;
+    for (const { original, index } of sourceExamples(source, tag)) {
+        const headingPattern =
+            tag === 'wa-rich-text-editor'
+                ? /^#{1,6}\s+(.+)$|<h[34]\b[^>]*>([^<]+)<\/h[34]>/gm
+                : /^#{1,6}\s+(.+)$/gm;
+        const headings = [...source.slice(0, index).matchAll(headingPattern)];
+        const heading = headings.at(-1);
+        const title =
+            heading?.[1] ?? (heading ? textContent(parseFragment(heading[2])).trim() : name);
         const scripts = [];
         let dataScripts = 0;
         const styles = [];
@@ -225,6 +310,18 @@ for (const { name, tag } of components) {
         let elementCount = 0;
         function visit(node) {
             const location = node.sourceCodeLocation;
+            if (tag === 'wa-rich-text-editor' && location && node.tagName === 'img') {
+                const src = node.attrs.find((attribute) => attribute.name === 'src');
+                if (src?.value.startsWith('/assets/')) {
+                    const { startOffset, endOffset } = location.attrs.src;
+                    const expression = JSON.stringify(src.value).replace(/"/g, '&quot;');
+                    edits.push({
+                        start: startOffset,
+                        end: endOffset,
+                        text: `:src="${expression}"`,
+                    });
+                }
+            }
             if (!location && node.tagName === 'tbody' && node.childNodes?.length) {
                 const first = node.childNodes[0].sourceCodeLocation;
                 const last = node.childNodes.at(-1).sourceCodeLocation;
@@ -351,7 +448,10 @@ for (const { name, tag } of components) {
                                     end,
                                     text: `:${attribute.name}="${Number(attribute.value)}"`,
                                 });
-                        } else if (node.tagName === 'wa-tag-input' && attribute.name === 'value') {
+                        } else if (
+                            ['wa-tag-input', 'wa-rich-text-editor'].includes(node.tagName) &&
+                            attribute.name === 'value'
+                        ) {
                             attributeEdits.push({
                                 start,
                                 end,
@@ -469,6 +569,8 @@ for (const { name, tag } of components) {
             elementCount = 1;
         }
         const blockers = [];
+        const setup = richTextEditorSetup.get(id);
+        if (setup) blockers.push(setup.environmentLimit);
         if (unknownElements.size) blockers.push('unshipped-element');
         const scriptImports = scripts.flatMap((script) =>
             [...script.matchAll(/^\s*import\s*\{([^}]+)\}\s*from\s*['"]([^'"]+)['"]\s*;?/gm)].map(

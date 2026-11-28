@@ -362,6 +362,19 @@
             </div>
         </template>
         <template v-if="scenario === 'icon-24'">
+            <Icon data-upstream-index="0"></Icon>
+            <html
+                data-fa-kit-code="YOUR_KIT_CODE_HERE"
+                data-fa-family="sharp"
+                data-fa-variant="light"
+            >
+                …
+            </html>
+        </template>
+        <template v-if="scenario === 'icon-25'">
+            <Icon data-upstream-index="0"></Icon>
+        </template>
+        <template v-if="scenario === 'icon-26'">
             <div class="canvas-demo">
                 <div class="canvas-demo-preview wa-cluster">
                     <Icon
@@ -442,7 +455,7 @@
                 </div>
             </div>
         </template>
-        <template v-if="scenario === 'icon-25'">
+        <template v-if="scenario === 'icon-27'">
             <Icon data-upstream-index="0" name="snowboarding" style="font-size: 2em"></Icon>
             <Icon
                 data-upstream-index="1"
@@ -476,7 +489,7 @@
                 style="font-size: 2em"
             ></Icon>
         </template>
-        <template v-if="scenario === 'icon-26'">
+        <template v-if="scenario === 'icon-28'">
             <Icon
                 data-upstream-index="0"
                 name="heart"
@@ -500,7 +513,7 @@
                 style="font-size: 2em; --beat-scale: 1.5"
             ></Icon>
         </template>
-        <template v-if="scenario === 'icon-27'">
+        <template v-if="scenario === 'icon-29'">
             <Icon
                 data-upstream-index="0"
                 name="triangle-exclamation"
@@ -531,7 +544,7 @@
                 style="font-size: 2em; --animation-duration: 2s; --fade-opacity: 0.6"
             ></Icon>
         </template>
-        <template v-if="scenario === 'icon-28'">
+        <template v-if="scenario === 'icon-30'">
             <Icon
                 data-upstream-index="0"
                 name="person-digging"
@@ -563,7 +576,7 @@
                 style="font-size: 2em; --beat-fade-opacity: 0.67; --beat-fade-scale: 1.075"
             ></Icon>
         </template>
-        <template v-if="scenario === 'icon-29'">
+        <template v-if="scenario === 'icon-31'">
             <Icon
                 data-upstream-index="0"
                 name="volleyball"
@@ -621,7 +634,7 @@
                 "
             ></Icon>
         </template>
-        <template v-if="scenario === 'icon-30'">
+        <template v-if="scenario === 'icon-32'">
             <Icon
                 data-upstream-index="0"
                 name="compact-disc"
@@ -660,7 +673,7 @@
                 style="font-size: 2em; --animation-duration: 3s"
             ></Icon>
         </template>
-        <template v-if="scenario === 'icon-31'">
+        <template v-if="scenario === 'icon-33'">
             <Icon
                 data-upstream-index="0"
                 name="compact-disc"
@@ -692,7 +705,7 @@
                 style="font-size: 2em; --animation-duration: 3s"
             ></Icon>
         </template>
-        <template v-if="scenario === 'icon-32'">
+        <template v-if="scenario === 'icon-34'">
             <Icon
                 data-upstream-index="0"
                 name="bell"
@@ -722,7 +735,7 @@
                 style="font-size: 2em"
             ></Icon>
         </template>
-        <template v-if="scenario === 'icon-33'">
+        <template v-if="scenario === 'icon-35'">
             <Icon
                 data-upstream-index="0"
                 name="sync"
@@ -780,7 +793,7 @@
                 "
             ></Icon>
         </template>
-        <template v-if="scenario === 'icon-34'">
+        <template v-if="scenario === 'icon-36'">
             <Icon
                 data-upstream-index="0"
                 name="gear"
@@ -811,7 +824,7 @@
                 style="font-size: 2em; --animation-direction: reverse"
             ></Icon>
         </template>
-        <template v-if="scenario === 'icon-35'">
+        <template v-if="scenario === 'icon-37'">
             <Icon
                 data-upstream-index="0"
                 name="bell"
@@ -835,7 +848,7 @@
                 style="font-size: 2em; --buzz-distance: 9px"
             ></Icon>
         </template>
-        <template v-if="scenario === 'icon-36'">
+        <template v-if="scenario === 'icon-38'">
             <Icon
                 data-upstream-index="0"
                 name="feather"
@@ -859,7 +872,7 @@
                 style="font-size: 2em; --animation-duration: 2s; --float-height: 0.5em"
             ></Icon>
         </template>
-        <template v-if="scenario === 'icon-37'">
+        <template v-if="scenario === 'icon-39'">
             <Icon
                 data-upstream-index="0"
                 name="cube"
@@ -883,7 +896,7 @@
                 style="font-size: 2em; --animation-duration: 2s; --jello-scale-x: 1.3"
             ></Icon>
         </template>
-        <template v-if="scenario === 'icon-38'">
+        <template v-if="scenario === 'icon-40'">
             <Icon
                 data-upstream-index="0"
                 name="bell"
@@ -907,7 +920,7 @@
                 style="font-size: 2em; --animation-duration: 2s; --swing-angle: 45deg"
             ></Icon>
         </template>
-        <template v-if="scenario === 'icon-39'">
+        <template v-if="scenario === 'icon-41'">
             <Icon
                 data-upstream-index="0"
                 name="hand-pointer"
@@ -931,7 +944,7 @@
                 style="font-size: 2em; --animation-duration: 2s; --wag-angle: 45deg"
             ></Icon>
         </template>
-        <template v-if="scenario === 'icon-40'">
+        <template v-if="scenario === 'icon-42'">
             <div class="duotone-demo">
                 <div class="duotone-demo-preview wa-cluster">
                     <Icon
@@ -980,7 +993,7 @@
                 </div>
             </div>
         </template>
-        <template v-if="scenario === 'icon-41'">
+        <template v-if="scenario === 'icon-43'">
             <div class="wa-stack">
                 <div class="wa-cluster" style="font-size: 1.5em">
                     <Icon data-upstream-index="0" family="duotone" name="home"></Icon>

@@ -24,6 +24,8 @@ export { default as PolarAreaChart } from './PolarAreaChart.vue';
 export type { PolarAreaChartProps } from '../../WebAwesome/proComponentProps';
 export { default as RadarChart } from './RadarChart.vue';
 export type { RadarChartProps } from '../../WebAwesome/proComponentProps';
+export { default as RichTextEditor } from './RichTextEditor.vue';
+export type { RichTextEditorProps } from '../../WebAwesome/proComponentProps';
 export { default as ScatterChart } from './ScatterChart.vue';
 export type { ScatterChartProps } from '../../WebAwesome/proComponentProps';
 export { default as Sparkline } from './Sparkline.vue';

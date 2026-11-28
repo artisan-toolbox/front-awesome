@@ -73,7 +73,6 @@ try {
         /Property 'toFixed' does not exist on type 'string'/,
         /Property 'toUpperCase' does not exist on type 'number'/,
         /Argument of type 'number' is not assignable to parameter of type 'string'/,
-        /Type 'true' is not assignable to type '(undefined|never)'/,
         /Type 'number' is not assignable to type '"active" \| "archived"'/,
         /Type 'string' is not assignable to type 'number'/,
         /Type '"missing"' is not assignable to type 'DataViewRowKey/,
@@ -87,7 +86,12 @@ try {
         );
     }
     const fixture = await readFile(resolve(directory, 'Invalid.vue'), 'utf8');
-    const keyLine = fixture.split('\n').findIndex((line) => line.includes('invalid-key')) + 1;
+    const lines = fixture.split('\n');
+    const groupLine = lines.findIndex((line) => line.includes(':views="invalidGroup"')) + 1;
+    if (!new RegExp(`Invalid\\.vue\\(${groupLine},\\d+\\): error TS2322:`).test(diagnostics)) {
+        throw new Error('DataView accepted grouping on a display-only column.');
+    }
+    const keyLine = lines.findIndex((line) => line.includes('invalid-key')) + 1;
     if (
         !diagnostics
             .split('\n')

@@ -146,6 +146,12 @@
                 </Card>
             </div>
         </template>
+        <template v-if="scenario === 'card-9'">
+            <Card data-upstream-index="0" class="brand-card">
+                <div slot="header">Custom Card</div>
+                These styles are set on the card element itself.
+            </Card>
+        </template>
     </div>
 </template>
 

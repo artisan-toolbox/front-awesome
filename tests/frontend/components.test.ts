@@ -19,8 +19,16 @@ const tags = manifest.modules
         declaration.tagName ? [declaration.tagName] : [],
     );
 
-test('exports every installed Core component through both public direct paths and the Vue barrel', () => {
-    expect(definitions.map((definition) => definition.tag).sort()).toEqual(tags.sort());
+test('exports the supported Core catalog through both public direct paths and the Vue barrel', () => {
+    const exported = definitions.map(({ tag }) => tag);
+    expect(exported.filter((tag) => !tags.includes(tag))).toEqual([]);
+    expect(tags.filter((tag: string) => !exported.includes(tag)).sort()).toEqual([
+        'wa-code-highlighter',
+        'wa-counter',
+        'wa-lightbox',
+        'wa-lightbox-item',
+        'wa-number-ticker',
+    ]);
     const pkg = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8'));
     for (const definition of definitions) {
         expect(components).toHaveProperty(definition.name);

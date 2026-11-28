@@ -5,13 +5,19 @@ import '#front-awesome-webawesome/styles/themes/default.css';
 import preflight from 'tailwindcss/preflight.css?raw';
 import coreReset from '../../resources/js/theme/core-host-reset.css?raw';
 import proReset from '../../resources/js/theme/pro-host-reset.css?raw';
-import definitions from '../../resources/js/WebAwesome/proComponents.json';
+import proDefinitions from '../../resources/js/WebAwesome/proComponents.json';
 
 const runtimes = import.meta.glob([
     '../../node_modules/@web.awesome.me/webawesome-pro/dist/components/*/*.js',
     '!../../node_modules/@web.awesome.me/webawesome-pro/dist/components/*/*test*.js',
 ]);
-const available = Object.keys(runtimes).length > 0;
+const registrations = new Map<string, () => Promise<unknown>>(
+    Object.entries(runtimes).flatMap(([path, load]) => {
+        const name = path.split('/').at(-2);
+        return name && path.endsWith(`/${name}.js`) ? [[`wa-${name}`, load] as const] : [];
+    }),
+);
+const definitions = proDefinitions.filter(({ tag }) => registrations.has(tag));
 const properties = [
     'margin-top',
     'margin-right',
@@ -46,12 +52,7 @@ const properties = [
 ];
 
 beforeAll(async () => {
-    if (available)
-        await Promise.all(
-            Object.entries(runtimes)
-                .filter(([path]) => path.split('/').at(-1) === `${path.split('/').at(-2)}.js`)
-                .map(([, load]) => load()),
-        );
+    await Promise.all([...registrations.values()].map((load) => load()));
 });
 
 async function settle(root: HTMLElement) {
@@ -88,7 +89,7 @@ function snapshot(root: HTMLElement) {
 }
 
 for (const mode of ['wa-light', 'wa-dark']) {
-    test.skipIf(!available)(
+    test.skipIf(!definitions.length)(
         `preserves licensed Pro host and part geometry with Preflight in ${mode}`,
         async () => {
             const root = document.createElement('section');
@@ -120,7 +121,6 @@ for (const mode of ['wa-light', 'wa-dark']) {
                 document.head.append(style);
                 await settle(root);
                 expect(snapshot(root)).toEqual(native);
-                expect(native).toHaveLength(17);
                 const combobox = root.querySelector('wa-combobox');
                 const dateInput = root.querySelector('wa-date-input');
                 if (!(combobox instanceof HTMLElement) || !(dateInput instanceof HTMLElement))

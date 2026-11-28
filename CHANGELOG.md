@@ -1,5 +1,14 @@
 # Changelog
 
+## [Unreleased]
+
+- Keep numeric Tailwind spacing independent of component spacing in the shared theme. Move the application's global `--spacing` declaration from `@theme` into `@layer app-branding` to enable the same isolation on component hosts.
+- Restore Web Awesome's native affix and group-label spacing under Preflight. Rebind mapped control radii, panel radii, and focus rings when local branding changes their inputs.
+- Render Button's Vue `#start` and `#end` slots alongside native slot attributes. When a conditional `anchor` binding is removed from Popup, the inline anchor slot works again.
+- Refresh Textarea and Slider's submitted values after an accepted native form reset. Preserve canceled resets and the configured native defaults.
+- Verify the existing Core catalog with Web Awesome 3.15.0 and Tailwind 4.3.5. Web Awesome 3.14 remains supported, and licensed Pro keeps its own runtime selection.
+- Add the experimental `RichTextEditor` wrapper for Web Awesome Pro 3.15.0 or later. Edit HTML or Markdown with Vue, Inertia, or native forms. Use `default-value` or trusted initial slot content to set the native reset value. The editor preserves Web Awesome toolbar controls, suggestions, and media providers.
+
 ## [1.0.0-beta.12] - 2026-11-27
 
 ### Features

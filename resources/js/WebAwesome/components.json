@@ -2981,6 +2981,12 @@
         "enumerated": false
       },
       {
+        "attribute": "disable-sticky",
+        "property": "disableSticky",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
         "attribute": "navigation-placement",
         "property": "navigationPlacement",
         "boolean": false,
@@ -3001,12 +3007,6 @@
       {
         "attribute": "lang",
         "property": "lang",
-        "boolean": false,
-        "enumerated": false
-      },
-      {
-        "attribute": "disable-sticky",
-        "property": "disableSticky",
         "boolean": false,
         "enumerated": false
       }

@@ -1,7 +1,15 @@
 import './app.css';
 import '@artisan-toolbox/front-awesome/web-awesome-tailwind';
-import '@awesome.me/webawesome/dist/components/button/button.js';
-import '@awesome.me/webawesome/dist/components/page/page.js';
+import '#front-awesome-webawesome/components/button/button.js';
+import '#front-awesome-webawesome/components/badge/badge.js';
+import '#front-awesome-webawesome/components/breadcrumb-item/breadcrumb-item.js';
+import '#front-awesome-webawesome/components/callout/callout.js';
+import '#front-awesome-webawesome/components/card/card.js';
+import '#front-awesome-webawesome/components/details/details.js';
+import '#front-awesome-webawesome/components/dialog/dialog.js';
+import '#front-awesome-webawesome/components/input/input.js';
+import '#front-awesome-webawesome/components/page/page.js';
+import '#front-awesome-webawesome/components/select/select.js';
 import { createApp, h, resolveDirective, withDirectives } from 'vue';
 import { createFrontAwesome } from '@artisan-toolbox/front-awesome';
 import Tag from '@artisan-toolbox/front-awesome/components/Tag.vue';

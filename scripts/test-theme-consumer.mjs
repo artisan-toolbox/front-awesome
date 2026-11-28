@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
+import { readFile } from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
 import { build, preview, createServer } from 'vite';
 import tailwindcss from '@tailwindcss/vite';
@@ -8,9 +10,16 @@ import { chromium } from 'playwright';
 import { frontAwesome } from '../resources/js/vite.mjs';
 import { hues, roles, stops } from './theme-tokens.mjs';
 import { verifyBranding } from './verify-theme-branding.mjs';
+import { verifyThemeBoundaries } from './verify-theme-boundaries.mjs';
 import { measureContrast } from './browser-contrast.mjs';
 
 const root = resolve(import.meta.dirname, '../tests/theme-consumer');
+const edition = process.env.FRONT_AWESOME_PRO ? 'pro' : 'core';
+const upstream = createRequire(import.meta.url)(
+    edition === 'pro'
+        ? '@web.awesome.me/webawesome-pro/package.json'
+        : '@awesome.me/webawesome/package.json',
+);
 const executablePath =
     process.env.CHROMIUM_EXECUTABLE ??
     (existsSync('/Applications/Chromium.app/Contents/MacOS/Chromium')
@@ -18,18 +27,27 @@ const executablePath =
         : undefined);
 const browser = await chromium.launch({ executablePath, headless: true });
 const results = [];
-console.log(`Chromium ${browser.version()}`);
+console.log(`Web Awesome ${edition} ${upstream.version}, Chromium ${browser.version()}`);
 try {
-    for (const prime of [false, true]) {
+    for (const { prime, legacy } of [
+        { prime: false, legacy: false },
+        { prime: true, legacy: false },
+        { prime: false, legacy: true },
+    ]) {
         const plugins = [
             vue(),
-            frontAwesome({ webAwesome: 'core' }),
+            frontAwesome({ webAwesome: edition }),
             tailwindcss(),
             {
                 name: 'theme-consumer-entry',
                 transformIndexHtml: {
                     order: 'pre',
                     handler: (html) => (prime ? html.replace('/main.ts', '/primevue.ts') : html),
+                },
+                async load(id) {
+                    if (legacy && id === resolve(root, 'app.css')) {
+                        return `${await readFile(id, 'utf8')}\n@theme { --spacing: 0.375rem; }`;
+                    }
                 },
                 resolveId(source) {
                     if (!prime && /^(primevue|@primeuix)\//.test(source))
@@ -39,7 +57,7 @@ try {
         ];
         const outDir = resolve(
             import.meta.dirname,
-            `../build/theme-${prime ? 'primevue' : 'base'}`,
+            `../build/theme-${edition}-${legacy ? 'legacy' : prime ? 'primevue' : 'base'}`,
         );
         await build({
             configFile: false,
@@ -67,6 +85,12 @@ try {
             await page.waitForFunction(() =>
                 document.querySelector('#wa')?.shadowRoot?.querySelector('button'),
             );
+            await verifyThemeBoundaries(page, { legacy });
+            if (legacy) {
+                assert.deepEqual(errors, []);
+                results.push({ consumer: 'legacy @theme spacing', slots: 'passed' });
+                continue;
+            }
             const first = await page.evaluate(() => {
                 const native = getComputedStyle(document.querySelector('#native'));
                 const wa = getComputedStyle(

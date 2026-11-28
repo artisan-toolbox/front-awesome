@@ -1,4 +1,5 @@
 import { createRequire } from 'node:module';
+import { existsSync } from 'node:fs';
 import { readdir } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { translationExport } from './vite-translations.mjs';
@@ -9,6 +10,8 @@ const corePackage = '@awesome.me/webawesome';
 const proPackage = '@web.awesome.me/webawesome-pro';
 const localeModule = 'virtual:front-awesome/web-awesome-locales';
 const resolvedLocaleModule = `\0${localeModule}`;
+const richTextEditorModule = 'components/rich-text-editor/rich-text-editor.js';
+const missingRichTextEditorModule = '\0front-awesome:missing-rich-text-editor';
 
 function findDist(requireFromApp, packageName, required = false) {
     try {
@@ -63,9 +66,16 @@ export function frontAwesome({ webAwesome, translations = false } = {}) {
                     `Front Awesome ${component} requires Web Awesome Pro. Install @web.awesome.me/webawesome-pro with your licensed registry configuration before importing this component.`,
                 );
             }
-            return resolve(licensedDist, source.slice(internalProWebAwesome.length + 1));
+            const path = source.slice(internalProWebAwesome.length + 1);
+            const resolved = resolve(licensedDist, path);
+            if (path === richTextEditorModule && !existsSync(resolved))
+                return missingRichTextEditorModule;
+            return resolved;
         },
         async load(id) {
+            if (id === missingRichTextEditorModule) {
+                return 'throw new Error("Front Awesome RichTextEditor requires Web Awesome Pro 3.15.0 or later.");';
+            }
             if (id !== resolvedLocaleModule) return;
             const translations = selectedDist ? resolve(selectedDist, 'translations') : undefined;
             const files = translations

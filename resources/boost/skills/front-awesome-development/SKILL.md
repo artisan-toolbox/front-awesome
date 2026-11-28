@@ -67,7 +67,7 @@ Reload the page after changing each selector and confirm persistence. See the gr
 
 ## Web Awesome component imports
 
-The Web Awesome wrappers live under `components/WebAwesome`. The beta includes wrappers for all 73 Web Awesome Core 3.14 components. Confirm the installed revision before use. Import components such as `Checkbox`, `Select`, `Option`, `Dialog`, `Card`, `Button`, `ButtonGroup`, `Input`, `Page`, and `Icon`, and their prop types from `@artisan-toolbox/front-awesome/components/WebAwesome`, or import an individual wrapper such as `@artisan-toolbox/front-awesome/components/WebAwesome/Input.vue`. Existing `components` named imports and direct `.vue` imports remain available. `Appearance` stays in `@artisan-toolbox/front-awesome/components` because it controls the application appearance.
+The Web Awesome wrappers live under `components/WebAwesome`. Front Awesome beta.13 exports 73 Core wrappers and checks them against Web Awesome Core 3.15.0. Five experimental Core elements in that version have no wrapper. Confirm the installed revision before use. Import components such as `Checkbox`, `Select`, `Option`, `Dialog`, `Card`, `Button`, `ButtonGroup`, `Input`, `Page`, and `Icon`, and their prop types from `@artisan-toolbox/front-awesome/components/WebAwesome`, or import an individual wrapper such as `@artisan-toolbox/front-awesome/components/WebAwesome/Input.vue`. Existing `components` named imports and direct `.vue` imports remain available. `Appearance` stays in `@artisan-toolbox/front-awesome/components` because it controls the application appearance.
 
 ## Masked text fields
 
@@ -148,7 +148,7 @@ import { Tag, Tooltip } from '@artisan-toolbox/front-awesome/components/WebAweso
 
 The page shows a small success tag. Hovering or focusing the link shows the help text. The application owns links, colors, spacing, IDs, and theme tokens. The wrappers add no classes, styles, or visual defaults. Tag's default slot is its label. Setting `with-remove` shows the native remove button and emits the original `wa-remove` Event. Remove the item in application state if desired. The native event alone does not delete the tag.
 
-The opt-in shared Tailwind theme restores native host margins, padding, and borders across the Core and Pro catalogs where Preflight resets them. Application padding and border utilities still take precedence. Keep icon and label spacing in your application composition rather than changing the wrapper's defaults.
+The opt-in shared Tailwind theme restores native host margins, padding, and borders where Preflight resets them. Starting in Front Awesome beta.13, Button accepts Vue `#start` and `#end` slots alongside its label and direct children with native `slot` attributes. Inspect the spacing beside the label before removing a manual icon margin. Application utilities such as `me-0` can override that margin.
 
 Tooltip's default slot is its noninteractive body. Its `for` prop references a separate target ID in the same document or shadow root. Mount the target with the tooltip. If a missing target appears later, change `for` to bind it. Retargeting and unmounting remove the tooltip's `aria-labelledby` contribution from the old target. Keep interactive actions outside the tooltip.
 
@@ -280,6 +280,8 @@ Run the application's build, type in both inputs, call `form.reset()`, and set t
 
 The shared binding covers Input, Checkbox, Switch, RadioGroup, ColorPicker, KnownDate, NumberInput, OtpInput, Rating, Select, Slider, TagInput, Textarea, TimeInput, and the Pro Combobox, DateInput, DatePicker, and FileInput. Bind the owning group, not its Radio or Option children. CheckboxGroup is a grouping container; bind its individual Checkbox controls.
 
+Starting in Front Awesome beta.13, edit a named Textarea or Slider inside a native form, reset it, then submit it. The entry contains its reset default. The Vue or Inertia binding follows the accepted reset. Canceling the reset preserves the edit, and sibling fields with the same name retain their entries and order. Once those checks pass, remove hidden fields or FormData rewrites added for this reset defect on these Vue wrappers. Raw `<wa-textarea>` and `<wa-slider>` keep their upstream reset behavior. When code calls `form.reset()` and immediately constructs `new FormData(form)`, await each affected host's `updateComplete` through the wrapper ref's `$el` first.
+
 Use boolean fields for Checkbox and Switch, finite numbers for Rating and Slider, and `File[]` for FileInput. NumberInput remains `string | null`. A single Select or Combobox field accepts the resolved option value or `null`. A multiple field accepts an array of resolved values or `null`. Bound null clears current selection while preserving reset defaults; multiple mode normalizes an empty selection to an empty array. Date controls can accept Dates but commit strings, and TagInput commits string arrays. Field types must accept both the setter input and native output. Collection values must contain supported entries at every array position. Sparse arrays are rejected; an empty array remains valid where the control accepts a collection. Never combine a primary model with `:form`, or supply a competing current `value`, `checked`, or `files` prop. Native reset defaults are separate inputs.
 
 All bound data-entry controls show the flat `form.errors[field]` messages and danger appearance. Errors clear when the application clears them, not automatically on input. For a Vue-only model, pass `:failed="true"` for danger appearance or a nonempty string or string array for appearance and escaped messages. `false` or an empty array clears only manual validation. Vue Boolean prop casting treats a bare `failed` and `:failed="''"` as true. Manual false cannot hide server errors. Rating and DatePicker render messages outside their interactive host because upstream has no hint slot. A stable presentation element preserves their native host and focus when validation is activated later. Its inactive mode uses `display: contents` without group semantics. Their component ref's `$el` still returns the native host. DatePicker contributes no native FormData entry. Some native focused controls do not forward host ARIA attributes to their internal input; inspect actual focused semantics in accessibility-sensitive compositions.
@@ -330,13 +332,15 @@ Use `v-model:page` on Pagination, `v-model:active` on TabGroup or Stepper, `v-mo
 
 ## Shared application branding
 
-Verify slotted Tailwind utilities as well as native parts. Web Awesome 3.14 AccordionItem, Card, Details, Dialog, Divider and Drawer use a local `--spacing` property. Tailwind uses the same name for numeric spacing. Container values can change padding and gaps in slotted content; the shared theme does not rename either public input. Review local `fa-theme` scopes before adopting those containers, and do not add per-container CSS resets or mutate shadow internals to conceal a mismatch.
+Starting in Front Awesome beta.13, move the global `--spacing` declaration in your published branding file out of `@theme`. Preserve its value in `@layer app-branding { :root { --spacing: 0.25rem; } }`, replacing the example default with your unit. This lets numeric utilities on a Web Awesome host use the same unit as its slotted children. A legacy `@theme` declaration still sets the unit for ordinary HTML in slots. For local branding, set `--spacing` on a surrounding HTML element with `fa-theme`.
 
-Use slotted button text or a labeled Icon for an accessible name. In the installed 3.14 native Button, host attributes are not all forwarded to its internal focusable button. Keep native controls when a custom disclosure or toggle needs `aria-expanded` or `aria-pressed` directly on that focusable element. Check the actual accessible tree rather than assuming a host attribute reaches the control.
+At the default unit, replace a trial `p-[1rem]` or `gap-[1rem]` on slotted content with `p-4` or `gap-4`. Check for the same computed value before removing other workarounds. Disable manual slot margins, padding, or font-size rules one at a time. Check Button decorations, Select group headings, or horizontal Card actions as appropriate. Verify a local Button's keyboard focus outline and the radii of a control and panel in both modes before removing global overrides. Keep purposeful host `--spacing` overrides and `::part()` rules for the component's own layout. [Customize branding](https://atb.dev.br/docs/front-awesome/branding#adjust-dimensions)
+
+Use slotted button text or a labeled Icon for an accessible name. Check the accessible tree before relying on a host attribute to reach the internal focusable button. Use native controls when a custom disclosure or toggle needs `aria-expanded` or `aria-pressed` directly on that focusable element.
 
 Publish the editable branding file with `php artisan vendor:publish --tag=front-awesome-branding`. Import `@artisan-toolbox/front-awesome/tailwind.css` followed by `./branding.css` in the application's CSS entry. Import that CSS before `@artisan-toolbox/front-awesome/web-awesome-tailwind` in JavaScript. Keep the package adapters imported and edit only application branding. Ordinary republishing preserves your file.
 
-Use the shared `@theme` variables for colors, fonts, spacing, radii, and complete shadows. The class-based dark variant follows `.dark`; `createFrontAwesome({ appearance: true })` manages `.dark`, `.wa-light`, and `.wa-dark`. Use one appearance controller per document. Add `fa-theme` to local branding scopes.
+Use the shared `@theme` variables for colors, fonts, radii, and complete shadows. The class-based dark variant follows `.dark`. The `createFrontAwesome({ appearance: true })` plugin manages `.dark`, `.wa-light`, and `.wa-dark`. Use one appearance controller per document.
 
 To use the scrollbar directive, load the shared theme and install `createFrontAwesome()` to register `v-scrollbar`. Apply it to a named HTML element with a bounded size and `overflow: auto` or `overflow: scroll`. Bare `v-scrollbar` defaults to neutral. In the existing plugin registration, set `createFrontAwesome({ scrollbar: { defaultVariant: 'brand' } })` to choose the default for that app, including the DataView table, print preview, and permission editor. The modifiers `.neutral`, `.brand`, `.success`, `.warning`, and `.danger` override the app default.
 
@@ -383,7 +387,9 @@ The page shows an unchecked checkbox and a weekly delivery choice. Changing eith
 
 New wrappers accept Vue named slots as well as native `slot` attributes on default-slot children. Named text content receives a span so the browser can assign its slot. For tabs and tree items, keep the native parent-child arrangement. Use a single native element or single-root component for named slot content.
 
-Use `checked`, `selected` and `value` for current state. When upstream separates these from `defaultChecked`, `defaultSelected` or `defaultValue`, initial scalar inputs establish native reset attributes unless an explicit default overrides them. Complex values such as arrays, Dates, and FormData stay on current properties and retain native property-reset behavior. Supply a supported native default explicitly when the reset must restore a complex current value. Do not pass arrays to a textual `defaultValue`. Subsequent current-state changes do not redefine reset defaults. Pass the native `form` attribute as a form ID string. Rich values, element references and callbacks reach native properties after browser registration. Methods remain on the component ref's `$el`; wait for `customElements.whenDefined()` before invoking them.
+For Popup, keep a child with `slot="anchor"` in place when you switch to an external element through `:anchor`. Starting in Front Awesome beta.13, omitting the prop again returns the open popup to its slotted anchor. Check both positions before removing a forced remount.
+
+Use `checked`, `selected` and `value` for current state. When upstream separates these from `defaultChecked`, `defaultSelected` or `defaultValue`, most wrappers use initial scalar inputs as native reset defaults unless an explicit default overrides them. RichTextEditor keeps its native default from its slot or `default-value`. Complex values such as arrays, Dates, and FormData stay on current properties and retain native property-reset behavior. Supply a supported native default explicitly when the reset must restore a complex current value. Do not pass arrays to a textual `defaultValue`. Subsequent current-state changes do not redefine reset defaults. Pass the native `form` attribute as a form ID string. Rich values, element references and callbacks reach native properties after browser registration. Methods remain on the component ref's `$el`; wait for `customElements.whenDefined()` before invoking them.
 
 The application owns its theme, classes, layout and loading decisions. Browse the [component groups and working Vue examples](https://atb.dev.br/docs/front-awesome/web-awesome/components/).
 
@@ -406,6 +412,27 @@ const selected = ref('2026-11-09');
 ```
 
 The calendar highlights November 9, 2026. Selecting another day updates the paragraph. If the application imports this wrapper without its licensed dependency, Front Awesome reports that the component requires Web Awesome Pro during the build and through Vite's development error reporting. The wrapper does not supply a license or silently substitute a Core element.
+
+### Edit formatted content with RichTextEditor
+
+`RichTextEditor` requires Web Awesome Pro 3.15.0 or later. Web Awesome marks the editor experimental. Import it from `@artisan-toolbox/front-awesome/components/WebAwesome/Pro`.
+
+```vue
+<template>
+    <RichTextEditor v-model="body" label="Article body" format="markdown" default-value="**First draft**" />
+</template>
+
+<script setup>
+import { ref } from 'vue';
+import { RichTextEditor } from '@artisan-toolbox/front-awesome/components/WebAwesome/Pro';
+
+const body = ref('**Draft**');
+</script>
+```
+
+The editor displays **Draft** in bold. Editing updates `body` with a Markdown string. Inside a native form, reset restores **First draft**. Plain `value` sets the current content. Set `default-value` or use trusted initial slot content for the reset value. For Inertia, pass `:form="form"` with a compatible string field such as `field="article.body"` in place of `v-model`. For native submission, set `name`.
+
+Keep untrusted initial content in a value binding. Sanitize submitted content on the server before storing or displaying it. See the [Rich Text Editor guide](https://atb.dev.br/docs/front-awesome/web-awesome/components/forms#rich-text-editor).
 
 ## Translate browser UI from Laravel
 

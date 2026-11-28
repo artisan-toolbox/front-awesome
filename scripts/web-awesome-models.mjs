@@ -127,6 +127,7 @@ export const webAwesomeModels = {
         },
     ],
     FileInput: [value('files', 'files', 'files', ['change'])],
+    RichTextEditor: [value('value', 'nullableString', 'string')],
     VideoPlaylist: [
         {
             ...state('activeIndex', 'number', ['wa-video-change']),

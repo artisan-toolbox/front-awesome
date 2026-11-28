@@ -238,7 +238,9 @@
     "./preferences/Timezone.vue": "./resources/js/preferences/Timezone.vue",
     "./preferences/Currency.vue": "./resources/js/preferences/Currency.vue",
     "./data-view": "./resources/js/data-view/index.ts",
-    "./data-view/DataView.vue": "./resources/js/data-view/DataView.vue"
+    "./data-view/DataView.vue": "./resources/js/data-view/DataView.vue",
+    "./components/RichTextEditor.vue": "./resources/js/components/WebAwesomePro/RichTextEditor.vue",
+    "./components/WebAwesome/RichTextEditor.vue": "./resources/js/components/WebAwesomePro/RichTextEditor.vue"
   },
   "scripts": {
     "build": "vp build",

@@ -70,7 +70,7 @@ test('preserves the native reset baseline and propagates native resets to the Vu
     const state = reactive({ value: 'Live', baseline: 'Original' });
     const { container, element: input } = mount({
         render: () => [
-            h('form', { id: 'native-profile' }),
+            h('form', { id: 'native-profile' }, h('button', { type: 'reset' }, 'Reset profile')),
             h(Input, {
                 modelValue: state.value,
                 'onUpdate:modelValue': (next: string | null | undefined) =>
@@ -97,7 +97,7 @@ test('preserves the native reset baseline and propagates native resets to the Vu
     expect(input.defaultValue).toBe('New baseline');
     state.value = 'Other edit';
     await ready(input);
-    container.querySelector('form')?.reset();
+    await page.getByRole('button', { name: 'Reset profile' }).click();
     await ready(input);
     expect(state.value).toBe('New baseline');
     container
@@ -105,7 +105,7 @@ test('preserves the native reset baseline and propagates native resets to the Vu
         ?.addEventListener('reset', (event) => event.preventDefault(), { once: true });
     state.value = 'Keep';
     await ready(input);
-    container.querySelector('form')?.reset();
+    await page.getByRole('button', { name: 'Reset profile' }).click();
     await ready(input);
     expect(state.value).toBe('Keep');
     expect(input.value).toBe('Keep');

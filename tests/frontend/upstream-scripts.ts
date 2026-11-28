@@ -5,7 +5,10 @@ import {
 import { allDefined } from '#front-awesome-webawesome/utilities/defined.js';
 import { getIconPath, setIconPath } from '#front-awesome-webawesome/utilities/base-path.js';
 import {
+    getDefaultIconFamily,
+    getDefaultIconVariant,
     registerIconLibrary,
+    setDefaultIconFamily,
     unregisterIconLibrary,
     getIconLibrary,
 } from '#front-awesome-webawesome/components/icon/library.js';
@@ -21,6 +24,7 @@ const upstream = {
     registerIconLibrary,
     unregisterIconLibrary,
     getIconFolder,
+    setDefaultIconFamily,
 };
 const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
 
@@ -31,6 +35,8 @@ export function scenarioScripts() {
     const libraries = new Set<string>();
     const defaultIconLibrary = getIconLibrary('default');
     const systemIconLibrary = getIconLibrary('system');
+    const iconFamily = getDefaultIconFamily();
+    const iconVariant = getDefaultIconVariant();
     const iconPath = upstream.getIconPath();
     const intervalHandles = new Set<number>();
 
@@ -147,6 +153,8 @@ export function scenarioScripts() {
                 upstream.registerIconLibrary('default', defaultIconLibrary);
             if (libraries.has('system') && systemIconLibrary)
                 upstream.registerIconLibrary('system', systemIconLibrary);
+            if (getDefaultIconFamily() !== iconFamily || getDefaultIconVariant() !== iconVariant)
+                setDefaultIconFamily(iconFamily, iconVariant);
             upstream.setIconPath(iconPath);
         },
     };

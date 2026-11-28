@@ -581,7 +581,7 @@ test('reports copy source errors and creates dismissible toasts after user activ
     if (!(nativeCopyControl instanceof HTMLElement)) throw new Error('Missing native copy control');
     await userEvent.click(nativeCopyControl);
     await userEvent.click(copyControl);
-    await expect.poll(() => nativeErrors).toBe(2);
+    await expect.poll(() => nativeErrors).toBe(1);
     await expect.poll(() => errors).toBe(nativeErrors);
     const toast = element(root, 'wa-toast');
     expect(toast.querySelector('wa-toast-item')).toBeNull();

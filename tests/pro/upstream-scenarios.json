@@ -1,6 +1,6 @@
 {
   "edition": "pro",
-  "version": "3.14.0",
+  "version": "3.15.0",
   "components": [
     {
       "name": "BarChart",
@@ -53,6 +53,10 @@
     {
       "name": "RadarChart",
       "tag": "wa-radar-chart"
+    },
+    {
+      "name": "RichTextEditor",
+      "tag": "wa-rich-text-editor"
     },
     {
       "name": "ScatterChart",
@@ -5644,6 +5648,956 @@
       },
       "externalResources": [],
       "scriptExecution": "scoped",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-1",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Rich Text Editor [Pro]",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<wa-rich-text-editor label=\"Description\" placeholder=\"Describe the project\"></wa-rich-text-editor>",
+      "markup": "<wa-rich-text-editor data-upstream-index=\"0\" label=\"Description\" placeholder=\"Describe the project\"></wa-rich-text-editor>",
+      "scripts": [],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 0,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 1
+      },
+      "externalResources": [],
+      "scriptExecution": "none",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-2",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Rich Text Editor [Pro]",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<wa-rich-text-editor label=\"Release Notes\" hint=\"Summarize what changed in this version.\">\n  <p>Exports now include <strong>custom fields</strong> and respect the active filters.</p>\n</wa-rich-text-editor>",
+      "markup": "<wa-rich-text-editor data-upstream-index=\"0\" label=\"Release Notes\" hint=\"Summarize what changed in this version.\">\n  <p>Exports now include <strong>custom fields</strong> and respect the active filters.</p>\n</wa-rich-text-editor>",
+      "scripts": [],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 0,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 1
+      },
+      "externalResources": [],
+      "scriptExecution": "none",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-3",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Label",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<wa-rich-text-editor label=\"Comment\"></wa-rich-text-editor>",
+      "markup": "<wa-rich-text-editor data-upstream-index=\"0\" label=\"Comment\"></wa-rich-text-editor>",
+      "scripts": [],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 0,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 1
+      },
+      "externalResources": [],
+      "scriptExecution": "none",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-4",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Hint",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<wa-rich-text-editor label=\"Bio\" hint=\"A few sentences about your background and interests.\"></wa-rich-text-editor>",
+      "markup": "<wa-rich-text-editor data-upstream-index=\"0\" label=\"Bio\" hint=\"A few sentences about your background and interests.\"></wa-rich-text-editor>",
+      "scripts": [],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 0,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 1
+      },
+      "externalResources": [],
+      "scriptExecution": "none",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-5",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Placeholder",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<wa-rich-text-editor label=\"Reply\" placeholder=\"Write a reply\"></wa-rich-text-editor>",
+      "markup": "<wa-rich-text-editor data-upstream-index=\"0\" label=\"Reply\" placeholder=\"Write a reply\"></wa-rich-text-editor>",
+      "scripts": [],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 0,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 1
+      },
+      "externalResources": [],
+      "scriptExecution": "none",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-6",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Initial Value",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<wa-rich-text-editor label=\"Meeting Notes\">\n  <h2>Decisions</h2>\n  <ul>\n    <li>Ship the import tool in the next release.</li>\n    <li>Move the weekly check-in to <strong>Thursdays</strong>.</li>\n  </ul>\n  <p>Next review is scheduled for <em>the end of the month</em>.</p>\n</wa-rich-text-editor>",
+      "markup": "<wa-rich-text-editor data-upstream-index=\"0\" label=\"Meeting Notes\">\n  <h2>Decisions</h2>\n  <ul>\n    <li>Ship the import tool in the next release.</li>\n    <li>Move the weekly check-in to <strong>Thursdays</strong>.</li>\n  </ul>\n  <p>Next review is scheduled for <em>the end of the month</em>.</p>\n</wa-rich-text-editor>",
+      "scripts": [],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 0,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 1
+      },
+      "externalResources": [],
+      "scriptExecution": "none",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-7",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Initial Value",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<wa-rich-text-editor\n  label=\"Product Summary\"\n  value=\"&lt;p&gt;Lightweight, water-resistant, and built for &lt;strong&gt;everyday carry&lt;/strong&gt;.&lt;/p&gt;\"\n></wa-rich-text-editor>",
+      "markup": "<wa-rich-text-editor data-upstream-index=\"0\"\n  label=\"Product Summary\"\n  value=\"&lt;p&gt;Lightweight, water-resistant, and built for &lt;strong&gt;everyday carry&lt;/strong&gt;.&lt;/p&gt;\"\n></wa-rich-text-editor>",
+      "scripts": [],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 0,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 1
+      },
+      "externalResources": [],
+      "scriptExecution": "none",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-8",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Appearance",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<div class=\"wa-stack\"> <wa-rich-text-editor appearance=\"outlined\" label=\"Outlined\" toolbar=\"bold italic underline\"></wa-rich-text-editor> <wa-rich-text-editor appearance=\"filled\" label=\"Filled\" toolbar=\"bold italic underline\"></wa-rich-text-editor> <wa-rich-text-editor appearance=\"filled-outlined\" label=\"Filled outlined\" toolbar=\"bold italic underline\" ></wa-rich-text-editor> </div>",
+      "markup": "<div class=\"wa-stack\"> <wa-rich-text-editor data-upstream-index=\"0\" appearance=\"outlined\" label=\"Outlined\" toolbar=\"bold italic underline\"></wa-rich-text-editor> <wa-rich-text-editor data-upstream-index=\"1\" appearance=\"filled\" label=\"Filled\" toolbar=\"bold italic underline\"></wa-rich-text-editor> <wa-rich-text-editor data-upstream-index=\"2\" appearance=\"filled-outlined\" label=\"Filled outlined\" toolbar=\"bold italic underline\" ></wa-rich-text-editor> </div>",
+      "scripts": [],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 0,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 3
+      },
+      "externalResources": [],
+      "scriptExecution": "none",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-9",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Size",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<div class=\"wa-stack\"> <wa-rich-text-editor size=\"xs\" label=\"Extra small\" toolbar=\"bold italic underline\"></wa-rich-text-editor> <wa-rich-text-editor size=\"s\" label=\"Small\" toolbar=\"bold italic underline\"></wa-rich-text-editor> <wa-rich-text-editor size=\"m\" label=\"Medium\" toolbar=\"bold italic underline\"></wa-rich-text-editor> <wa-rich-text-editor size=\"l\" label=\"Large\" toolbar=\"bold italic underline\"></wa-rich-text-editor> <wa-rich-text-editor size=\"xl\" label=\"Extra large\" toolbar=\"bold italic underline\"></wa-rich-text-editor> </div>",
+      "markup": "<div class=\"wa-stack\"> <wa-rich-text-editor data-upstream-index=\"0\" size=\"xs\" label=\"Extra small\" toolbar=\"bold italic underline\"></wa-rich-text-editor> <wa-rich-text-editor data-upstream-index=\"1\" size=\"s\" label=\"Small\" toolbar=\"bold italic underline\"></wa-rich-text-editor> <wa-rich-text-editor data-upstream-index=\"2\" size=\"m\" label=\"Medium\" toolbar=\"bold italic underline\"></wa-rich-text-editor> <wa-rich-text-editor data-upstream-index=\"3\" size=\"l\" label=\"Large\" toolbar=\"bold italic underline\"></wa-rich-text-editor> <wa-rich-text-editor data-upstream-index=\"4\" size=\"xl\" label=\"Extra large\" toolbar=\"bold italic underline\"></wa-rich-text-editor> </div>",
+      "scripts": [],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 0,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 5
+      },
+      "externalResources": [],
+      "scriptExecution": "none",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-10",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Disabled",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<wa-rich-text-editor label=\"Notes\" disabled> <p>This content can't be edited or focused.</p> </wa-rich-text-editor>",
+      "markup": "<wa-rich-text-editor data-upstream-index=\"0\" label=\"Notes\" disabled> <p>This content can't be edited or focused.</p> </wa-rich-text-editor>",
+      "scripts": [],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 0,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 1
+      },
+      "externalResources": [],
+      "scriptExecution": "none",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-11",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Readonly",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<wa-rich-text-editor label=\"Terms\" readonly> <p> Subscriptions renew automatically at the end of each billing period. You can cancel at any time from your <strong>account settings</strong>. </p> </wa-rich-text-editor>",
+      "markup": "<wa-rich-text-editor data-upstream-index=\"0\" label=\"Terms\" readonly> <p> Subscriptions renew automatically at the end of each billing period. You can cancel at any time from your <strong>account settings</strong>. </p> </wa-rich-text-editor>",
+      "scripts": [],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 0,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 1
+      },
+      "externalResources": [],
+      "scriptExecution": "none",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-12",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Character Count",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<div class=\"wa-stack\"> <wa-rich-text-editor label=\"Comment\" hint=\"Share your feedback.\" with-count></wa-rich-text-editor> <wa-rich-text-editor label=\"Summary\" hint=\"Keep it short.\" with-count maxlength=\"140\"></wa-rich-text-editor> </div>",
+      "markup": "<div class=\"wa-stack\"> <wa-rich-text-editor data-upstream-index=\"0\" label=\"Comment\" hint=\"Share your feedback.\" with-count></wa-rich-text-editor> <wa-rich-text-editor data-upstream-index=\"1\" label=\"Summary\" hint=\"Keep it short.\" with-count maxlength=\"140\"></wa-rich-text-editor> </div>",
+      "scripts": [],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 0,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 2
+      },
+      "externalResources": [],
+      "scriptExecution": "none",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-13",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Validation",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<form id=\"rich-text-editor__form\" class=\"wa-stack\"> <wa-rich-text-editor name=\"feedback\" label=\"Feedback\" hint=\"At least 20 characters.\" toolbar=\"bold italic | bullet-list ordered-list | link\" required minlength=\"20\" maxlength=\"500\" with-count ></wa-rich-text-editor> <div class=\"wa-cluster\"> <wa-button type=\"submit\" variant=\"brand\">Submit</wa-button> <wa-button type=\"reset\">Reset</wa-button> </div> </form> <script type=\"module\"> const form = document.getElementById('rich-text-editor__form'); form.addEventListener('submit', event => { event.preventDefault(); alert(`Submitted HTML:\\n\\n${new FormData(form).get('feedback')}`); }); </script>",
+      "markup": "<form id=\"rich-text-editor__form\" class=\"wa-stack\"> <wa-rich-text-editor data-upstream-index=\"0\" name=\"feedback\" label=\"Feedback\" hint=\"At least 20 characters.\" toolbar=\"bold italic | bullet-list ordered-list | link\" required minlength=\"20\" maxlength=\"500\" with-count ></wa-rich-text-editor> <div class=\"wa-cluster\"> <wa-button data-upstream-index=\"1\" type=\"submit\" variant=\"brand\">Submit</wa-button> <wa-button data-upstream-index=\"2\" type=\"reset\">Reset</wa-button> </div> </form> ",
+      "scripts": [
+        "const form = document.getElementById('rich-text-editor__form'); form.addEventListener('submit', event => { event.preventDefault(); alert(`Submitted HTML:\\n\\n${new FormData(form).get('feedback')}`); });"
+      ],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 1,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 3
+      },
+      "externalResources": [],
+      "scriptExecution": "review-required",
+      "limitations": ["The reference opens a browser alert on submit."],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-14",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Input Behavior",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<wa-rich-text-editor label=\"Commit Message\" spellcheck=\"false\" autocorrect=\"off\" autocapitalize=\"off\"> <p>Rename fetchUsr to fetchUserById and drop the cachd flag.</p> </wa-rich-text-editor>",
+      "markup": "<wa-rich-text-editor data-upstream-index=\"0\" label=\"Commit Message\" spellcheck=\"false\" autocorrect=\"off\" autocapitalize=\"off\"> <p>Rename fetchUsr to fetchUserById and drop the cachd flag.</p> </wa-rich-text-editor>",
+      "scripts": [],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 0,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 1
+      },
+      "externalResources": [],
+      "scriptExecution": "none",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-15",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Markdown",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<div id=\"rich-text-editor__markdown\" class=\"wa-stack\"> <wa-rich-text-editor label=\"Release Notes\" format=\"markdown\"> ## What's New - **Faster sync** for large libraries - Export to ==CSV== and ~~XML~~ JSON Read the [full changelog](https://example.com/changelog). </wa-rich-text-editor> <wa-textarea label=\"Markdown\" rows=\"8\" readonly></wa-textarea> </div> <script type=\"module\"> const container = document.getElementById('rich-text-editor__markdown'); const editor = container.querySelector('wa-rich-text-editor'); const output = container.querySelector('wa-textarea'); function showValue() { output.value = editor.value; } editor.addEventListener('input', showValue); await customElements.whenDefined('wa-rich-text-editor'); await editor.updateComplete; showValue(); </script>",
+      "markup": "<div id=\"rich-text-editor__markdown\" class=\"wa-stack\"> <wa-rich-text-editor data-upstream-index=\"0\" label=\"Release Notes\" format=\"markdown\"> ## What's New - **Faster sync** for large libraries - Export to ==CSV== and ~~XML~~ JSON Read the [full changelog](https://example.com/changelog). </wa-rich-text-editor> <wa-textarea data-upstream-index=\"1\" label=\"Markdown\" rows=\"8\" readonly></wa-textarea> </div> ",
+      "scripts": [
+        "const container = document.getElementById('rich-text-editor__markdown'); const editor = container.querySelector('wa-rich-text-editor'); const output = container.querySelector('wa-textarea'); function showValue() { output.value = editor.value; } editor.addEventListener('input', showValue); await customElements.whenDefined('wa-rich-text-editor'); await editor.updateComplete; showValue();"
+      ],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 1,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 2
+      },
+      "externalResources": ["https://example.com/changelog)."],
+      "scriptExecution": "review-required",
+      "limitations": ["The installed reference collapses the line breaks in the Markdown source."],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-16",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Customizing the Toolbar",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<wa-rich-text-editor label=\"Comment\" toolbar=\"bold italic underline | link | undo redo\"> <p> The <strong>groups</strong> in this toolbar follow the <a href=\"https://example.com/style-guide\">style guide</a>. </p> </wa-rich-text-editor>",
+      "markup": "<wa-rich-text-editor data-upstream-index=\"0\" label=\"Comment\" toolbar=\"bold italic underline | link | undo redo\"> <p> The <strong>groups</strong> in this toolbar follow the <a href=\"https://example.com/style-guide\">style guide</a>. </p> </wa-rich-text-editor>",
+      "scripts": [],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 0,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 1
+      },
+      "externalResources": ["https://example.com/style-guide"],
+      "scriptExecution": "none",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-17",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Customizing the Toolbar",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<div class=\"wa-stack\"> <wa-rich-text-editor label=\"Format menu\" toolbar=\"bold italic format-menu\"> <p>Open the menu to see every text format without a button of its own.</p> </wa-rich-text-editor> <wa-rich-text-editor label=\"Format menu with underline and strikethrough buttons\" toolbar=\"bold italic underline strikethrough format-menu\" > <p>Underline and strikethrough have left this menu.</p> </wa-rich-text-editor> </div>",
+      "markup": "<div class=\"wa-stack\"> <wa-rich-text-editor data-upstream-index=\"0\" label=\"Format menu\" toolbar=\"bold italic format-menu\"> <p>Open the menu to see every text format without a button of its own.</p> </wa-rich-text-editor> <wa-rich-text-editor data-upstream-index=\"1\" label=\"Format menu with underline and strikethrough buttons\" toolbar=\"bold italic underline strikethrough format-menu\" > <p>Underline and strikethrough have left this menu.</p> </wa-rich-text-editor> </div>",
+      "scripts": [],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 0,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 2
+      },
+      "externalResources": [],
+      "scriptExecution": "none",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-18",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Customizing the Toolbar",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<wa-rich-text-editor id=\"rich-text-editor__every-tool\" label=\"Article\" toolbar=\"block | bold italic underline strikethrough highlight code subscript superscript | color clear-formatting | align bullet-list ordered-list indent outdent | blockquote code-block horizontal-rule | link image embed table | paste-plain-text | undo redo\" > <h2>Field Notes</h2> <p> The <strong>north trail</strong> reopens <em>Friday</em>. Bring <mark>water</mark>; the pump at mile 3 is <s>working</s> offline. </p> <ul> <li>Permits are issued at the <a href=\"https://example.com/permits\">ranger station</a>.</li> <li>Dogs stay leashed past the ridge.</li> </ul> </wa-rich-text-editor> <style> #rich-text-editor__every-tool::part(toolbar) { flex-wrap: wrap; } </style>",
+      "markup": "<wa-rich-text-editor data-upstream-index=\"0\" id=\"rich-text-editor__every-tool\" label=\"Article\" toolbar=\"block | bold italic underline strikethrough highlight code subscript superscript | color clear-formatting | align bullet-list ordered-list indent outdent | blockquote code-block horizontal-rule | link image embed table | paste-plain-text | undo redo\" > <h2>Field Notes</h2> <p> The <strong>north trail</strong> reopens <em>Friday</em>. Bring <mark>water</mark>; the pump at mile 3 is <s>working</s> offline. </p> <ul> <li>Permits are issued at the <a href=\"https://example.com/permits\">ranger station</a>.</li> <li>Dogs stay leashed past the ridge.</li> </ul> </wa-rich-text-editor> ",
+      "scripts": [],
+      "styles": ["#rich-text-editor__every-tool::part(toolbar) { flex-wrap: wrap; }"],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 0,
+        "dataScripts": 0,
+        "styles": 1,
+        "elements": 1
+      },
+      "externalResources": ["https://example.com/permits"],
+      "scriptExecution": "none",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-19",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Customizing the Toolbar",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<wa-rich-text-editor label=\"Quick Note\" toolbar=\"\" placeholder=\"Type # and a space to start a heading\" ></wa-rich-text-editor>",
+      "markup": "<wa-rich-text-editor data-upstream-index=\"0\" label=\"Quick Note\" toolbar=\"\" placeholder=\"Type # and a space to start a heading\" ></wa-rich-text-editor>",
+      "scripts": [],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 0,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 1
+      },
+      "externalResources": [],
+      "scriptExecution": "none",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-20",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Toolbar Placement",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<wa-rich-text-editor label=\"Message\" placeholder=\"Write a message\" toolbar-placement=\"bottom\" toolbar=\"bold italic | link\" disabled-features=\"image embed table color align\" style=\"--content-min-height: 3em\" ></wa-rich-text-editor>",
+      "markup": "<wa-rich-text-editor data-upstream-index=\"0\" label=\"Message\" placeholder=\"Write a message\" toolbar-placement=\"bottom\" toolbar=\"bold italic | link\" disabled-features=\"image embed table color align\" style=\"--content-min-height: 3em\" ></wa-rich-text-editor>",
+      "scripts": [],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 0,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 1
+      },
+      "externalResources": [],
+      "scriptExecution": "none",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-21",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Custom Toolbar Buttons",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<wa-rich-text-editor id=\"rich-text-editor__actions\" label=\"Support Reply\" toolbar=\"bold italic link | actions | undo redo\" > <p>Thanks for reaching out.</p> <wa-button slot=\"actions\" appearance=\"plain\" size=\"s\" data-action=\"ticket\"> <wa-icon name=\"ticket\" label=\"Insert ticket link\"></wa-icon> </wa-button> <wa-button slot=\"actions\" appearance=\"plain\" size=\"s\" data-action=\"date\"> <wa-icon name=\"calendar-day\" label=\"Insert today's date\"></wa-icon> </wa-button> </wa-rich-text-editor> <script type=\"module\"> const editor = document.getElementById('rich-text-editor__actions'); editor.addEventListener('click', event => { const action = event.target.closest('[data-action]')?.dataset.action; if (action === 'ticket') { editor.insertHtml('<a href=\"https://example.com/tickets/4821\">ticket #4821</a>'); } else if (action === 'date') { editor.insertText(new Date().toLocaleDateString()); } }); </script>",
+      "markup": "<wa-rich-text-editor data-upstream-index=\"0\" id=\"rich-text-editor__actions\" label=\"Support Reply\" toolbar=\"bold italic link | actions | undo redo\" > <p>Thanks for reaching out.</p> <wa-button data-upstream-index=\"1\" slot=\"actions\" appearance=\"plain\" size=\"s\" data-action=\"ticket\"> <wa-icon data-upstream-index=\"2\" name=\"ticket\" label=\"Insert ticket link\"></wa-icon> </wa-button> <wa-button data-upstream-index=\"3\" slot=\"actions\" appearance=\"plain\" size=\"s\" data-action=\"date\"> <wa-icon data-upstream-index=\"4\" name=\"calendar-day\" label=\"Insert today's date\"></wa-icon> </wa-button> </wa-rich-text-editor> ",
+      "scripts": [
+        "const editor = document.getElementById('rich-text-editor__actions'); editor.addEventListener('click', event => { const action = event.target.closest('[data-action]')?.dataset.action; if (action === 'ticket') { editor.insertHtml('<a href=\"https://example.com/tickets/4821\">ticket #4821</a>'); } else if (action === 'date') { editor.insertText(new Date().toLocaleDateString()); } });"
+      ],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 1,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 5
+      },
+      "externalResources": ["https://example.com/tickets/4821"],
+      "scriptExecution": "scoped",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-22",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Disabling Features",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<wa-rich-text-editor label=\"Comment\" toolbar=\"bold italic underline strikethrough | bullet-list ordered-list | link\" disabled-features=\"image embed table color align\" ></wa-rich-text-editor>",
+      "markup": "<wa-rich-text-editor data-upstream-index=\"0\" label=\"Comment\" toolbar=\"bold italic underline strikethrough | bullet-list ordered-list | link\" disabled-features=\"image embed table color align\" ></wa-rich-text-editor>",
+      "scripts": [],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 0,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 1
+      },
+      "externalResources": [],
+      "scriptExecution": "none",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-23",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Disabling Features",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<wa-rich-text-editor label=\"Support Reply\" disabled-features=\"table image embed code-block\"> <p>The table and code block below are reduced to paragraphs because tables and code blocks are disabled.</p> <table> <tr> <th>Plan</th> <th>Seats</th> </tr> <tr> <td>Team</td> <td>10</td> </tr> </table> <pre><code>npm install</code></pre> </wa-rich-text-editor>",
+      "markup": "<wa-rich-text-editor data-upstream-index=\"0\" label=\"Support Reply\" disabled-features=\"table image embed code-block\"> <p>The table and code block below are reduced to paragraphs because tables and code blocks are disabled.</p> <table> <tr> <th>Plan</th> <th>Seats</th> </tr> <tr> <td>Team</td> <td>10</td> </tr> </table> <pre><code>npm install</code></pre> </wa-rich-text-editor>",
+      "scripts": [],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 0,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 1
+      },
+      "externalResources": [],
+      "scriptExecution": "none",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-24",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Heading Levels",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<wa-rich-text-editor label=\"Section\" heading-levels=\"2 3\"> <h1>This heading becomes level 2</h1> <p>Open the block menu to see the available levels.</p> </wa-rich-text-editor>",
+      "markup": "<wa-rich-text-editor data-upstream-index=\"0\" label=\"Section\" heading-levels=\"2 3\"> <h1>This heading becomes level 2</h1> <p>Open the block menu to see the available levels.</p> </wa-rich-text-editor>",
+      "scripts": [],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 0,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 1
+      },
+      "externalResources": [],
+      "scriptExecution": "none",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-25",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Links",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<wa-rich-text-editor label=\"Resources\" link-target=\"_blank\" toolbar=\"bold italic | link | undo redo\"> <p>Select this text and press the link button to try it.</p> </wa-rich-text-editor>",
+      "markup": "<wa-rich-text-editor data-upstream-index=\"0\" label=\"Resources\" link-target=\"_blank\" toolbar=\"bold italic | link | undo redo\"> <p>Select this text and press the link button to try it.</p> </wa-rich-text-editor>",
+      "scripts": [],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 0,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 1
+      },
+      "externalResources": [],
+      "scriptExecution": "none",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-26",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Images",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<wa-rich-text-editor label=\"Post\" toolbar=\"block | bold italic | image | undo redo\"> <p>Click the image button and enter the URL of an image.</p> </wa-rich-text-editor>",
+      "markup": "<wa-rich-text-editor data-upstream-index=\"0\" label=\"Post\" toolbar=\"block | bold italic | image | undo redo\"> <p>Click the image button and enter the URL of an image.</p> </wa-rich-text-editor>",
+      "scripts": [],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 0,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 1
+      },
+      "externalResources": [],
+      "scriptExecution": "none",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-27",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Aligning Images",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<wa-rich-text-editor label=\"Story\" toolbar=\"bold italic | image | undo redo\"> <p> <img src=\"/assets/images/kits.jpg\" alt=\"Downloading kits\" width=\"160\" style=\"float: inline-start; margin-inline-end: 1em\" /> Click the image and choose an alignment. Wrapped images float beside the text of their paragraph, so long paragraphs flow around them while the next paragraph starts below. </p> <p>This paragraph starts below the image.</p> </wa-rich-text-editor>",
+      "markup": "<wa-rich-text-editor data-upstream-index=\"0\" label=\"Story\" toolbar=\"bold italic | image | undo redo\"> <p> <img src=\"/assets/images/kits.jpg\" alt=\"Downloading kits\" width=\"160\" style=\"float: inline-start; margin-inline-end: 1em\" /> Click the image and choose an alignment. Wrapped images float beside the text of their paragraph, so long paragraphs flow around them while the next paragraph starts below. </p> <p>This paragraph starts below the image.</p> </wa-rich-text-editor>",
+      "scripts": [],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 0,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 1
+      },
+      "externalResources": ["/assets/images/kits.jpg"],
+      "scriptExecution": "none",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-28",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Uploading Images",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<wa-rich-text-editor id=\"rich-text-editor__image-provider\" label=\"Post\" hint=\"Choose an image with the image button, or paste or drop one.\" toolbar=\"bold italic | image | undo redo\" ></wa-rich-text-editor> <script type=\"module\"> const editor = document.getElementById('rich-text-editor__image-provider'); // Opens the browser's file picker and resolves with the chosen file, or null when it's canceled function chooseImage() { return new Promise(resolve => { const input = Object.assign(document.createElement('input'), { type: 'file', accept: 'image/*' }); input.addEventListener('change', () => resolve(input.files[0] ?? null)); input.addEventListener('cancel', () => resolve(null)); input.click(); }); } editor.imageProvider = async file => { file ??= await chooseImage(); if (!file) return null; // Upload the file to your server here and return its permanent URL. An object URL only lasts until the page closes. return URL.createObjectURL(file); }; </script>",
+      "markup": "<wa-rich-text-editor data-upstream-index=\"0\" id=\"rich-text-editor__image-provider\" label=\"Post\" hint=\"Choose an image with the image button, or paste or drop one.\" toolbar=\"bold italic | image | undo redo\" ></wa-rich-text-editor> ",
+      "scripts": [
+        "const editor = document.getElementById('rich-text-editor__image-provider'); // Opens the browser's file picker and resolves with the chosen file, or null when it's canceled function chooseImage() { return new Promise(resolve => { const input = Object.assign(document.createElement('input'), { type: 'file', accept: 'image/*' }); input.addEventListener('change', () => resolve(input.files[0] ?? null)); input.addEventListener('cancel', () => resolve(null)); input.click(); }); } editor.imageProvider = async file => { file ??= await chooseImage(); if (!file) return null; // Upload the file to your server here and return its permanent URL. An object URL only lasts until the page closes. return URL.createObjectURL(file); };"
+      ],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 1,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 1
+      },
+      "externalResources": [],
+      "scriptExecution": "review-required",
+      "limitations": [
+        "The installed reference collapses the script into a line containing comments. The test uses a local provider."
+      ],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-29",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Embeds",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<wa-rich-text-editor label=\"Lesson\" toolbar=\"block | bold italic | link embed | undo redo\"> <p>Click the embed button and paste a video link or embed code.</p> </wa-rich-text-editor>",
+      "markup": "<wa-rich-text-editor data-upstream-index=\"0\" label=\"Lesson\" toolbar=\"block | bold italic | link embed | undo redo\"> <p>Click the embed button and paste a video link or embed code.</p> </wa-rich-text-editor>",
+      "scripts": [],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 0,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 1
+      },
+      "externalResources": [],
+      "scriptExecution": "none",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-30",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Tables",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<wa-rich-text-editor label=\"Pricing Notes\" toolbar=\"bold italic | table | undo redo\"> <table> <tr> <th>Plan</th> <th>Seats</th> <th>Support</th> </tr> <tr> <td>Starter</td> <td>3</td> <td>Email</td> </tr> <tr> <td>Team</td> <td>25</td> <td>Priority</td> </tr> </table> </wa-rich-text-editor>",
+      "markup": "<wa-rich-text-editor data-upstream-index=\"0\" label=\"Pricing Notes\" toolbar=\"bold italic | table | undo redo\"> <table> <tr> <th>Plan</th> <th>Seats</th> <th>Support</th> </tr> <tr> <td>Starter</td> <td>3</td> <td>Email</td> </tr> <tr> <td>Team</td> <td>25</td> <td>Priority</td> </tr> </table> </wa-rich-text-editor>",
+      "scripts": [],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 0,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 1
+      },
+      "externalResources": [],
+      "scriptExecution": "none",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-31",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Colors",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<wa-rich-text-editor label=\"Status Update\" toolbar=\"bold italic color | undo redo\" text-colors=\"rgb(220 38 38); rgb(234 88 12); rgb(202 138 4); rgb(22 163 74); rgb(37 99 235); rgb(147 51 234); rgb(219 39 119); rgb(75 85 99)\" highlight-colors=\"rgb(248 113 113 / 40%); rgb(251 146 60 / 40%); rgb(250 204 21 / 40%); rgb(74 222 128 / 40%); rgb(96 165 250 / 40%); rgb(192 132 252 / 40%); rgb(244 114 182 / 40%); rgb(156 163 175 / 40%)\" > <p> The redesign is <span style=\"color: rgb(22 163 74)\">on track</span> for Friday, but the icon audit is <span style=\"color: rgb(220 38 38)\">blocked</span>. <mark style=\"background-color: rgb(250 204 21 / 40%)\">Sign-off is due Thursday</mark>, and the <mark style=\"background-color: rgb(96 165 250 / 40%)\">launch checklist</mark> is ready for review. </p> </wa-rich-text-editor>",
+      "markup": "<wa-rich-text-editor data-upstream-index=\"0\" label=\"Status Update\" toolbar=\"bold italic color | undo redo\" text-colors=\"rgb(220 38 38); rgb(234 88 12); rgb(202 138 4); rgb(22 163 74); rgb(37 99 235); rgb(147 51 234); rgb(219 39 119); rgb(75 85 99)\" highlight-colors=\"rgb(248 113 113 / 40%); rgb(251 146 60 / 40%); rgb(250 204 21 / 40%); rgb(74 222 128 / 40%); rgb(96 165 250 / 40%); rgb(192 132 252 / 40%); rgb(244 114 182 / 40%); rgb(156 163 175 / 40%)\" > <p> The redesign is <span style=\"color: rgb(22 163 74)\">on track</span> for Friday, but the icon audit is <span style=\"color: rgb(220 38 38)\">blocked</span>. <mark style=\"background-color: rgb(250 204 21 / 40%)\">Sign-off is due Thursday</mark>, and the <mark style=\"background-color: rgb(96 165 250 / 40%)\">launch checklist</mark> is ready for review. </p> </wa-rich-text-editor>",
+      "scripts": [],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 0,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 1
+      },
+      "externalResources": [],
+      "scriptExecution": "none",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-32",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Colors",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<wa-rich-text-editor id=\"rich-text-editor__colors\" label=\"Announcement\" toolbar=\"bold italic color | undo redo\"> <p>Select some text, then choose a color. Hover a swatch to see its name.</p> </wa-rich-text-editor> <script type=\"module\"> const editor = document.getElementById('rich-text-editor__colors'); const palette = [ ['Red', '220 38 38', '248 113 113'], ['Orange', '234 88 12', '251 146 60'], ['Yellow', '202 138 4', '250 204 21'], ['Green', '22 163 74', '74 222 128'], ['Blue', '37 99 235', '96 165 250'], ['Purple', '147 51 234', '192 132 252'], ['Pink', '219 39 119', '244 114 182'], ['Gray', '75 85 99', '156 163 175'], ]; editor.textColors = palette.map(([label, text]) => ({ color: `rgb(${text})`, label })); editor.highlightColors = palette.map(([label, , highlight]) => ({ color: `rgb(${highlight} / 40%)`, label })); </script>",
+      "markup": "<wa-rich-text-editor data-upstream-index=\"0\" id=\"rich-text-editor__colors\" label=\"Announcement\" toolbar=\"bold italic color | undo redo\"> <p>Select some text, then choose a color. Hover a swatch to see its name.</p> </wa-rich-text-editor> ",
+      "scripts": [
+        "const editor = document.getElementById('rich-text-editor__colors'); const palette = [ ['Red', '220 38 38', '248 113 113'], ['Orange', '234 88 12', '251 146 60'], ['Yellow', '202 138 4', '250 204 21'], ['Green', '22 163 74', '74 222 128'], ['Blue', '37 99 235', '96 165 250'], ['Purple', '147 51 234', '192 132 252'], ['Pink', '219 39 119', '244 114 182'], ['Gray', '75 85 99', '156 163 175'], ]; editor.textColors = palette.map(([label, text]) => ({ color: `rgb(${text})`, label })); editor.highlightColors = palette.map(([label, , highlight]) => ({ color: `rgb(${highlight} / 40%)`, label }));"
+      ],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 1,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 1
+      },
+      "externalResources": [],
+      "scriptExecution": "scoped",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-33",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Keyboard & Markdown Shortcuts",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<div class=\"wa-stack\"> <wa-rich-text-editor id=\"rich-text-editor__shortcuts\" label=\"Release Notes\" placeholder='Try typing \"# Heading\", \"- item\", \"--\", or \"...\"' ></wa-rich-text-editor> <div class=\"wa-cluster\"> <wa-switch id=\"rich-text-editor__smart-punctuation\" checked>Smart punctuation</wa-switch> <wa-switch id=\"rich-text-editor__markdown-shortcuts\" checked>Markdown shortcuts</wa-switch> </div> </div> <script type=\"module\"> const editor = document.getElementById('rich-text-editor__shortcuts'); const smartPunctuation = document.getElementById('rich-text-editor__smart-punctuation'); const markdownShortcuts = document.getElementById('rich-text-editor__markdown-shortcuts'); smartPunctuation.addEventListener('change', () => { editor.withoutSmartPunctuation = !smartPunctuation.checked; }); markdownShortcuts.addEventListener('change', () => { editor.withoutMarkdownShortcuts = !markdownShortcuts.checked; }); </script>",
+      "markup": "<div class=\"wa-stack\"> <wa-rich-text-editor data-upstream-index=\"0\" id=\"rich-text-editor__shortcuts\" label=\"Release Notes\" placeholder='Try typing \"# Heading\", \"- item\", \"--\", or \"...\"' ></wa-rich-text-editor> <div class=\"wa-cluster\"> <wa-switch data-upstream-index=\"1\" id=\"rich-text-editor__smart-punctuation\" checked>Smart punctuation</wa-switch> <wa-switch data-upstream-index=\"2\" id=\"rich-text-editor__markdown-shortcuts\" checked>Markdown shortcuts</wa-switch> </div> </div> ",
+      "scripts": [
+        "const editor = document.getElementById('rich-text-editor__shortcuts'); const smartPunctuation = document.getElementById('rich-text-editor__smart-punctuation'); const markdownShortcuts = document.getElementById('rich-text-editor__markdown-shortcuts'); smartPunctuation.addEventListener('change', () => { editor.withoutSmartPunctuation = !smartPunctuation.checked; }); markdownShortcuts.addEventListener('change', () => { editor.withoutMarkdownShortcuts = !markdownShortcuts.checked; });"
+      ],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 1,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 3
+      },
+      "externalResources": [],
+      "scriptExecution": "scoped",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-34",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Suggestions",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<wa-rich-text-editor id=\"rich-text-editor__suggestions\" label=\"Comment\" hint=\"Type @ to mention a teammate or # to add a tag.\" toolbar=\"bold italic | link\" ></wa-rich-text-editor> <script type=\"module\"> const editor = document.getElementById('rich-text-editor__suggestions'); const people = [ { value: 'u-104', label: '@Avery Chen', description: 'Design' }, { value: 'u-215', label: '@Jordan Patel', description: 'Engineering' }, { value: 'u-322', label: '@Maya Okafor', description: 'Product' }, { value: 'u-418', label: '@Sam Rivera', description: 'Support' }, ]; const tags = ['accessibility', 'bug', 'design', 'docs', 'performance']; const matches = (text, query) => text.toLowerCase().includes(query.toLowerCase()); editor.suggestions = [ { trigger: '@', dataSource: ({ query }) => people.filter(person => matches(person.label, query)), }, { trigger: '#', dataSource: ({ query }) => tags.filter(tag => matches(tag, query)).map(tag => ({ label: `#${tag}` })), }, ]; </script>",
+      "markup": "<wa-rich-text-editor data-upstream-index=\"0\" id=\"rich-text-editor__suggestions\" label=\"Comment\" hint=\"Type @ to mention a teammate or # to add a tag.\" toolbar=\"bold italic | link\" ></wa-rich-text-editor> ",
+      "scripts": [
+        "const editor = document.getElementById('rich-text-editor__suggestions'); const people = [ { value: 'u-104', label: '@Avery Chen', description: 'Design' }, { value: 'u-215', label: '@Jordan Patel', description: 'Engineering' }, { value: 'u-322', label: '@Maya Okafor', description: 'Product' }, { value: 'u-418', label: '@Sam Rivera', description: 'Support' }, ]; const tags = ['accessibility', 'bug', 'design', 'docs', 'performance']; const matches = (text, query) => text.toLowerCase().includes(query.toLowerCase()); editor.suggestions = [ { trigger: '@', dataSource: ({ query }) => people.filter(person => matches(person.label, query)), }, { trigger: '#', dataSource: ({ query }) => tags.filter(tag => matches(tag, query)).map(tag => ({ label: `#${tag}` })), }, ];"
+      ],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 1,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 1
+      },
+      "externalResources": [],
+      "scriptExecution": "scoped",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-35",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Suggestions",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<wa-rich-text-editor id=\"rich-text-editor__formatter\" label=\"Comment\" hint=\"Type @ to mention a teammate.\" toolbar=\"bold italic | link\" data-wa-preload=\"wa-avatar\" ></wa-rich-text-editor> <script type=\"module\"> const editor = document.getElementById('rich-text-editor__formatter'); const people = [ { value: 'u-104', label: '@Avery Chen', initials: 'AC', role: 'Design' }, { value: 'u-215', label: '@Jordan Patel', initials: 'JP', role: 'Engineering' }, { value: 'u-322', label: '@Maya Okafor', initials: 'MO', role: 'Product' }, { value: 'u-418', label: '@Sam Rivera', initials: 'SR', role: 'Support' }, ]; // Escapes values before they go into the HTML string const escapeHtml = text => String(text).replace(/[&<>\"']/g, char => `&#${char.charCodeAt(0)};`); editor.suggestions = [ { trigger: '@', dataSource: ({ query }) => people.filter(person => person.label.toLowerCase().includes(query.toLowerCase())), formatter: person => ` <div style=\"display: flex; align-items: center; gap: 0.75em; line-height: var(--wa-line-height-condensed)\"> <wa-avatar initials=\"${escapeHtml(person.initials)}\" style=\"--size: 2.25em; font-size: 0.875em\"></wa-avatar> <div> <div style=\"font-weight: var(--wa-font-weight-semibold)\">${escapeHtml(person.label)}</div> <div style=\"font-size: 0.875em\">${escapeHtml(person.role)}</div> </div> </div> `, }, ]; </script>",
+      "markup": "<wa-rich-text-editor data-upstream-index=\"0\" id=\"rich-text-editor__formatter\" label=\"Comment\" hint=\"Type @ to mention a teammate.\" toolbar=\"bold italic | link\" data-wa-preload=\"wa-avatar\" ></wa-rich-text-editor> ",
+      "scripts": [
+        "const editor = document.getElementById('rich-text-editor__formatter'); const people = [ { value: 'u-104', label: '@Avery Chen', initials: 'AC', role: 'Design' }, { value: 'u-215', label: '@Jordan Patel', initials: 'JP', role: 'Engineering' }, { value: 'u-322', label: '@Maya Okafor', initials: 'MO', role: 'Product' }, { value: 'u-418', label: '@Sam Rivera', initials: 'SR', role: 'Support' }, ]; // Escapes values before they go into the HTML string const escapeHtml = text => String(text).replace(/[&<>\"']/g, char => `&#${char.charCodeAt(0)};`); editor.suggestions = [ { trigger: '@', dataSource: ({ query }) => people.filter(person => person.label.toLowerCase().includes(query.toLowerCase())), formatter: person => ` <div style=\"display: flex; align-items: center; gap: 0.75em; line-height: var(--wa-line-height-condensed)\"> <wa-avatar initials=\"${escapeHtml(person.initials)}\" style=\"--size: 2.25em; font-size: 0.875em\"></wa-avatar> <div> <div style=\"font-weight: var(--wa-font-weight-semibold)\">${escapeHtml(person.label)}</div> <div style=\"font-size: 0.875em\">${escapeHtml(person.role)}</div> </div> </div> `, }, ];"
+      ],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 1,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 1
+      },
+      "externalResources": [],
+      "scriptExecution": "review-required",
+      "limitations": [
+        "The installed reference collapses the script into a line containing comments. The test uses a local suggestion source."
+      ],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-36",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Reacting to Changes",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<div class=\"wa-stack\"> <wa-rich-text-editor id=\"rich-text-editor__watch\" label=\"Draft\" toolbar=\"block | bold italic | bullet-list | undo redo\" > <p>Edit this text to see the value change.</p> </wa-rich-text-editor> <pre id=\"rich-text-editor__watch-output\" style=\"white-space: pre-wrap; margin: 0\"></pre> </div> <script type=\"module\"> const editor = document.getElementById('rich-text-editor__watch'); const output = document.getElementById('rich-text-editor__watch-output'); function showValue() { output.textContent = `value: ${editor.value}\\n\\ntextValue: ${editor.textValue}`; } editor.addEventListener('input', showValue); await customElements.whenDefined('wa-rich-text-editor'); await editor.updateComplete; showValue(); </script>",
+      "markup": "<div class=\"wa-stack\"> <wa-rich-text-editor data-upstream-index=\"0\" id=\"rich-text-editor__watch\" label=\"Draft\" toolbar=\"block | bold italic | bullet-list | undo redo\" > <p>Edit this text to see the value change.</p> </wa-rich-text-editor> <pre id=\"rich-text-editor__watch-output\" style=\"white-space: pre-wrap; margin: 0\"></pre> </div> ",
+      "scripts": [
+        "const editor = document.getElementById('rich-text-editor__watch'); const output = document.getElementById('rich-text-editor__watch-output'); function showValue() { output.textContent = `value: ${editor.value}\\n\\ntextValue: ${editor.textValue}`; } editor.addEventListener('input', showValue); await customElements.whenDefined('wa-rich-text-editor'); await editor.updateComplete; showValue();"
+      ],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 1,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 1
+      },
+      "externalResources": [],
+      "scriptExecution": "scoped",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-37",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Tracking Unsaved Changes",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<div class=\"wa-stack\"> <wa-rich-text-editor id=\"rich-text-editor__dirty\" label=\"Notes\" toolbar=\"bold italic | bullet-list | undo redo\"> <p>Edit this text, then save it.</p> </wa-rich-text-editor> <div class=\"wa-cluster\"> <wa-button id=\"rich-text-editor__dirty-save\" size=\"s\" disabled>Save</wa-button> <span id=\"rich-text-editor__dirty-status\">All changes saved</span> </div> </div> <script type=\"module\"> const editor = document.getElementById('rich-text-editor__dirty'); const save = document.getElementById('rich-text-editor__dirty-save'); const status = document.getElementById('rich-text-editor__dirty-status'); function showStatus() { save.disabled = !editor.dirty; status.textContent = editor.dirty ? 'Unsaved changes' : 'All changes saved'; } editor.addEventListener('input', showStatus); save.addEventListener('click', () => { // Send editor.value to your server here, then mark the editor clean editor.defaultValue = editor.value; showStatus(); }); </script>",
+      "markup": "<div class=\"wa-stack\"> <wa-rich-text-editor data-upstream-index=\"0\" id=\"rich-text-editor__dirty\" label=\"Notes\" toolbar=\"bold italic | bullet-list | undo redo\"> <p>Edit this text, then save it.</p> </wa-rich-text-editor> <div class=\"wa-cluster\"> <wa-button data-upstream-index=\"1\" id=\"rich-text-editor__dirty-save\" size=\"s\" disabled>Save</wa-button> <span id=\"rich-text-editor__dirty-status\">All changes saved</span> </div> </div> ",
+      "scripts": [
+        "const editor = document.getElementById('rich-text-editor__dirty'); const save = document.getElementById('rich-text-editor__dirty-save'); const status = document.getElementById('rich-text-editor__dirty-status'); function showStatus() { save.disabled = !editor.dirty; status.textContent = editor.dirty ? 'Unsaved changes' : 'All changes saved'; } editor.addEventListener('input', showStatus); save.addEventListener('click', () => { // Send editor.value to your server here, then mark the editor clean editor.defaultValue = editor.value; showStatus(); });"
+      ],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 1,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 2
+      },
+      "externalResources": [],
+      "scriptExecution": "review-required",
+      "limitations": [
+        "The installed reference collapses the script into a line containing comments."
+      ],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-38",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Controlling the Editor with JavaScript",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<div class=\"wa-stack\"> <wa-rich-text-editor id=\"rich-text-editor__control\" label=\"Changelog\" toolbar=\"\"> <p>Select text, then use the buttons below.</p> <p>Visit <a href=\"https://example.com\">the release page</a> for details.</p> </wa-rich-text-editor> <div class=\"wa-cluster\"> <wa-button id=\"rich-text-editor__control-heading\" size=\"s\">Heading 2</wa-button> <wa-button id=\"rich-text-editor__control-date\" size=\"s\">Insert Date</wa-button> <wa-button id=\"rich-text-editor__control-unlink\" size=\"s\" disabled>Remove Link</wa-button> <wa-button id=\"rich-text-editor__control-undo\" size=\"s\" disabled>Undo</wa-button> <wa-button id=\"rich-text-editor__control-redo\" size=\"s\" disabled>Redo</wa-button> </div> </div> <script type=\"module\"> const editor = document.getElementById('rich-text-editor__control'); const button = name => document.getElementById(`rich-text-editor__control-${name}`); function run(action) { action(); editor.focus(); } button('heading').addEventListener('click', () => { run(() => editor.runCommand(editor.isActive('heading-2') ? 'paragraph' : 'heading-2')); }); button('date').addEventListener('click', () => { run(() => editor.insertText(new Date().toLocaleDateString())); }); button('unlink').addEventListener('click', () => run(() => editor.runCommand('unlink'))); button('undo').addEventListener('click', () => run(() => editor.undo())); button('redo').addEventListener('click', () => run(() => editor.redo())); editor.addEventListener('selectionchange', () => { button('unlink').disabled = !editor.isActive('link'); button('undo').disabled = !editor.canUndo; button('redo').disabled = !editor.canRedo; }); </script>",
+      "markup": "<div class=\"wa-stack\"> <wa-rich-text-editor data-upstream-index=\"0\" id=\"rich-text-editor__control\" label=\"Changelog\" toolbar=\"\"> <p>Select text, then use the buttons below.</p> <p>Visit <a href=\"https://example.com\">the release page</a> for details.</p> </wa-rich-text-editor> <div class=\"wa-cluster\"> <wa-button data-upstream-index=\"1\" id=\"rich-text-editor__control-heading\" size=\"s\">Heading 2</wa-button> <wa-button data-upstream-index=\"2\" id=\"rich-text-editor__control-date\" size=\"s\">Insert Date</wa-button> <wa-button data-upstream-index=\"3\" id=\"rich-text-editor__control-unlink\" size=\"s\" disabled>Remove Link</wa-button> <wa-button data-upstream-index=\"4\" id=\"rich-text-editor__control-undo\" size=\"s\" disabled>Undo</wa-button> <wa-button data-upstream-index=\"5\" id=\"rich-text-editor__control-redo\" size=\"s\" disabled>Redo</wa-button> </div> </div> ",
+      "scripts": [
+        "const editor = document.getElementById('rich-text-editor__control'); const button = name => document.getElementById(`rich-text-editor__control-${name}`); function run(action) { action(); editor.focus(); } button('heading').addEventListener('click', () => { run(() => editor.runCommand(editor.isActive('heading-2') ? 'paragraph' : 'heading-2')); }); button('date').addEventListener('click', () => { run(() => editor.insertText(new Date().toLocaleDateString())); }); button('unlink').addEventListener('click', () => run(() => editor.runCommand('unlink'))); button('undo').addEventListener('click', () => run(() => editor.undo())); button('redo').addEventListener('click', () => run(() => editor.redo())); editor.addEventListener('selectionchange', () => { button('unlink').disabled = !editor.isActive('link'); button('undo').disabled = !editor.canUndo; button('redo').disabled = !editor.canRedo; });"
+      ],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 1,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 6
+      },
+      "externalResources": ["https://example.com"],
+      "scriptExecution": "scoped",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-39",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Styling the Editor",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<wa-rich-text-editor id=\"rich-text-editor__styling\" label=\"Article\"> <h2>Getting Started</h2> <p>Create a workspace, then invite your team.</p> <blockquote><p>Most teams are up and running in under ten minutes.</p></blockquote> </wa-rich-text-editor> <script type=\"module\"> const editor = document.getElementById('rich-text-editor__styling'); await customElements.whenDefined('wa-rich-text-editor'); const sheet = new CSSStyleSheet(); sheet.replaceSync(` [part~='content'] h2 { color: var(--wa-color-brand-on-quiet); } [part~='content'] blockquote { font-style: italic; } `); editor.shadowRoot.adoptedStyleSheets = [...editor.shadowRoot.adoptedStyleSheets, sheet]; </script>",
+      "markup": "<wa-rich-text-editor data-upstream-index=\"0\" id=\"rich-text-editor__styling\" label=\"Article\"> <h2>Getting Started</h2> <p>Create a workspace, then invite your team.</p> <blockquote><p>Most teams are up and running in under ten minutes.</p></blockquote> </wa-rich-text-editor> ",
+      "scripts": [
+        "const editor = document.getElementById('rich-text-editor__styling'); await customElements.whenDefined('wa-rich-text-editor'); const sheet = new CSSStyleSheet(); sheet.replaceSync(` [part~='content'] h2 { color: var(--wa-color-brand-on-quiet); } [part~='content'] blockquote { font-style: italic; } `); editor.shadowRoot.adoptedStyleSheets = [...editor.shadowRoot.adoptedStyleSheets, sheet];"
+      ],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 1,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 1
+      },
+      "externalResources": [],
+      "scriptExecution": "scoped",
+      "limitations": [],
+      "inputAdaptation": null
+    },
+    {
+      "id": "rich-text-editor-40",
+      "component": "RichTextEditor",
+      "tag": "wa-rich-text-editor",
+      "title": "Styling the Editor",
+      "source": "skills/webawesome/references/components/rich-text-editor.md",
+      "original": "<wa-rich-text-editor label=\"Changelog\" toolbar=\"bold italic | bullet-list | undo redo\" style=\"--content-min-height: 4em; --content-max-height: 10em\" > <ul> <li>Added bulk editing for tasks.</li> <li>Added keyboard shortcuts to the board view.</li> <li>Improved search ranking for recent items.</li> <li>Fixed a bug where due dates shifted across time zones.</li> <li>Fixed a bug where archived projects appeared in search.</li> <li>Removed the legacy export format.</li> </ul> </wa-rich-text-editor>",
+      "markup": "<wa-rich-text-editor data-upstream-index=\"0\" label=\"Changelog\" toolbar=\"bold italic | bullet-list | undo redo\" style=\"--content-min-height: 4em; --content-max-height: 10em\" > <ul> <li>Added bulk editing for tasks.</li> <li>Added keyboard shortcuts to the board view.</li> <li>Improved search ranking for recent items.</li> <li>Fixed a bug where due dates shifted across time zones.</li> <li>Fixed a bug where archived projects appeared in search.</li> <li>Removed the legacy export format.</li> </ul> </wa-rich-text-editor>",
+      "scripts": [],
+      "styles": [],
+      "scriptImports": [],
+      "fixtureSetup": null,
+      "counts": {
+        "scripts": 0,
+        "dataScripts": 0,
+        "styles": 0,
+        "elements": 1
+      },
+      "externalResources": [],
+      "scriptExecution": "none",
       "limitations": [],
       "inputAdaptation": null
     },

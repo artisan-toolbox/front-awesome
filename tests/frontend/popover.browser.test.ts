@@ -77,10 +77,11 @@ test('opens from a native button and supports real link navigation, Tab, Escape 
     expect(popover.className).toBe('');
     expect(popover.getAttribute('style')).toBeNull();
     expect(trigger.getAttribute('aria-haspopup')).toBe('dialog');
-    expect(trigger.hasAttribute('aria-expanded')).toBe(false);
+    expect(trigger.getAttribute('aria-expanded')).toBe('false');
     expect(trigger.hasAttribute('aria-controls')).toBe(false);
     await page.getByRole('button', { name: 'About native component' }).click();
     await shown(popover, true);
+    expect(trigger.getAttribute('aria-expanded')).toBe('true');
     await expect.poll(() => popover.shadowRoot?.activeElement).toBe(popover.dialog);
     await userEvent.keyboard('{Tab}');
     expect(document.activeElement).toBe(link);
@@ -89,6 +90,7 @@ test('opens from a native button and supports real link navigation, Tab, Escape 
     expect(popover.open).toBe(true);
     await userEvent.keyboard('{Escape}');
     await shown(popover, false);
+    expect(trigger.getAttribute('aria-expanded')).toBe('false');
     expect(document.activeElement).toBe(trigger);
     await userEvent.keyboard('{Enter}');
     await shown(popover, true);

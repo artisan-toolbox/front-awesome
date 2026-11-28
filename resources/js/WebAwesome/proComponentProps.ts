@@ -1,3 +1,5 @@
+// oxlint-disable-next-line typescript/triple-slash-reference -- Composer-installed consumers need the optional editor Vite module declaration.
+/// <reference path="./optionalProModules.d.ts" />
 import type WaBarChart from '@web.awesome.me/webawesome-pro/dist/components/bar-chart/bar-chart.js';
 import type WaBubbleChart from '@web.awesome.me/webawesome-pro/dist/components/bubble-chart/bubble-chart.js';
 import type WaChart from '@web.awesome.me/webawesome-pro/dist/components/chart/chart.js';
@@ -15,11 +17,19 @@ import type WaScatterChart from '@web.awesome.me/webawesome-pro/dist/components/
 import type WaSparkline from '@web.awesome.me/webawesome-pro/dist/components/sparkline/sparkline.js';
 import type WaVideo from '@web.awesome.me/webawesome-pro/dist/components/video/video.js';
 import type WaVideoPlaylist from '@web.awesome.me/webawesome-pro/dist/components/video-playlist/video-playlist.js';
+import type {} from '@web.awesome.me/webawesome-pro/dist/events/events.js';
 import type { OptionModel, OptionSelectionProps, OptionValue } from './optionSelection';
 import type { ControlBindingProps } from './useFormBridge';
 import type { DatePickerModelValue } from './modelDomains';
 import type * as Upstream from '@web.awesome.me/webawesome-pro/dist/custom-elements-jsx.d.ts';
 import type { HTMLAttributes } from 'vue';
+
+// Web Awesome Pro versions before 3.15 do not declare the editor element.
+type EditorElementName = Extract<keyof HTMLElementTagNameMap, 'wa-rich-text-editor'>;
+type WaRichTextEditor = [EditorElementName] extends [never]
+    ? { value: string } & Record<string, never>
+    : HTMLElementTagNameMap[EditorElementName];
+export type RichTextEditorValue = WaRichTextEditor['value'];
 
 export interface BarChartNativeProps extends Omit<
     HTMLAttributes,
@@ -1100,6 +1110,150 @@ export interface RadarChartNativeProps extends Omit<
 }
 
 export interface RadarChartProps extends RadarChartNativeProps {}
+
+export interface RichTextEditorNativeProps extends Omit<
+    HTMLAttributes,
+    | 'name'
+    | 'value'
+    | 'defaultValue'
+    | 'format'
+    | 'label'
+    | 'hint'
+    | 'with-label'
+    | 'withLabel'
+    | 'with-hint'
+    | 'withHint'
+    | 'placeholder'
+    | 'size'
+    | 'appearance'
+    | 'disabled'
+    | 'readonly'
+    | 'required'
+    | 'minlength'
+    | 'maxlength'
+    | 'with-count'
+    | 'withCount'
+    | 'toolbar'
+    | 'toolbar-placement'
+    | 'toolbarPlacement'
+    | 'icon-library'
+    | 'iconLibrary'
+    | 'disabled-features'
+    | 'disabledFeatures'
+    | 'heading-levels'
+    | 'headingLevels'
+    | 'text-colors'
+    | 'textColors'
+    | 'highlight-colors'
+    | 'highlightColors'
+    | 'link-target'
+    | 'linkTarget'
+    | 'link-rel'
+    | 'linkRel'
+    | 'without-smart-punctuation'
+    | 'withoutSmartPunctuation'
+    | 'without-markdown-shortcuts'
+    | 'withoutMarkdownShortcuts'
+    | 'without-autolink'
+    | 'withoutAutolink'
+    | 'autocapitalize'
+    | 'autocorrect'
+    | 'enterkeyhint'
+    | 'spellcheck'
+    | 'inputmode'
+    | 'custom-error'
+    | 'customError'
+    | 'dir'
+    | 'lang'
+    | 'imageProvider'
+    | 'embedProvider'
+    | 'suggestions'
+    | 'onInput'
+    | 'onSelectionchange'
+    | 'onChange'
+    | 'onFocus'
+    | 'onBlur'
+    | 'onWaInvalid'
+    | 'onWaSuggestionsError'
+> {
+    name?: WaRichTextEditor['name'];
+    value?: string | null;
+    defaultValue?: WaRichTextEditor['defaultValue'];
+    format?: WaRichTextEditor['format'];
+    label?: WaRichTextEditor['label'];
+    hint?: WaRichTextEditor['hint'];
+    'with-label'?: WaRichTextEditor['withLabel'];
+    withLabel?: WaRichTextEditor['withLabel'];
+    'with-hint'?: WaRichTextEditor['withHint'];
+    withHint?: WaRichTextEditor['withHint'];
+    placeholder?: WaRichTextEditor['placeholder'];
+    size?: WaRichTextEditor['size'];
+    appearance?: WaRichTextEditor['appearance'];
+    disabled?: WaRichTextEditor['disabled'];
+    readonly?: WaRichTextEditor['readonly'];
+    required?: WaRichTextEditor['required'];
+    minlength?: WaRichTextEditor['minlength'];
+    maxlength?: WaRichTextEditor['maxlength'];
+    'with-count'?: WaRichTextEditor['withCount'];
+    withCount?: WaRichTextEditor['withCount'];
+    toolbar?: WaRichTextEditor['toolbar'];
+    'toolbar-placement'?: WaRichTextEditor['toolbarPlacement'];
+    toolbarPlacement?: WaRichTextEditor['toolbarPlacement'];
+    'icon-library'?: WaRichTextEditor['iconLibrary'];
+    iconLibrary?: WaRichTextEditor['iconLibrary'];
+    'disabled-features'?: WaRichTextEditor['disabledFeatures'];
+    disabledFeatures?: WaRichTextEditor['disabledFeatures'];
+    'heading-levels'?: WaRichTextEditor['headingLevels'];
+    headingLevels?: WaRichTextEditor['headingLevels'];
+    'text-colors'?: WaRichTextEditor['textColors'];
+    textColors?: WaRichTextEditor['textColors'];
+    'highlight-colors'?: WaRichTextEditor['highlightColors'];
+    highlightColors?: WaRichTextEditor['highlightColors'];
+    'link-target'?: WaRichTextEditor['linkTarget'];
+    linkTarget?: WaRichTextEditor['linkTarget'];
+    'link-rel'?: WaRichTextEditor['linkRel'];
+    linkRel?: WaRichTextEditor['linkRel'];
+    'without-smart-punctuation'?: WaRichTextEditor['withoutSmartPunctuation'];
+    withoutSmartPunctuation?: WaRichTextEditor['withoutSmartPunctuation'];
+    'without-markdown-shortcuts'?: WaRichTextEditor['withoutMarkdownShortcuts'];
+    withoutMarkdownShortcuts?: WaRichTextEditor['withoutMarkdownShortcuts'];
+    'without-autolink'?: WaRichTextEditor['withoutAutolink'];
+    withoutAutolink?: WaRichTextEditor['withoutAutolink'];
+    autocapitalize?: WaRichTextEditor['autocapitalize'];
+    autocorrect?: boolean | 'on' | 'off';
+    enterkeyhint?: WaRichTextEditor['enterkeyhint'];
+    spellcheck?: HTMLAttributes['spellcheck'];
+    inputmode?: WaRichTextEditor['inputmode'];
+    'custom-error'?: WaRichTextEditor['customError'];
+    customError?: WaRichTextEditor['customError'];
+    dir?: WaRichTextEditor['dir'];
+    lang?: WaRichTextEditor['lang'];
+    imageProvider?: WaRichTextEditor['imageProvider'];
+    embedProvider?: WaRichTextEditor['embedProvider'];
+    suggestions?: WaRichTextEditor['suggestions'];
+    form?: string;
+    slot?: string;
+    onInput?: (event: InputEvent) => void;
+    onSelectionchange?: (event: Event) => void;
+    onChange?: (event: Event) => void;
+    onFocus?: (event: FocusEvent) => void;
+    onBlur?: (event: FocusEvent) => void;
+    onWaInvalid?: (event: GlobalEventHandlersEventMap['wa-invalid']) => void;
+    onWaSuggestionsError?: (
+        event: GlobalEventHandlersEventMap[Extract<
+            keyof GlobalEventHandlersEventMap,
+            'wa-suggestions-error'
+        >],
+    ) => void;
+}
+
+export type RichTextEditorProps<T extends object = object> = Omit<
+    RichTextEditorNativeProps,
+    'form'
+> &
+    ControlBindingProps<T, string | null, RichTextEditorValue, 'value'> & {
+        'onUpdate:modelValue'?: (value: RichTextEditorValue) => void;
+    };
 
 export interface ScatterChartNativeProps extends Omit<
     HTMLAttributes,

@@ -1291,7 +1291,7 @@
     "properties": ["isDateDisabled", "dayContent"],
     "events": ["input", "change", "wa-focus-day", "wa-view-change"],
     "formAssociated": false,
-    "slots": ["previous-icon", "next-icon", "header", "footer"],
+    "slots": ["previous-icon", "next-icon", "header", "footer", "day-YYYY-MM-DD"],
     "models": [
       {
         "name": "modelValue",
@@ -1997,6 +1997,252 @@
     "formAssociated": false,
     "slots": [""],
     "models": [],
+    "generated": true
+  },
+  {
+    "name": "RichTextEditor",
+    "tag": "wa-rich-text-editor",
+    "attributes": [
+      {
+        "attribute": "name",
+        "property": "name",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "value",
+        "property": "defaultValue",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "format",
+        "property": "format",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "label",
+        "property": "label",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "hint",
+        "property": "hint",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "with-label",
+        "property": "withLabel",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "with-hint",
+        "property": "withHint",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "placeholder",
+        "property": "placeholder",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "size",
+        "property": "size",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "appearance",
+        "property": "appearance",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "disabled",
+        "property": "disabled",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "readonly",
+        "property": "readonly",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "required",
+        "property": "required",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "minlength",
+        "property": "minlength",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "maxlength",
+        "property": "maxlength",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "with-count",
+        "property": "withCount",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "toolbar",
+        "property": "toolbar",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "toolbar-placement",
+        "property": "toolbarPlacement",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "icon-library",
+        "property": "iconLibrary",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "disabled-features",
+        "property": "disabledFeatures",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "heading-levels",
+        "property": "headingLevels",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "text-colors",
+        "property": "textColors",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "highlight-colors",
+        "property": "highlightColors",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "link-target",
+        "property": "linkTarget",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "link-rel",
+        "property": "linkRel",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "without-smart-punctuation",
+        "property": "withoutSmartPunctuation",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "without-markdown-shortcuts",
+        "property": "withoutMarkdownShortcuts",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "without-autolink",
+        "property": "withoutAutolink",
+        "boolean": true,
+        "enumerated": false
+      },
+      {
+        "attribute": "autocapitalize",
+        "property": "autocapitalize",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "autocorrect",
+        "property": "autocorrect",
+        "boolean": true,
+        "enumerated": true
+      },
+      {
+        "attribute": "enterkeyhint",
+        "property": "enterkeyhint",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "spellcheck",
+        "property": "spellcheck",
+        "boolean": true,
+        "enumerated": true
+      },
+      {
+        "attribute": "inputmode",
+        "property": "inputmode",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "custom-error",
+        "property": "customError",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "dir",
+        "property": "dir",
+        "boolean": false,
+        "enumerated": false
+      },
+      {
+        "attribute": "lang",
+        "property": "lang",
+        "boolean": false,
+        "enumerated": false
+      }
+    ],
+    "properties": ["value", "imageProvider", "embedProvider", "suggestions"],
+    "events": [
+      "input",
+      "selectionchange",
+      "change",
+      "focus",
+      "blur",
+      "wa-invalid",
+      "wa-suggestions-error"
+    ],
+    "formAssociated": true,
+    "slots": ["", "label", "hint", "actions"],
+    "models": [
+      {
+        "name": "modelValue",
+        "property": "value",
+        "write": "nullableString",
+        "read": "string",
+        "events": ["input"],
+        "form": true
+      }
+    ],
+    "seedResetDefault": false,
     "generated": true
   },
   {

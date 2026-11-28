@@ -1,0 +1,44 @@
+@layer base {
+    :where(
+        :is(
+                wa-badge,
+                wa-breadcrumb-item,
+                wa-button,
+                wa-combobox,
+                wa-input,
+                wa-option,
+                wa-select,
+                wa-tag-input
+            )
+            > [slot='start'],
+        wa-callout > [slot='icon']
+    ) {
+        margin-inline-end: revert-layer;
+    }
+
+    :where(
+        :is(
+                wa-badge,
+                wa-breadcrumb-item,
+                wa-button,
+                wa-combobox,
+                wa-input,
+                wa-option,
+                wa-select,
+                wa-tag-input
+            )
+            > [slot='end'],
+        :is(wa-combobox, wa-select, wa-tag-input) > [slot='start']
+    ) {
+        margin-inline-start: revert-layer;
+    }
+
+    :where(wa-combobox, wa-select) > small:where(:not([slot]), [slot='']) {
+        font-size: revert-layer;
+        padding: revert-layer;
+    }
+
+    :where(wa-card[orientation='horizontal'] > [slot='actions']) {
+        padding: revert-layer;
+    }
+}

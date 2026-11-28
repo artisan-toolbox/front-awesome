@@ -5,6 +5,8 @@
 @import './theme/tokens.css';
 @import './theme/core-host-reset.css';
 @import './theme/pro-host-reset.css';
+@import './theme/slot-reset.css';
+@plugin './theme/legacy-spacing.mjs';
 @source './components';
 @source './data-view';
 

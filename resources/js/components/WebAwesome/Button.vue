@@ -8,13 +8,16 @@
         :with-end.attr="withEnd ? '' : null"
         :formnovalidate.attr="formnovalidate ? '' : null"
     >
+        <NamedSlot v-if="$slots.start" name="start" :nodes="$slots.start()" />
         <slot />
+        <NamedSlot v-if="$slots.end" name="end" :nodes="$slots.end()" />
     </wa-button>
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { onMounted, type VNode } from 'vue';
 import type { ButtonProps } from '../../WebAwesome/buttonProps';
+import { projectNativeSlot } from '../../WebAwesome/nativeSlots';
 
 interface Props extends /* @vue-ignore */ ButtonProps {
     disabled?: boolean;
@@ -27,6 +30,11 @@ interface Props extends /* @vue-ignore */ ButtonProps {
 }
 
 defineProps<Props>();
+
+function NamedSlot(props: { name: string; nodes: VNode[] }) {
+    return projectNativeSlot(props.nodes, props.name);
+}
+NamedSlot.props = ['name', 'nodes'];
 
 onMounted(async () => {
     await import('#front-awesome-webawesome/components/button/button.js');
